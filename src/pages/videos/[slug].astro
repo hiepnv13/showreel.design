@@ -1,0 +1,167 @@
+---
+import { getCollection, type CollectionEntry } from 'astro:content';
+import { getAllVideos } from '../../utils/videoUtils';
+import Layout from '../../layouts/Layout.astro';
+import VideoPlayer from '../../components/VideoPlayer.astro';
+import type { GetStaticPaths } from 'astro';
+
+export const getStaticPaths: GetStaticPaths = async () => {
+  const videos = await getAllVideos();
+  return videos.map((video: CollectionEntry<'videos'>) => ({
+    params: { slug: video.slug },
+    props: { video },
+  }));
+};
+
+interface Props {
+  video: CollectionEntry<'videos'> & {
+    data: CollectionEntry<'videos'>['data'] & {
+      videoUrl: string;
+      previewUrl: string;
+      videoSources: { src: string; type: string; }[];
+    }
+  };
+}
+
+const { video }: Props = Astro.props;
+const { Content } = await video.render();
+---
+
+<Layout title={video.data.title}>
+  <main class="min-h-screen bg-black text-white">
+    <!-- Hero Section with Video -->
+    <section class="relative w-full h-screen overflow-hidden">
+      <!-- Full Width Video Player -->
+      <VideoPlayer 
+        videoUrl={video.data.videoUrl}
+        poster={video.data.previewUrl}
+        autoplay={true}
+        muted={true}
+        loop={true}
+        className="w-full h-full"
+      />
+      
+      <!-- Overlay -->
+      <div class="absolute inset-0 bg-black/40 z-10"></div>
+      
+      <!-- Content -->
+      <div class="absolute inset-0 z-20 flex items-center justify-center">
+        <div class="text-center max-w-4xl mx-auto px-4">
+        <div class="mb-6">
+          <span class="inline-block bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full text-sm font-medium mb-4">
+            {video.data.category}
+          </span>
+        </div>
+        <h1 class="text-5xl md:text-7xl font-bold mb-6 leading-tight">
+          {video.data.title}
+        </h1>
+        <p class="text-xl md:text-2xl text-gray-300 mb-8">
+          by {video.data.author}
+        </p>
+        <div class="flex flex-wrap justify-center gap-2 mb-8">
+          {video.data.tags.map((tag: string) => (
+            <span class="bg-white/10 backdrop-blur-sm px-3 py-1 rounded-full text-sm">
+              #{tag}
+            </span>
+          ))}
+        </div>
+        <p class="text-lg text-gray-300 max-w-2xl mx-auto">
+          {video.data.description}
+        </p>
+        </div>
+      </div>
+      
+      <!-- Scroll Indicator -->
+      <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
+        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+        </svg>
+      </div>
+    </section>
+
+    <!-- Content Section -->
+    <section class="py-16 px-4 max-w-4xl mx-auto">
+      <div class="prose prose-invert prose-lg max-w-none">
+        <Content />
+      </div>
+    </section>
+
+    <!-- Video Details -->
+    <section class="py-16 px-4 max-w-4xl mx-auto border-t border-gray-800">
+      <div class="grid md:grid-cols-2 gap-8">
+        <div>
+          <h3 class="text-2xl font-bold mb-4">Project Details</h3>
+          <dl class="space-y-3">
+            <div>
+              <dt class="text-gray-400 text-sm">Category</dt>
+              <dd class="text-white font-medium">{video.data.category}</dd>
+            </div>
+            <div>
+              <dt class="text-gray-400 text-sm">Author</dt>
+              <dd class="text-white font-medium">{video.data.author}</dd>
+            </div>
+            <div>
+              <dt class="text-gray-400 text-sm">Published</dt>
+              <dd class="text-white font-medium">
+                {new Date(video.data.publishDate).toLocaleDateString('en-US', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric'
+                })}
+              </dd>
+            </div>
+            {video.data.featured && (
+              <div>
+                <dt class="text-gray-400 text-sm">Status</dt>
+                <dd class="text-white font-medium">
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                    Featured
+                  </span>
+                </dd>
+              </div>
+            )}
+          </dl>
+        </div>
+        
+        <div>
+          <h3 class="text-2xl font-bold mb-4">Tags</h3>
+          <div class="flex flex-wrap gap-2">
+            {video.data.tags.map((tag: string) => (
+              <span class="bg-gray-800 text-gray-300 px-3 py-1 rounded-full text-sm hover:bg-gray-700 transition-colors">
+                #{tag}
+              </span>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Navigation -->
+    <section class="py-8 px-4 max-w-4xl mx-auto border-t border-gray-800">
+      <div class="flex justify-between items-center">
+        <a 
+          href="/" 
+          class="inline-flex items-center px-6 py-3 bg-white text-black rounded-full font-medium hover:bg-gray-200 transition-colors"
+        >
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+          </svg>
+          Back to Gallery
+        </a>
+        
+        <div class="flex gap-4">
+          <button class="p-3 bg-gray-800 text-white rounded-full hover:bg-gray-700 transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+            </svg>
+          </button>
+          <button class="p-3 bg-gray-800 text-white rounded-full hover:bg-gray-700 transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </section>
+  </main>
+</Layout>

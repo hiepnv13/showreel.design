@@ -1,0 +1,66 @@
+---
+import VideoCard from './VideoCard.astro';
+import { getAllVideos, getAllCategories, sortVideosByDate } from '../utils/videoUtils';
+
+// Get all videos from content collections
+const allVideos = await getAllVideos();
+const videos = sortVideosByDate(allVideos);
+
+// Get all categories for filter tabs
+const categories = await getAllCategories();
+
+// Get current filter from URL params (default to 'All')
+const url = Astro.url;
+const currentFilter = url.searchParams.get('category') || 'All';
+
+// Filter videos based on current filter
+const filteredVideos = currentFilter === 'All' 
+  ? videos 
+  : videos.filter(video => video.data.category === currentFilter);
+---
+
+<section class="py-16 px-4 max-w-7xl mx-auto">
+  <div class="mb-8">
+    <h2 class="text-3xl font-bold text-white mb-6">Featured Work</h2>
+    
+    <!-- Filter Tabs -->
+    <div class="flex flex-wrap gap-2 mb-8">
+      <a 
+        href="/" 
+        class={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+          currentFilter === 'All' 
+            ? 'bg-white text-black' 
+            : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+        }`}
+      >
+        All
+      </a>
+      {categories.map((category: string) => (
+        <a 
+          href={`/?category=${encodeURIComponent(category)}`}
+          class={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+            currentFilter === category 
+              ? 'bg-white text-black' 
+              : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+          }`}
+        >
+          {category}
+        </a>
+      ))}
+    </div>
+  </div>
+
+  <!-- Video Grid -->
+   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+     {filteredVideos.map((video: any, index: number) => (
+       <VideoCard
+         title={video.data.title}
+         author={video.data.author}
+         thumbnail={video.data.thumbnail}
+         videoUrl={video.data.videoUrl}
+         category={video.data.category}
+         slug={video.slug}
+       />
+     ))}
+   </div>
+</section>

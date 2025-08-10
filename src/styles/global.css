@@ -1,0 +1,54 @@
+@import url('/fonts/ronzino.css');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-family: 'Ronzino', sans-serif;
+  }
+  
+  body {
+    @apply bg-white min-h-screen text-black;
+  }
+}
+
+@layer components {
+  .video-card {
+    @apply bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-200;
+    @apply hover:scale-105 hover:-translate-y-1;
+  }
+  
+  .video-thumbnail {
+    @apply w-full aspect-video object-cover transition-transform duration-300;
+  }
+  
+  .video-card:hover .video-thumbnail {
+    @apply scale-110;
+  }
+  
+  .btn-primary {
+    @apply bg-black text-white px-6 py-3 rounded-lg;
+    @apply hover:bg-gray-800 transition-all duration-200;
+    @apply shadow-lg hover:shadow-xl transform hover:-translate-y-0.5;
+  }
+  
+  .text-gradient {
+    @apply text-black;
+  }
+}
+
+@layer utilities {
+  .animation-delay-200 {
+    animation-delay: 200ms;
+  }
+  
+  .animation-delay-400 {
+    animation-delay: 400ms;
+  }
+  
+  .animation-delay-600 {
+    animation-delay: 600ms;
+  }
+}

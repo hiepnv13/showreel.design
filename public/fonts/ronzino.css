@@ -1,0 +1,56 @@
+/* Ronzino Font Family - Free for personal and commercial use */
+/* Source: Collletttivo - https://www.collletttivo.it/typefaces/ronzino */
+
+@font-face {
+  font-family: 'Ronzino';
+  src: url('https://cdn.jsdelivr.net/gh/collletttivo/ronzino@main/fonts/Ronzino-Regular.woff2') format('woff2'),
+       url('https://cdn.jsdelivr.net/gh/collletttivo/ronzino@main/fonts/Ronzino-Regular.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Ronzino';
+  src: url('https://cdn.jsdelivr.net/gh/collletttivo/ronzino@main/fonts/Ronzino-Medium.woff2') format('woff2'),
+       url('https://cdn.jsdelivr.net/gh/collletttivo/ronzino@main/fonts/Ronzino-Medium.woff') format('woff');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Ronzino';
+  src: url('https://cdn.jsdelivr.net/gh/collletttivo/ronzino@main/fonts/Ronzino-Bold.woff2') format('woff2'),
+       url('https://cdn.jsdelivr.net/gh/collletttivo/ronzino@main/fonts/Ronzino-Bold.woff') format('woff');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Ronzino';
+  src: url('https://cdn.jsdelivr.net/gh/collletttivo/ronzino@main/fonts/Ronzino-Oblique.woff2') format('woff2'),
+       url('https://cdn.jsdelivr.net/gh/collletttivo/ronzino@main/fonts/Ronzino-Oblique.woff') format('woff');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Ronzino';
+  src: url('https://cdn.jsdelivr.net/gh/collletttivo/ronzino@main/fonts/Ronzino-MediumOblique.woff2') format('woff2'),
+       url('https://cdn.jsdelivr.net/gh/collletttivo/ronzino@main/fonts/Ronzino-MediumOblique.woff') format('woff');
+  font-weight: 500;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Ronzino';
+  src: url('https://cdn.jsdelivr.net/gh/collletttivo/ronzino@main/fonts/Ronzino-BoldOblique.woff2') format('woff2'),
+       url('https://cdn.jsdelivr.net/gh/collletttivo/ronzino@main/fonts/Ronzino-BoldOblique.woff') format('woff');
+  font-weight: 700;
+  font-style: italic;
+  font-display: swap;
+}

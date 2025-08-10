@@ -1,0 +1,97 @@
+---
+export interface Props {
+  title: string;
+  author: string;
+  thumbnail: string;
+  videoUrl?: string;
+  category?: string;
+  slug?: string;
+}
+
+const { title, author, thumbnail, videoUrl, category, slug } = Astro.props;
+---
+
+<a href={slug ? `/videos/${slug}` : '#'} class="video-card group cursor-pointer block" data-video-url={videoUrl}>
+  <!-- Thumbnail Container -->
+  <div class="relative overflow-hidden rounded-ss-md">
+    <!-- Thumbnail Image -->
+    <img 
+      src={thumbnail} 
+      alt={title}
+      class="video-thumbnail w-full h-64 object-cover transition-opacity duration-300 group-hover:opacity-0"
+      loading="lazy"
+    />
+    
+    <!-- Video Element (hidden by default) -->
+    {videoUrl && (
+      <video 
+        class="video-element absolute inset-0 w-full h-64 object-cover opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+        muted
+        loop
+        preload="none"
+      >
+        <source src={videoUrl} type="video/mp4" />
+      </video>
+    )}
+    
+    <!-- Play Button Overlay -->
+    <div class="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+      <div class="bg-white/90 rounded-full p-4 transform scale-75 group-hover:scale-100 transition-transform duration-300">
+        <svg class="w-8 h-8 text-black" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M8 5v14l11-7z"/>
+        </svg>
+      </div>
+    </div>
+    
+    <!-- Category Badge -->
+    {category && (
+      <div class="absolute top-3 left-3 z-10">
+          <span class="bg-black text-white px-3 py-1 rounded-full text-sm font-medium">
+            {category}
+          </span>
+        </div>
+    )}
+  </div>
+  
+  <!-- Card Content -->
+  <div class="p-6">
+    <h3 class="text-xl font-semibold text-black mb-2 line-clamp-2">
+      {title}
+    </h3>
+    <p class="text-gray-600 mb-4">
+      by {author}
+    </p>
+  </div>
+</a>
+
+<script>
+  // Video hover functionality
+  document.addEventListener('DOMContentLoaded', function() {
+    const videoCards = document.querySelectorAll('.video-card');
+    
+    videoCards.forEach(card => {
+      const video = card.querySelector('.video-element') as HTMLVideoElement;
+      
+      if (video) {
+        card.addEventListener('mouseenter', () => {
+          video.currentTime = 0; // Reset to beginning
+          video.play().catch((e: any) => console.log('Video play failed:', e));
+        });
+        
+        card.addEventListener('mouseleave', () => {
+          video.pause();
+          video.currentTime = 0; // Reset to beginning
+        });
+      }
+    });
+  });
+</script>
+
+<style>
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+</style>
