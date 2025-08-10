@@ -12,45 +12,55 @@ const { title, author, thumbnail, videoUrl, category, slug } = Astro.props;
 ---
 
 <a href={slug ? `/videos/${slug}` : '#'} class="video-card group cursor-pointer block" data-video-url={videoUrl}>
-  <!-- Thumbnail Container -->
-  <div class="relative overflow-hidden">
-    <!-- Thumbnail Image -->
-    <img 
-      src={thumbnail} 
-      alt={title}
-      class="video-thumbnail w-full h-64 object-cover transition-opacity duration-300 group-hover:opacity-0"
-      loading="lazy"
-    />
-    
-    <!-- Video Element (hidden by default) -->
-    {videoUrl && (
-      <video 
-        class="video-element absolute inset-0 w-full h-64 object-cover opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-        muted
-        loop
-        preload="none"
-      >
-        <source src={videoUrl} type="video/mp4" />
-      </video>
-    )}
-    
-    <!-- Play Button Overlay -->
-    <div class="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-      <div class="bg-white/95 backdrop-blur-sm rounded-full p-4 transform scale-75 group-hover:scale-100 transition-transform duration-300 shadow-lg">
-        <svg class="w-8 h-8 text-gray-900" fill="currentColor" viewBox="0 0 24 24">
-          <path d="M8 5v14l11-7z"/>
-        </svg>
+  <!-- Video Container -->
+  <div class="relative overflow-hidden aspect-video bg-gray-100">
+    <!-- Loading Skeleton -->
+    <div class="video-skeleton absolute inset-0 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 animate-pulse">
+      <div class="absolute inset-0 flex items-center justify-center">
+        <div class="w-12 h-12 border-4 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
       </div>
     </div>
+    
+    <!-- Video Element -->
+    {videoUrl ? (
+      <video 
+        class="video-element w-full h-full object-cover opacity-0 transition-opacity duration-500"
+        muted
+        loop
+        playsinline
+        preload="none"
+        data-src={videoUrl}
+      >
+        <source data-src={videoUrl} type="video/mp4" />
+      </video>
+    ) : (
+      <!-- Fallback image if no video URL -->
+      <img 
+        src={thumbnail} 
+        alt={title}
+        class="w-full h-full object-cover"
+        loading="lazy"
+      />
+    )}
+    
+    <!-- Video Overlay (subtle) -->
+    <div class="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
     
     <!-- Category Badge -->
     {category && (
       <div class="absolute top-4 left-4 z-10">
-        <span class="bg-white/90 backdrop-blur-sm text-gray-900 px-3 py-1.5 rounded-full text-sm font-medium border border-gray-200">
+        <span class="bg-white/90 backdrop-blur-sm text-gray-900 px-3 py-1.5 rounded-full text-sm font-medium border border-gray-200 shadow-sm">
           {category}
         </span>
       </div>
     )}
+    
+    <!-- Video Status Indicator -->
+    <div class="video-status absolute bottom-4 right-4 opacity-0 transition-opacity duration-300">
+      <div class="bg-black/70 text-white px-2 py-1 rounded text-xs font-medium">
+        <span class="status-text">Loading...</span>
+      </div>
+    </div>
   </div>
   
   <!-- Card Content -->
@@ -67,25 +77,194 @@ const { title, author, thumbnail, videoUrl, category, slug } = Astro.props;
 </a>
 
 <script>
-  // Video hover functionality
+  // Intersection Observer + Progressive Loading for Video Cards
   document.addEventListener('DOMContentLoaded', function() {
-    const videoCards = document.querySelectorAll('.video-card');
-    
-    videoCards.forEach(card => {
-      const video = card.querySelector('.video-element') as HTMLVideoElement;
-      
-      if (video) {
-        card.addEventListener('mouseenter', () => {
-          video.currentTime = 0; // Reset to beginning
-          video.play().catch((e: any) => console.log('Video play failed:', e));
-        });
-        
-        card.addEventListener('mouseleave', () => {
-          video.pause();
-          video.currentTime = 0; // Reset to beginning
-        });
-      }
+    // Configuration
+    const CONFIG = {
+      rootMargin: '50px', // Start loading 50px before entering viewport
+      threshold: 0.1, // Trigger when 10% of video is visible
+      maxConcurrentVideos: 4, // Maximum videos playing simultaneously
+      playThreshold: 0.5 // Play when 50% visible
+    };
+
+    let currentlyPlayingVideos = new Set<HTMLVideoElement>();
+    let loadedVideos = new WeakSet();
+
+    // Create intersection observers
+    const loadObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          loadVideo(entry.target);
+        }
+      });
+    }, {
+      rootMargin: CONFIG.rootMargin,
+      threshold: CONFIG.threshold
     });
+
+    const playObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        const videoCard = entry.target;
+        const video = videoCard.querySelector('.video-element') as HTMLVideoElement;
+        
+        if (!video || !loadedVideos.has(video)) return;
+
+        if (entry.isIntersecting && entry.intersectionRatio >= CONFIG.playThreshold) {
+          playVideo(video, videoCard);
+        } else {
+          pauseVideo(video, videoCard);
+        }
+      });
+    }, {
+      threshold: CONFIG.playThreshold
+    });
+
+    // Load video function
+    function loadVideo(videoCard: Element) {
+      const video = videoCard.querySelector('.video-element') as HTMLVideoElement;
+      const skeleton = videoCard.querySelector('.video-skeleton') as HTMLElement;
+      const statusIndicator = videoCard.querySelector('.video-status') as HTMLElement;
+      const statusText = videoCard.querySelector('.status-text') as HTMLElement;
+      
+      if (!video || loadedVideos.has(video)) return;
+
+      // Show loading status
+      if (statusIndicator && statusText) {
+        statusText.textContent = 'Loading...';
+        statusIndicator.style.opacity = '1';
+      }
+
+      // Set video source
+      const dataSrc = video.getAttribute('data-src');
+      if (dataSrc) {
+        const source = video.querySelector('source');
+        if (source) {
+          source.src = dataSrc;
+        }
+        video.src = dataSrc;
+      }
+
+      // Handle video events
+      video.addEventListener('loadstart', () => {
+        if (statusText) statusText.textContent = 'Loading...';
+      });
+
+      video.addEventListener('canplay', () => {
+        loadedVideos.add(video);
+        
+        // Hide skeleton and show video
+        if (skeleton) skeleton.style.display = 'none';
+        video.style.opacity = '1';
+        
+        // Update status
+        if (statusText) statusText.textContent = 'Ready';
+        setTimeout(() => {
+          if (statusIndicator) statusIndicator.style.opacity = '0';
+        }, 1000);
+
+        // Start observing for play/pause
+        playObserver.observe(videoCard);
+      });
+
+      video.addEventListener('error', () => {
+        console.warn('Video failed to load:', dataSrc);
+        if (statusText) statusText.textContent = 'Error';
+        if (statusIndicator) {
+          statusIndicator.style.opacity = '1';
+          setTimeout(() => {
+            statusIndicator.style.opacity = '0';
+          }, 2000);
+        }
+      });
+
+      // Load the video
+      video.load();
+    }
+
+    // Play video with concurrency control
+    function playVideo(video: HTMLVideoElement, videoCard: Element) {
+      // Check if we've reached max concurrent videos
+      if (currentlyPlayingVideos.size >= CONFIG.maxConcurrentVideos) {
+        // Pause the oldest playing video
+        const oldestVideo = currentlyPlayingVideos.values().next().value;
+        if (oldestVideo && oldestVideo !== video) {
+          pauseVideoElement(oldestVideo);
+        }
+      }
+
+      video.currentTime = 0; // Reset to beginning
+      video.play().then(() => {
+        currentlyPlayingVideos.add(video);
+      }).catch((error) => {
+        console.log('Autoplay failed:', error);
+        // Handle autoplay restrictions (especially on mobile)
+        showPlayButton(videoCard);
+      });
+    }
+
+    // Pause video
+    function pauseVideo(video: HTMLVideoElement, videoCard: Element) {
+      pauseVideoElement(video);
+    }
+
+    function pauseVideoElement(video: HTMLVideoElement) {
+      video.pause();
+      currentlyPlayingVideos.delete(video);
+    }
+
+    // Show play button for manual interaction (fallback for autoplay restrictions)
+    function showPlayButton(videoCard: Element) {
+      const playButton = document.createElement('div');
+      playButton.className = 'absolute inset-0 flex items-center justify-center bg-black/20 cursor-pointer z-10';
+      playButton.innerHTML = `
+        <div class="bg-white/95 backdrop-blur-sm rounded-full p-4 shadow-lg hover:scale-110 transition-transform">
+          <svg class="w-8 h-8 text-gray-900" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M8 5v14l11-7z"/>
+          </svg>
+        </div>
+      `;
+      
+      playButton.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const video = videoCard.querySelector('.video-element') as HTMLVideoElement;
+        if (video) {
+          video.play();
+          playButton.remove();
+        }
+      });
+      
+      videoCard.querySelector('.relative')?.appendChild(playButton);
+    }
+
+    // Handle reduced motion preference
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReducedMotion) {
+      console.log('Reduced motion detected, skipping video autoplay');
+      return;
+    }
+
+    // Initialize observers for all video cards
+    const videoCards = document.querySelectorAll('.video-card');
+    videoCards.forEach(card => {
+      loadObserver.observe(card);
+    });
+
+    // Cleanup on page unload
+     window.addEventListener('beforeunload', () => {
+       currentlyPlayingVideos.forEach(video => {
+         video.pause();
+       });
+     });
+
+     // Handle visibility change (pause videos when tab is hidden)
+     document.addEventListener('visibilitychange', () => {
+       if (document.hidden) {
+         currentlyPlayingVideos.forEach(video => {
+           video.pause();
+         });
+       }
+     });
   });
 </script>
 

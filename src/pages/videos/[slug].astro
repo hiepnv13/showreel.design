@@ -30,53 +30,45 @@ const { Content } = await video.render();
 <Layout title={video.data.title}>
   <main class="min-h-screen bg-gray-50">
     <!-- Hero Section with Video -->
-    <section class="relative w-full h-screen overflow-hidden bg-gray-900">
-      <!-- Full Width Video Player -->
-      <VideoPlayer 
-        videoUrl={video.data.videoUrl}
-        poster={video.data.previewUrl}
-        autoplay={true}
-        muted={true}
-        loop={true}
-        className="w-full h-full"
-      />
-      
-      <!-- Overlay -->
-      <div class="absolute inset-0 bg-gradient-to-t from-gray-900/80 via-gray-900/40 to-transparent z-10"></div>
-      
-      <!-- Content -->
-      <div class="absolute inset-0 z-20 flex items-center justify-center">
-        <div class="text-center max-w-4xl mx-auto px-4">
-        <div class="mb-6">
-          <span class="inline-block bg-white/90 backdrop-blur-sm px-4 py-2 rounded-full text-sm font-medium mb-4 text-gray-900 shadow-lg">
-            {video.data.category}
-          </span>
-        </div>
-        <h1 class="text-5xl md:text-7xl font-bold mb-6 leading-tight text-white">
-          {video.data.title}
-        </h1>
-        <p class="text-xl md:text-2xl text-gray-200 mb-8">
-          by {video.data.author}
-        </p>
-        <div class="flex flex-wrap justify-center gap-2 mb-8">
-          {video.data.tags.map((tag: string) => (
-            <span class="bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full text-sm text-white border border-white/20">
-              #{tag}
-            </span>
-          ))}
-        </div>
-        <p class="text-lg text-gray-200 max-w-2xl mx-auto">
-          {video.data.description}
-        </p>
-        </div>
+    <section class="w-full bg-gray-900">
+      <!-- Video Container -->
+      <div class="w-full h-screen">
+        <VideoPlayer 
+          videoUrl={video.data.videoUrl}
+          poster={video.data.previewUrl}
+          autoplay={false}
+          muted={false}
+          loop={false}
+          className="w-full h-full"
+        />
       </div>
       
-      <!-- Scroll Indicator -->
-      <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
-        <div class="w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
-          <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
-          </svg>
+      <!-- Video Information Section -->
+      <div class="bg-gray-900 text-white py-16">
+        <div class="section-container">
+          <div class="max-w-4xl mx-auto text-center">
+            <div class="mb-6">
+              <span class="inline-block bg-white/90 backdrop-blur-sm px-4 py-2 rounded-full text-sm font-medium mb-4 text-gray-900 shadow-lg">
+                {video.data.category}
+              </span>
+            </div>
+            <h1 class="text-5xl md:text-7xl font-bold mb-6 leading-tight text-white">
+              {video.data.title}
+            </h1>
+            <p class="text-xl md:text-2xl text-gray-200 mb-8">
+              by {video.data.author}
+            </p>
+            <div class="flex flex-wrap justify-center gap-2 mb-8">
+              {video.data.tags.map((tag: string) => (
+                <span class="bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full text-sm text-white border border-white/20">
+                  #{tag}
+                </span>
+              ))}
+            </div>
+            <p class="text-lg text-gray-200 max-w-2xl mx-auto">
+              {video.data.description}
+            </p>
+          </div>
         </div>
       </div>
     </section>
