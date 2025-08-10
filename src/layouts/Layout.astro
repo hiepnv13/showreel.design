@@ -1,24 +1,34 @@
 ---
+import SmoothScroll from '../components/SmoothScroll.astro';
+import Preloader from '../components/Preloader.astro';
+
 export interface Props {
-	title?: string;
-	description?: string;
+  title: string;
 }
 
-const { title = "Showreel.design", description = "Discover amazing motion design and video showcases" } = Astro.props;
+const { title } = Astro.props;
 ---
 
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="generator" content={Astro.generator} />
-		<meta name="description" content={description} />
-		<title>{title}</title>
-		<link rel="stylesheet" href="/src/styles/global.css" />
-	</head>
-	<body class="font-sans antialiased">
-		<slot />
-	</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="description" content="Discover amazing motion design and animation work from talented creators worldwide." />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="view-transition" content="same-origin" />
+    <title>{title}</title>
+    <link rel="stylesheet" href="/src/styles/global.css" />
+  </head>
+  <body>
+    <Preloader />
+    <slot />
+    <SmoothScroll />
+  </body>
 </html>
+
+<script>
+  // Import page transitions
+  import '../scripts/pageTransitions.js';
+</script>

@@ -19,48 +19,74 @@ const filteredVideos = currentFilter === 'All'
   : videos.filter(video => video.data.category === currentFilter);
 ---
 
-<section class="py-16 px-4 max-w-7xl mx-auto">
-  <div class="mb-8">
-    <h2 class="text-3xl font-bold text-white mb-6">Featured Work</h2>
-    
+<section class="py-20 bg-gray-50">
+  <div class="section-container">
+   
     <!-- Filter Tabs -->
-    <div class="flex flex-wrap gap-2 mb-8">
+    <div class="flex flex-wrap justify-center gap-3 mb-12">
       <a 
         href="/" 
-        class={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+        data-sort="all"
+        class={`px-6 py-3 rounded-full text-sm font-medium transition-all duration-200 ${
           currentFilter === 'All' 
-            ? 'bg-white text-black' 
-            : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+            ? 'bg-gray-900 text-white shadow-lg' 
+            : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200 hover:border-gray-300'
         }`}
       >
-        All
+        All Work
       </a>
       {categories.map((category: string) => (
         <a 
           href={`/?category=${encodeURIComponent(category)}`}
-          class={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+          data-sort={category.toLowerCase()}
+          class={`px-6 py-3 rounded-full text-sm font-medium transition-all duration-200 ${
             currentFilter === category 
-              ? 'bg-white text-black' 
-              : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+              ? 'bg-gray-900 text-white shadow-lg' 
+              : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200 hover:border-gray-300'
           }`}
         >
           {category}
         </a>
       ))}
+      
+      <!-- Additional Action Buttons -->
+      <button 
+        data-shuffle
+        class="px-6 py-3 rounded-full text-sm font-medium transition-all duration-200 bg-white text-gray-700 hover:bg-gray-100 border border-gray-200 hover:border-gray-300"
+        title="Shuffle items"
+      >
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+        </svg>
+      </button>
     </div>
-  </div>
 
-  <!-- Video Grid -->
-   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-     {filteredVideos.map((video: any, index: number) => (
-       <VideoCard
-         title={video.data.title}
-         author={video.data.author}
-         thumbnail={video.data.thumbnail}
-         videoUrl={video.data.videoUrl}
-         category={video.data.category}
-         slug={video.slug}
-       />
-     ))}
-   </div>
+    
+
+    <!-- Video Grid -->
+    <div class="video-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      {filteredVideos.map((video: any, index: number) => (
+        <VideoCard
+          title={video.data.title}
+          author={video.data.author}
+          thumbnail={video.data.thumbnail}
+          videoUrl={video.data.videoUrl}
+          category={video.data.category}
+          slug={video.slug}
+        />
+      ))}
+    </div>
+
+    <!-- Load More Button -->
+    {filteredVideos.length > 6 && (
+      <div class="text-center mt-16">
+        <button class="btn-secondary">
+          Load More Projects
+          <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
+          </svg>
+        </button>
+      </div>
+    )}
+  </div>
 </section>

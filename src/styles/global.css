@@ -10,14 +10,30 @@
   }
   
   body {
-    @apply bg-white min-h-screen text-black;
+    @apply bg-gray-50 min-h-screen text-gray-900;
+  }
+  
+  /* Smooth scrolling for better UX */
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  /* Reduce motion for accessibility */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
   }
 }
 
 @layer components {
   .video-card {
-    @apply bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-200;
-    @apply hover:scale-105 hover:-translate-y-1;
+    @apply transition-all duration-300;
+    @apply hover:scale-[1.02] hover:-translate-y-1;
   }
   
   .video-thumbnail {
@@ -25,17 +41,62 @@
   }
   
   .video-card:hover .video-thumbnail {
-    @apply scale-110;
+    @apply scale-105;
   }
   
   .btn-primary {
-    @apply bg-black text-white px-6 py-3 rounded-lg;
+    @apply bg-gray-900 text-white px-8 py-4 rounded-xl font-medium;
     @apply hover:bg-gray-800 transition-all duration-200;
-    @apply shadow-lg hover:shadow-xl transform hover:-translate-y-0.5;
+    @apply shadow-sm hover:shadow-md transform hover:-translate-y-0.5;
+  }
+  
+  .btn-secondary {
+    @apply bg-white text-gray-900 px-8 py-4 rounded-xl font-medium border border-gray-200;
+    @apply hover:bg-gray-50 hover:border-gray-300 transition-all duration-200;
+    @apply shadow-sm hover:shadow-md transform hover:-translate-y-0.5;
   }
   
   .text-gradient {
-    @apply text-black;
+    @apply text-gray-900;
+  }
+  
+  .card-elevated {
+    @apply bg-white rounded-2xl shadow-sm border border-gray-100 p-6;
+    @apply hover:shadow-lg hover:border-gray-200 transition-all duration-300;
+  }
+  
+  .section-container {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+  
+  /* Animation classes for GSAP */
+  .fade-in {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  
+  .slide-up {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+  
+  .scale-in {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  
+  /* Preloader styles */
+  .preloader-logo {
+    animation: pulse 2s ease-in-out infinite;
+  }
+  
+  @keyframes pulse {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.7;
+    }
   }
 }
 
@@ -50,5 +111,21 @@
   
   .animation-delay-600 {
     animation-delay: 600ms;
+  }
+  
+  /* GSAP animation utilities */
+  .gsap-fade-in {
+    opacity: 0;
+    visibility: hidden;
+  }
+  
+  .gsap-slide-up {
+    opacity: 0;
+    transform: translateY(100px);
+  }
+  
+  .gsap-scale-in {
+    opacity: 0;
+    transform: scale(0.8);
   }
 }

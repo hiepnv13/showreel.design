@@ -13,7 +13,7 @@ const { title, author, thumbnail, videoUrl, category, slug } = Astro.props;
 
 <a href={slug ? `/videos/${slug}` : '#'} class="video-card group cursor-pointer block" data-video-url={videoUrl}>
   <!-- Thumbnail Container -->
-  <div class="relative overflow-hidden rounded-ss-md">
+  <div class="relative overflow-hidden">
     <!-- Thumbnail Image -->
     <img 
       src={thumbnail} 
@@ -35,9 +35,9 @@ const { title, author, thumbnail, videoUrl, category, slug } = Astro.props;
     )}
     
     <!-- Play Button Overlay -->
-    <div class="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-      <div class="bg-white/90 rounded-full p-4 transform scale-75 group-hover:scale-100 transition-transform duration-300">
-        <svg class="w-8 h-8 text-black" fill="currentColor" viewBox="0 0 24 24">
+    <div class="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+      <div class="bg-white/95 backdrop-blur-sm rounded-full p-4 transform scale-75 group-hover:scale-100 transition-transform duration-300 shadow-lg">
+        <svg class="w-8 h-8 text-gray-900" fill="currentColor" viewBox="0 0 24 24">
           <path d="M8 5v14l11-7z"/>
         </svg>
       </div>
@@ -45,22 +45,24 @@ const { title, author, thumbnail, videoUrl, category, slug } = Astro.props;
     
     <!-- Category Badge -->
     {category && (
-      <div class="absolute top-3 left-3 z-10">
-          <span class="bg-black text-white px-3 py-1 rounded-full text-sm font-medium">
-            {category}
-          </span>
-        </div>
+      <div class="absolute top-4 left-4 z-10">
+        <span class="bg-white/90 backdrop-blur-sm text-gray-900 px-3 py-1.5 rounded-full text-sm font-medium border border-gray-200">
+          {category}
+        </span>
+      </div>
     )}
   </div>
   
   <!-- Card Content -->
-  <div class="p-6">
-    <h3 class="text-xl font-semibold text-black mb-2 line-clamp-2">
+  <div class="card-content pt-4">
+    <h3 class="text-xl font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-gray-700 transition-colors">
       {title}
     </h3>
-    <p class="text-gray-600 mb-4">
+    <p class="text-gray-600 mb-4 font-medium">
       by {author}
     </p>
+    
+    
   </div>
 </a>
 
