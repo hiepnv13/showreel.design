@@ -1,8 +1,8 @@
 ---
-title: "Motion Graphics Showreel 2024"
+title: "Studio gusto 2025 showreel"
 author: "Creative Studio"
 thumbnail: "/placeholder.svg"
-videoFileName: "motion-graphics-showreel-2024.mp4"
+videoFileName: "Studio gusto 2025 showreel.mp4"
 category: "Motion Graphics"
 tags: ["motion", "graphics", "2024", "showreel"]
 featured: true

@@ -1,8 +1,8 @@
 ---
-title: "UI/UX Animation Showcase"
+title: "Dogstudio showreel"
 author: "UX Designer"
 thumbnail: "/placeholder.svg"
-videoFileName: "ui-ux-animation-showcase.mp4"
+videoFileName: "Dogstudio showreel.mp4"
 category: "UI/UX"
 tags: ["ui", "ux", "interface", "interaction", "prototype"]
 featured: false

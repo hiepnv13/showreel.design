@@ -22,6 +22,12 @@ export async function getVideosByCategory(category: string): Promise<CollectionE
   return allVideos.filter(video => video.data.category === category);
 }
 
+// Get videos by category slug
+export async function getVideosByCategorySlug(categorySlug: string): Promise<CollectionEntry<'videos'>[]> {
+  const allVideos = await getAllVideos();
+  return allVideos.filter(video => generateSlug(video.data.category) === categorySlug);
+}
+
 // Get featured videos
 export async function getFeaturedVideos(): Promise<CollectionEntry<'videos'>[]> {
   const allVideos = await getAllVideos();
@@ -32,6 +38,26 @@ export async function getFeaturedVideos(): Promise<CollectionEntry<'videos'>[]> 
 export async function getVideosByTag(tag: string): Promise<CollectionEntry<'videos'>[]> {
   const allVideos = await getAllVideos();
   return allVideos.filter(video => video.data.tags.includes(tag));
+}
+
+// Get videos by tag slug
+export async function getVideosByTagSlug(tagSlug: string): Promise<CollectionEntry<'videos'>[]> {
+  const allVideos = await getAllVideos();
+  return allVideos.filter(video => 
+    video.data.tags.some(tag => generateSlug(tag) === tagSlug)
+  );
+}
+
+// Get videos by author
+export async function getVideosByAuthor(author: string): Promise<CollectionEntry<'videos'>[]> {
+  const allVideos = await getAllVideos();
+  return allVideos.filter(video => video.data.author === author);
+}
+
+// Get videos by author slug
+export async function getVideosByAuthorSlug(authorSlug: string): Promise<CollectionEntry<'videos'>[]> {
+  const allVideos = await getAllVideos();
+  return allVideos.filter(video => generateSlug(video.data.author) === authorSlug);
 }
 
 // Get all unique categories
@@ -46,6 +72,13 @@ export async function getAllTags(): Promise<string[]> {
   const videos = await getCollection('videos');
   const tags = videos.flatMap((video: CollectionEntry<'videos'>) => video.data.tags);
   return [...new Set(tags)];
+}
+
+// Get all unique authors
+export async function getAllAuthors(): Promise<string[]> {
+  const videos = await getCollection('videos');
+  const authors = videos.map((video: CollectionEntry<'videos'>) => video.data.author);
+  return [...new Set(authors)];
 }
 
 // Sort videos by publish date (newest first)
@@ -85,4 +118,15 @@ export async function getRelatedVideos(
   const categoryVideos = await getVideosByCategory(category);
   const relatedVideos = categoryVideos.filter(video => video.slug !== currentSlug);
   return sortVideosByDate(relatedVideos).slice(0, limit);
+}
+
+// Generate slug from text
+export function generateSlug(text: string): string {
+  return text
+    .toLowerCase()
+    .replace(/[^a-z0-9 -]/g, '') // Remove special characters
+    .replace(/\s+/g, '-') // Replace spaces with hyphens
+    .replace(/-+/g, '-') // Replace multiple hyphens with single hyphen
+    .trim()
+    .replace(/^-+|-+$/g, ''); // Remove leading/trailing hyphens
 }

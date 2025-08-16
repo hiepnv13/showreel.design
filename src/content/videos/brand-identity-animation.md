@@ -1,8 +1,8 @@
 ---
-title: "Brand Identity Animation"
+title: "basic agency show reel"
 author: "Design Agency"
 thumbnail: "/placeholder.svg"
-videoFileName: "brand-identity-animation.mp4"
+videoFileName: "basic agency show reel.mp4"
 category: "Branding"
 tags: ["branding", "identity", "animation", "logo"]
 featured: false

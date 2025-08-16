@@ -1,19 +1,20 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import Header from '../components/Header.astro';
-import Hero from '../components/Hero.astro';
-import VideoGrid from '../components/VideoGrid.astro';
+import Layout from "../layouts/Layout.astro";
+import Header from "../components/Header.astro";
+import Hero from "../components/Hero.astro";
+import VideoGrid from "../components/VideoGrid.astro";
+import { getAllVideos, sortVideosByDate } from "../utils/videoUtils";
+
+// Homepage always shows all videos - no URL param filtering
+const allVideos = await getAllVideos();
+const videos = sortVideosByDate(allVideos);
 ---
 
 <Layout title="Showreel.design - Discover Amazing Motion Design & Animation">
-  <Header />
-  <main>
-    <Hero />
-    <VideoGrid />
-  </main>
+    <Header />
+    <main>
+        <Hero />
+        <!-- Pass all videos to VideoGrid with currentCategory="All" -->
+        <VideoGrid videos={videos} currentCategory="All" showAllTab={true} />
+    </main>
 </Layout>
-
-<script>
-  // Import grid actions for interactive animations
-  import '../scripts/gridActions.js';
-</script>

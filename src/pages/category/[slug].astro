@@ -1,0 +1,104 @@
+---
+import { getCollection, type CollectionEntry } from "astro:content";
+import {
+    getVideosByCategorySlug,
+    getAllCategories,
+    sortVideosByDate,
+    generateSlug,
+} from "../../utils/videoUtils";
+import Layout from "../../layouts/Layout.astro";
+import Header from "../../components/Header.astro";
+import VideoGrid from "../../components/VideoGrid.astro";
+import type { GetStaticPaths } from "astro";
+
+export const getStaticPaths: GetStaticPaths = async () => {
+    const categories = await getAllCategories();
+    return categories.map((category: string) => ({
+        params: { slug: generateSlug(category) },
+        props: { category, categorySlug: generateSlug(category) },
+    }));
+};
+
+interface Props {
+    category: string;
+    categorySlug: string;
+}
+
+const { category, categorySlug }: Props = Astro.props;
+
+// Get videos for this category
+const allVideos = await getVideosByCategorySlug(categorySlug);
+const videos = sortVideosByDate(allVideos);
+
+// Get all categories for breadcrumb/navigation
+const allCategories = await getAllCategories();
+---
+
+<Layout title={`${category} Videos - Showreel.design`}>
+    <Header />
+    <main>
+        <!-- Hero Section -->
+        <section class="py-20 bg-gray-900 text-white">
+            <div class="section-container text-center">
+                <!-- Breadcrumb -->
+                <nav class="mb-8">
+                    <ol
+                        class="flex justify-center items-center space-x-2 text-sm text-gray-300"
+                    >
+                        <li>
+                            <a
+                                href="/"
+                                class="hover:text-white transition-colors"
+                                >Home</a>
+                        </li>
+                        <li class="text-gray-500">/</li>
+                        <li><span class="text-gray-400">Category</span></li>
+                        <li class="text-gray-500">/</li>
+                        <li class="text-white font-medium">{category}</li>
+                    </ol>
+                </nav>
+
+                <h1 class="text-4xl md:text-6xl font-bold mb-6 leading-tight">
+                    {category} Videos
+                </h1>
+                <p class="text-xl md:text-2xl text-gray-300 mb-8">
+                    Discover amazing {category.toLowerCase()} projects and animations
+                </p>
+                <div class="text-lg text-gray-400">
+                    {videos.length}
+                    {videos.length === 1 ? "project" : "projects"} found
+                </div>
+            </div>
+        </section>
+
+        <!-- Use VideoGrid Component -->
+        <VideoGrid
+            videos={videos}
+            currentCategory={category}
+            showAllTab={true}
+        />
+
+        <!-- Empty State (only show if no videos in this category) -->
+        {
+            videos.length === 0 && (
+                <section class="py-20 bg-gray-50">
+                    <div class="section-container">
+                        <div class="text-center py-16">
+                            <div class="text-gray-400 text-6xl mb-4">🎬</div>
+                            <h3 class="text-2xl font-bold text-gray-900 mb-2">
+                                No videos found
+                            </h3>
+                            <p class="text-gray-600 mb-8">
+                                There are no videos in the {category} category
+                                yet.
+                            </p>
+                            <a href="/" class="btn-primary">
+                                Browse All Videos
+                            </a>
+                        </div>
+                    </div>
+                </section>
+            )
+        }
+    </main>
+</Layout>

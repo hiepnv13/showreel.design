@@ -1,8 +1,8 @@
 ---
-title: "3D Animation Demo Reel"
+title: "Rejouice Studio showreel"
 author: "3D Artist"
 thumbnail: "/placeholder.svg"
-videoFileName: "BB Agency Showcase 2024.mp4"
+videoFileName: "Rejouice Studio showreel.mp4"
 category: "3D"
 tags: ["3d", "animation", "modeling", "rendering"]
 featured: true

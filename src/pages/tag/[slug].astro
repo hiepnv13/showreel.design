@@ -1,0 +1,136 @@
+---
+import { getCollection, type CollectionEntry } from 'astro:content';
+import { getVideosByTagSlug, getAllTags, sortVideosByDate, generateSlug } from '../../utils/videoUtils';
+import Layout from '../../layouts/Layout.astro';
+import Header from '../../components/Header.astro';
+import VideoCard from '../../components/VideoCard.astro';
+import type { GetStaticPaths } from 'astro';
+
+export const getStaticPaths: GetStaticPaths = async () => {
+  const tags = await getAllTags();
+  return tags.map((tag: string) => ({
+    params: { slug: generateSlug(tag) },
+    props: { tag, tagSlug: generateSlug(tag) },
+  }));
+};
+
+interface Props {
+  tag: string;
+  tagSlug: string;
+}
+
+const { tag, tagSlug }: Props = Astro.props;
+
+// Get videos for this tag
+const allVideos = await getVideosByTagSlug(tagSlug);
+const videos = sortVideosByDate(allVideos);
+
+// Get all tags for navigation
+const allTags = await getAllTags();
+---
+
+<Layout title={`#${tag} Videos - Showreel.design`}>
+  <Header />
+  <main>
+    <!-- Hero Section -->
+    <section class="py-20 bg-gray-900 text-white">
+      <div class="section-container text-center">
+        <!-- Breadcrumb -->
+        <nav class="mb-8">
+          <ol class="flex justify-center items-center space-x-2 text-sm text-gray-300">
+            <li><a href="/" class="hover:text-white transition-colors">Home</a></li>
+            <li class="text-gray-500">/</li>
+            <li><span class="text-gray-400">Tag</span></li>
+            <li class="text-gray-500">/</li>
+            <li class="text-white font-medium">#{tag}</li>
+          </ol>
+        </nav>
+        
+        <h1 class="text-4xl md:text-6xl font-bold mb-6 leading-tight">
+          #{tag}
+        </h1>
+        <p class="text-xl md:text-2xl text-gray-300 mb-8">
+          Videos tagged with <span class="text-blue-400">#{tag}</span>
+        </p>
+        <div class="text-lg text-gray-400">
+          {videos.length} {videos.length === 1 ? 'project' : 'projects'} found
+        </div>
+      </div>
+    </section>
+
+    <!-- Video Grid Section -->
+    <section class="py-20 bg-gray-50">
+      <div class="section-container">
+        <!-- Popular Tags -->
+        <div class="mb-12">
+          <h3 class="text-lg font-semibold text-gray-900 mb-4 text-center">Popular Tags</h3>
+          <div class="flex flex-wrap justify-center gap-2">
+            {allTags.slice(0, 10).map((t: string) => (
+              <a 
+                href={`/tag/${generateSlug(t)}`}
+                class={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
+                  t === tag
+                    ? 'bg-blue-600 text-white shadow-lg' 
+                    : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200 hover:border-gray-300'
+                }`}
+              >
+                #{t}
+              </a>
+            ))}
+            
+            <!-- Back to All -->
+            <a 
+              href="/" 
+              class="px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 bg-gray-900 text-white hover:bg-gray-800"
+            >
+              All Work
+            </a>
+          </div>
+        </div>
+
+        <!-- Video Grid -->
+        <div class="video-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {videos.map((video: any, index: number) => (
+            <VideoCard
+              title={video.data.title}
+              author={video.data.author}
+              thumbnail={video.data.thumbnail}
+              videoUrl={video.data.videoUrl}
+              category={video.data.category}
+              slug={video.slug}
+            />
+          ))}
+        </div>
+
+        <!-- Empty State -->
+        {videos.length === 0 && (
+          <div class="text-center py-16">
+            <div class="text-gray-400 text-6xl mb-4">🏷️</div>
+            <h3 class="text-2xl font-bold text-gray-900 mb-2">No videos found</h3>
+            <p class="text-gray-600 mb-8">There are no videos tagged with <strong>#{tag}</strong> yet.</p>
+            <a href="/" class="btn-primary">
+              Browse All Videos
+            </a>
+          </div>
+        )}
+
+        <!-- Load More Button -->
+        {videos.length > 6 && (
+          <div class="text-center mt-16">
+            <button class="btn-secondary">
+              Load More Projects
+              <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
+              </svg>
+            </button>
+          </div>
+        )}
+      </div>
+    </section>
+  </main>
+</Layout>
+
+<script>
+  // Import grid actions for interactive animations
+  import '../../scripts/gridActions.js';
+</script>

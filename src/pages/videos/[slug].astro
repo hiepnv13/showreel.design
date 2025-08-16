@@ -1,25 +1,25 @@
 ---
-import { getCollection, type CollectionEntry } from 'astro:content';
-import { getAllVideos } from '../../utils/videoUtils';
-import Layout from '../../layouts/Layout.astro';
-import VideoPlayer from '../../components/VideoPlayer.astro';
-import type { GetStaticPaths } from 'astro';
+import { getCollection, type CollectionEntry } from "astro:content";
+import { getAllVideos, generateSlug } from "../../utils/videoUtils";
+import Layout from "../../layouts/Layout.astro";
+import Header from "../../components/Header.astro";
+import type { GetStaticPaths } from "astro";
 
 export const getStaticPaths: GetStaticPaths = async () => {
   const videos = await getAllVideos();
-  return videos.map((video: CollectionEntry<'videos'>) => ({
+  return videos.map((video: CollectionEntry<"videos">) => ({
     params: { slug: video.slug },
     props: { video },
   }));
 };
 
 interface Props {
-  video: CollectionEntry<'videos'> & {
-    data: CollectionEntry<'videos'>['data'] & {
+  video: CollectionEntry<"videos"> & {
+    data: CollectionEntry<"videos">["data"] & {
       videoUrl: string;
       previewUrl: string;
-      videoSources: { src: string; type: string; }[];
-    }
+      videoSources: { src: string; type: string }[];
+    };
   };
 }
 
@@ -28,111 +28,201 @@ const { Content } = await video.render();
 ---
 
 <Layout title={video.data.title}>
+  <Header />
   <main class="min-h-screen bg-gray-50">
     <!-- Hero Section with Video -->
-    <section class="w-full bg-gray-900">
+    <section class="w-full bg-white py-20">
       <!-- Video Container -->
-      <div class="w-full h-screen">
-        <VideoPlayer 
-          videoUrl={video.data.videoUrl}
-          poster={video.data.previewUrl}
-          autoplay={false}
-          muted={false}
-          loop={false}
-          className="w-full h-full"
-        />
+      <div class="w-full p-5">
+        <div class="bg-white overflow-hidden relative">
+          <video
+            class="w-full h-auto cursor-pointer"
+            autoplay
+            loop
+            controls
+            controlslist="nodownload"
+            playsinline
+            style="object-fit: contain;"
+          >
+            <source src={video.data.videoUrl} type="video/mp4" />
+            <source
+              src={`/videos/${encodeURIComponent(video.data.videoFileName)}`}
+              type="video/mp4"
+            />
+            Your browser does not support the video tag.
+          </video>
+
+          <!-- Fullscreen Button -->
+          <button
+            id="fullscreen-btn"
+            class="absolute top-8 right-8 bg-black/50 hover:bg-black/70 text-white p-3 rounded-full transition-all duration-200 backdrop-blur-sm"
+            title="Toggle Fullscreen"
+          >
+            <svg
+              class="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 1v4m0 0h-4m4 0l-5-5"
+              ></path>
+            </svg>
+          </button>
+        </div>
       </div>
-      
-      <!-- Video Information Section -->
-      <div class="bg-gray-900 text-white py-16">
-        <div class="section-container">
-          <div class="max-w-4xl mx-auto text-center">
-            <div class="mb-6">
-              <span class="inline-block bg-white/90 backdrop-blur-sm px-4 py-2 rounded-full text-sm font-medium mb-4 text-gray-900 shadow-lg">
+    </section>
+
+    <!-- Video Information Section -->
+    <section class="py-20 bg-white">
+      <div class="max-w-7xl mx-auto px-5">
+        <div class="text-center mb-12">
+          <div class="mb-6">
+            <a
+              href={`/category/${generateSlug(video.data.category)}`}
+              class="inline-block"
+            >
+              <span
+                class="bg-blue-100 text-blue-800 px-4 py-2 rounded-full text-sm font-medium hover:bg-blue-200 transition-colors"
+              >
                 {video.data.category}
               </span>
-            </div>
-            <h1 class="text-5xl md:text-7xl font-bold mb-6 leading-tight text-white">
-              {video.data.title}
-            </h1>
-            <p class="text-xl md:text-2xl text-gray-200 mb-8">
-              by {video.data.author}
-            </p>
-            <div class="flex flex-wrap justify-center gap-2 mb-8">
-              {video.data.tags.map((tag: string) => (
-                <span class="bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full text-sm text-white border border-white/20">
-                  #{tag}
-                </span>
-              ))}
-            </div>
-            <p class="text-lg text-gray-200 max-w-2xl mx-auto">
-              {video.data.description}
-            </p>
+            </a>
           </div>
+          <h1
+            class="text-4xl md:text-6xl font-bold mb-6 leading-tight text-gray-900"
+          >
+            {video.data.title}
+          </h1>
+          <p class="text-xl md:text-2xl text-gray-600 mb-8">
+            by <a
+              href={`/author/${generateSlug(video.data.author)}`}
+              class="text-blue-600 hover:text-blue-800 transition-colors"
+              >{video.data.author}</a
+            >
+          </p>
+          <div class="flex flex-wrap justify-center gap-2 mb-8">
+            {
+              video.data.tags.map((tag: string) => (
+                <a
+                  href={`/tag/${generateSlug(tag)}`}
+                  class="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm hover:bg-gray-200 transition-colors"
+                >
+                  #{tag}
+                </a>
+              ))
+            }
+          </div>
+          <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+            {video.data.description}
+          </p>
         </div>
       </div>
     </section>
 
     <!-- Content Section -->
-    <section class="py-20 bg-white">
-      <div class="section-container">
+    <section class="py-20 bg-gray-50">
+      <div class="max-w-7xl mx-auto px-5">
         <div class="max-w-4xl mx-auto">
-          <div class="prose prose-gray prose-lg max-w-none">
+          <div
+            class="prose prose-gray prose-lg max-w-none bg-white rounded-lg p-8 shadow-sm"
+          >
             <Content />
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Video Details -->
-    <section class="py-20 bg-gray-50">
-      <div class="section-container">
+    <!-- Project Details Section -->
+    <section class="py-20 bg-white">
+      <div class="max-w-7xl mx-auto px-5">
         <div class="max-w-4xl mx-auto">
-          <div class="grid md:grid-cols-2 gap-12">
-            <div class="card-elevated p-8">
-              <h3 class="text-2xl font-bold mb-6 text-gray-900">Project Details</h3>
+          <div class="grid md:grid-cols-2 gap-8">
+            <div
+              class="bg-white rounded-lg p-8 shadow-sm border border-gray-200"
+            >
+              <h3 class="text-2xl font-bold mb-6 text-gray-900">
+                Project Details
+              </h3>
               <dl class="space-y-4">
-                <div class="flex justify-between items-center py-3 border-b border-gray-100">
+                <div
+                  class="flex justify-between items-center py-3 border-b border-gray-100"
+                >
                   <dt class="text-gray-600 font-medium">Category</dt>
-                  <dd class="text-gray-900 font-semibold">{video.data.category}</dd>
-                </div>
-                <div class="flex justify-between items-center py-3 border-b border-gray-100">
-                  <dt class="text-gray-600 font-medium">Author</dt>
-                  <dd class="text-gray-900 font-semibold">{video.data.author}</dd>
-                </div>
-                <div class="flex justify-between items-center py-3 border-b border-gray-100">
-                  <dt class="text-gray-600 font-medium">Published</dt>
                   <dd class="text-gray-900 font-semibold">
-                    {new Date(video.data.publishDate).toLocaleDateString('en-US', {
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric'
-                    })}
+                    <a
+                      href={`/category/${generateSlug(video.data.category)}`}
+                      class="text-blue-600 hover:text-blue-800 transition-colors"
+                    >
+                      {video.data.category}
+                    </a>
                   </dd>
                 </div>
-                {video.data.featured && (
-                  <div class="flex justify-between items-center py-3">
-                    <dt class="text-gray-600 font-medium">Status</dt>
-                    <dd>
-                      <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 border border-yellow-200">
-                        ⭐ Featured
-                      </span>
-                    </dd>
-                  </div>
-                )}
+                <div
+                  class="flex justify-between items-center py-3 border-b border-gray-100"
+                >
+                  <dt class="text-gray-600 font-medium">Author</dt>
+                  <dd class="text-gray-900 font-semibold">
+                    <a
+                      href={`/author/${generateSlug(video.data.author)}`}
+                      class="text-blue-600 hover:text-blue-800 transition-colors"
+                    >
+                      {video.data.author}
+                    </a>
+                  </dd>
+                </div>
+                <div
+                  class="flex justify-between items-center py-3 border-b border-gray-100"
+                >
+                  <dt class="text-gray-600 font-medium">Published</dt>
+                  <dd class="text-gray-900 font-semibold">
+                    {
+                      new Date(video.data.publishDate).toLocaleDateString(
+                        "en-US",
+                        {
+                          year: "numeric",
+                          month: "long",
+                          day: "numeric",
+                        },
+                      )
+                    }
+                  </dd>
+                </div>
+                {
+                  video.data.featured && (
+                    <div class="flex justify-between items-center py-3">
+                      <dt class="text-gray-600 font-medium">Status</dt>
+                      <dd>
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 border border-yellow-200">
+                          ⭐ Featured
+                        </span>
+                      </dd>
+                    </div>
+                  )
+                }
               </dl>
             </div>
-            
-            <div class="card-elevated p-8">
+
+            <div
+              class="bg-white rounded-lg p-8 shadow-sm border border-gray-200"
+            >
               <h3 class="text-2xl font-bold mb-6 text-gray-900">Tags</h3>
               <div class="flex flex-wrap gap-3">
-                {video.data.tags.map((tag: string) => (
-                  <span class="bg-gray-100 text-gray-700 px-4 py-2 rounded-full text-sm font-medium hover:bg-gray-200 transition-colors border border-gray-200">
-                    #{tag}
-                  </span>
-                ))}
+                {
+                  video.data.tags.map((tag: string) => (
+                    <a
+                      href={`/tag/${generateSlug(tag)}`}
+                      class="bg-gray-100 text-gray-700 px-4 py-2 rounded-full text-sm font-medium hover:bg-gray-200 transition-colors border border-gray-200"
+                    >
+                      #{tag}
+                    </a>
+                  ))
+                }
               </div>
-              
+
               <!-- Stats -->
               <div class="mt-8 pt-6 border-t border-gray-200">
                 <div class="grid grid-cols-3 gap-4 text-center">
@@ -160,31 +250,73 @@ const { Content } = await video.render();
     <section class="py-12 bg-white border-t border-gray-200">
       <div class="section-container">
         <div class="max-w-4xl mx-auto">
-          <div class="flex flex-col sm:flex-row justify-between items-center gap-6">
-            <a 
-              href="/" 
-              class="btn-secondary inline-flex items-center"
-            >
-              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+          <div
+            class="flex flex-col sm:flex-row justify-between items-center gap-6"
+          >
+            <a href="/" class="btn-secondary inline-flex items-center">
+              <svg
+                class="w-5 h-5 mr-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
               </svg>
               Back to Gallery
             </a>
-            
+
             <div class="flex gap-3">
-              <button class="p-3 bg-gray-100 text-gray-700 rounded-full hover:bg-gray-200 transition-colors border border-gray-200 group">
-                <svg class="w-5 h-5 group-hover:text-red-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+              <button
+                class="p-3 bg-gray-100 text-gray-700 rounded-full hover:bg-gray-200 transition-colors border border-gray-200 group"
+              >
+                <svg
+                  class="w-5 h-5 group-hover:text-red-500 transition-colors"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                  ></path>
                 </svg>
               </button>
-              <button class="p-3 bg-gray-100 text-gray-700 rounded-full hover:bg-gray-200 transition-colors border border-gray-200 group">
-                <svg class="w-5 h-5 group-hover:text-blue-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z"></path>
+              <button
+                class="p-3 bg-gray-100 text-gray-700 rounded-full hover:bg-gray-200 transition-colors border border-gray-200 group"
+              >
+                <svg
+                  class="w-5 h-5 group-hover:text-blue-500 transition-colors"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z"
+                  ></path>
                 </svg>
               </button>
               <button class="btn-primary inline-flex items-center">
-                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                <svg
+                  class="w-5 h-5 mr-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+                  ></path>
                 </svg>
                 Download
               </button>
@@ -195,3 +327,88 @@ const { Content } = await video.render();
     </section>
   </main>
 </Layout>
+
+<script>
+  // Video player functionality
+  document.addEventListener("DOMContentLoaded", () => {
+    const video = document.querySelector("video") as HTMLVideoElement;
+    const fullscreenBtn = document.getElementById("fullscreen-btn");
+
+    if (video && fullscreenBtn) {
+      // Set volume to 50% immediately
+      video.volume = 0.5;
+
+      // Play video on click
+      video.addEventListener("click", () => {
+        if (video.paused) {
+          video.play();
+        } else {
+          video.pause();
+        }
+      });
+
+      // Fullscreen functionality
+      fullscreenBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+
+        if (!document.fullscreenElement) {
+          if (video.requestFullscreen) {
+            video.requestFullscreen();
+          } else if ((video as any).webkitRequestFullscreen) {
+            (video as any).webkitRequestFullscreen();
+          } else if ((video as any).msRequestFullscreen) {
+            (video as any).msRequestFullscreen();
+          }
+        } else {
+          if (document.exitFullscreen) {
+            document.exitFullscreen();
+          } else if ((document as any).webkitExitFullscreen) {
+            (document as any).webkitExitFullscreen();
+          } else if ((document as any).msExitFullscreen) {
+            (document as any).msExitFullscreen();
+          }
+        }
+      });
+
+      // Ensure autoplay with volume when video loads
+      video.addEventListener("loadeddata", () => {
+        video.volume = 0.5; // Set volume to 50%
+        video.play().catch((e) => {
+          console.log("Auto-play prevented by browser:", e);
+          // Fallback: show a play button overlay if autoplay fails
+          showPlayButton();
+        });
+      });
+
+      // Also try to set volume and play when metadata loads
+      video.addEventListener("loadedmetadata", () => {
+        video.volume = 0.5;
+      });
+
+      // Show play button overlay if autoplay fails
+      function showPlayButton() {
+        const playOverlay = document.createElement("div");
+        playOverlay.className =
+          "absolute inset-0 flex items-center justify-center bg-black/20 cursor-pointer z-20";
+        playOverlay.innerHTML = `
+          <div class="bg-white/95 backdrop-blur-sm rounded-full p-6 shadow-lg hover:scale-110 transition-transform">
+            <svg class="w-12 h-12 text-gray-900" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M8 5v14l11-7z"/>
+            </svg>
+          </div>
+        `;
+
+        playOverlay.addEventListener("click", (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          video.volume = 0.5;
+          video.play().then(() => {
+            playOverlay.remove();
+          });
+        });
+
+        video.parentElement?.appendChild(playOverlay);
+      }
+    }
+  });
+</script>
