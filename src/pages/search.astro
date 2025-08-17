@@ -1,0 +1,117 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Header from "../components/Header.astro";
+import VideoGrid from "../components/VideoGrid.astro";
+import { searchVideos, sortVideosByDate } from "../utils/videoUtils";
+import type { CollectionEntry } from 'astro:content';
+
+// Get search query from URL params
+const url = Astro.url;
+const query = url.searchParams.get('q') || '';
+
+// Search videos if query exists
+let videos: CollectionEntry<'videos'>[] = [];
+let searchPerformed = false;
+
+if (query.trim()) {
+  const searchResults = await searchVideos(query.trim());
+  videos = sortVideosByDate(searchResults);
+  searchPerformed = true;
+}
+---
+
+<Layout title={query ? `Search: ${query} - Showreel.design` : "Search - Showreel.design"}>
+  <Header />
+  <main>
+    <!-- Hero Section -->
+    <section class="py-20 bg-gray-900 text-white">
+      <div class="section-container text-center">
+        <!-- Breadcrumb -->
+        <nav class="mb-8">
+          <ol class="flex justify-center items-center space-x-2 text-sm text-gray-300">
+            <li>
+              <a href="/" class="hover:text-white transition-colors">Home</a>
+            </li>
+            <li class="text-gray-500">/</li>
+            <li class="text-white font-medium">Search</li>
+          </ol>
+        </nav>
+
+        <h1 class="text-4xl md:text-6xl font-bold mb-6 leading-tight">
+          {query ? `Search Results` : 'Search Videos'}
+        </h1>
+        
+        {query && (
+          <p class="text-xl md:text-2xl text-gray-300 mb-8">
+            Results for: <span class="text-blue-400 font-semibold">"{query}"</span>
+          </p>
+        )}
+        
+        <div class="text-lg text-gray-400">
+          {searchPerformed ? (
+            <span>
+              {videos.length} {videos.length === 1 ? 'result' : 'results'} found
+            </span>
+          ) : (
+            <span>Enter a search term to find videos</span>
+          )}
+        </div>
+      </div>
+    </section>
+
+    <!-- Search Results -->
+    {searchPerformed && videos.length > 0 && (
+      <VideoGrid 
+        videos={videos} 
+        currentCategory="Search Results" 
+        showAllTab={false} 
+      />
+    )}
+
+    <!-- Empty State -->
+    {searchPerformed && videos.length === 0 && (
+      <section class="py-20 bg-gray-50">
+        <div class="section-container">
+          <div class="text-center py-16">
+            <div class="text-gray-400 text-6xl mb-4">🔍</div>
+            <h3 class="text-2xl font-bold text-gray-900 mb-2">
+              No videos found
+            </h3>
+            <p class="text-gray-600 mb-8">
+              No videos match your search for <strong>"{query}"</strong>.
+              <br />Try different keywords or browse all videos.
+            </p>
+            <a href="/" class="btn-primary">
+              Browse All Videos
+            </a>
+          </div>
+        </div>
+      </section>
+    )}
+
+    <!-- No Search Performed -->
+    {!searchPerformed && (
+      <section class="py-20 bg-gray-50">
+        <div class="section-container">
+          <div class="text-center py-16">
+            <div class="text-gray-400 text-6xl mb-4">🎬</div>
+            <h3 class="text-2xl font-bold text-gray-900 mb-2">
+              Start Your Search
+            </h3>
+            <p class="text-gray-600 mb-8">
+              Use the search bar above to find videos by title, author, description, or tags.
+            </p>
+            <a href="/" class="btn-primary">
+              Browse All Videos
+            </a>
+          </div>
+        </div>
+      </section>
+    )}
+  </main>
+</Layout>
+
+<script>
+  // Import grid actions for interactive animations
+  import '../scripts/gridActions.js';
+</script>
