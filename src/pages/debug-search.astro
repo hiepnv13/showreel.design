@@ -1,0 +1,52 @@
+---
+import { getAllVideos, searchVideos } from "../utils/videoUtils";
+
+// Test search functionality
+const allVideos = await getAllVideos();
+const searchResults = await searchVideos("3d");
+const searchResults2 = await searchVideos("animation");
+const searchResults3 = await searchVideos("studio");
+---
+
+<html>
+<head>
+    <title>Debug Search</title>
+</head>
+<body>
+    <h1>Search Debug Page</h1>
+    
+    <h2>All Videos ({allVideos.length})</h2>
+    <ul>
+        {allVideos.map(video => (
+            <li>
+                <strong>{video.data.title}</strong> by {video.data.author}
+                <br />
+                <small>Tags: {video.data.tags.join(', ')}</small>
+                <br />
+                <small>Description: {video.data.description}</small>
+            </li>
+        ))}
+    </ul>
+    
+    <h2>Search "3d" ({searchResults.length} results)</h2>
+    <ul>
+        {searchResults.map(video => (
+            <li>{video.data.title}</li>
+        ))}
+    </ul>
+    
+    <h2>Search "animation" ({searchResults2.length} results)</h2>
+    <ul>
+        {searchResults2.map(video => (
+            <li>{video.data.title}</li>
+        ))}
+    </ul>
+    
+    <h2>Search "studio" ({searchResults3.length} results)</h2>
+    <ul>
+        {searchResults3.map(video => (
+            <li>{video.data.title}</li>
+        ))}
+    </ul>
+</body>
+</html>

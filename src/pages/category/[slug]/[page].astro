@@ -5,38 +5,60 @@ import {
     getAllCategories,
     sortVideosByDate,
     generateSlug,
-} from "../../utils/videoUtils";
-import Layout from "../../layouts/Layout.astro";
-import Header from "../../components/Header.astro";
-import VideoGrid from "../../components/VideoGrid.astro";
+} from "../../../utils/videoUtils";
+import Layout from "../../../layouts/Layout.astro";
+import Header from "../../../components/Header.astro";
+import VideoGrid from "../../../components/VideoGrid.astro";
 import type { GetStaticPaths } from "astro";
 
 export const getStaticPaths: GetStaticPaths = async () => {
     const categories = await getAllCategories();
-    return categories.map((category: string) => ({
-        params: { slug: generateSlug(category) },
-        props: { category, categorySlug: generateSlug(category) },
-    }));
+    const paths: Array<{
+        params: { slug: string; page: string };
+        props: { category: string; categorySlug: string; currentPage: number; totalPages: number };
+    }> = [];
+    
+    for (const category of categories) {
+        const categorySlug = generateSlug(category);
+        const videos = sortVideosByDate(await getVideosByCategorySlug(categorySlug));
+        const itemsPerPage = 24;
+        const totalPages = Math.ceil(videos.length / itemsPerPage);
+        
+        for (let i = 1; i <= totalPages; i++) {
+            paths.push({
+                params: { slug: categorySlug, page: i.toString() },
+                props: { category, categorySlug, currentPage: i, totalPages },
+            });
+        }
+    }
+    
+    return paths;
 };
 
 interface Props {
     category: string;
     categorySlug: string;
+    currentPage: number;
+    totalPages: number;
 }
 
-const { category, categorySlug }: Props = Astro.props;
+const { category, categorySlug, currentPage, totalPages }: Props = Astro.props;
+const pageNumber = parseInt(Astro.params.page as string || '1');
+
+// Redirect to page 1 if invalid page number
+if (pageNumber < 1 || pageNumber > totalPages) {
+    return Astro.redirect(`/category/${categorySlug}`);
+}
 
 // Get videos for this category
 const allVideos = await getVideosByCategorySlug(categorySlug);
 const videos = sortVideosByDate(allVideos);
-const itemsPerPage = 24;
-const totalPages = Math.ceil(videos.length / itemsPerPage);
 
 // Get all categories for breadcrumb/navigation
 const allCategories = await getAllCategories();
 ---
 
-<Layout title={`${category} Videos - Showreel.design`}>
+<Layout title={`${category} Videos - Page ${pageNumber} - Showreel.design`}>
     <Header />
     <main>
         <!-- Hero Section -->
@@ -57,6 +79,8 @@ const allCategories = await getAllCategories();
                         <li><span class="text-gray-400">Category</span></li>
                         <li class="text-gray-500">/</li>
                         <li class="text-white font-medium">{category}</li>
+                        <li class="text-gray-500">/</li>
+                        <li class="text-gray-400">Page {pageNumber}</li>
                     </ol>
                 </nav>
 
@@ -69,6 +93,7 @@ const allCategories = await getAllCategories();
                 <div class="text-lg text-gray-400">
                     {videos.length}
                     {videos.length === 1 ? "project" : "projects"} found
+                    {totalPages > 1 && ` - Page ${pageNumber} of ${totalPages}`}
                 </div>
             </div>
         </section>
@@ -78,8 +103,8 @@ const allCategories = await getAllCategories();
             videos={videos}
             currentCategory={category}
             showAllTab={true}
-            currentPage={1}
-            itemsPerPage={itemsPerPage}
+            currentPage={pageNumber}
+            itemsPerPage={24}
             baseUrl={`/category/${categorySlug}`}
         />
 

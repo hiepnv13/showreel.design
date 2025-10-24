@@ -5,17 +5,28 @@ import VideoGrid from "../components/VideoGrid.astro";
 import { searchVideos, sortVideosByDate } from "../utils/videoUtils";
 import type { CollectionEntry } from 'astro:content';
 
-// Get search query from URL params
+// Get search query and page from URL params
 const url = Astro.url;
 const query = url.searchParams.get('q') || '';
+const pageParam = url.searchParams.get('page') || '1';
+const currentPage = parseInt(pageParam);
+const itemsPerPage = 24;
 
 // Search videos if query exists
 let videos: CollectionEntry<'videos'>[] = [];
 let searchPerformed = false;
+let totalPages = 1;
 
 if (query.trim()) {
   const searchResults = await searchVideos(query.trim());
-  videos = sortVideosByDate(searchResults);
+  const allResults = sortVideosByDate(searchResults);
+  totalPages = Math.ceil(allResults.length / itemsPerPage);
+  
+  // Paginate results
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  videos = allResults.slice(startIndex, endIndex);
+  
   searchPerformed = true;
 }
 ---
@@ -51,6 +62,7 @@ if (query.trim()) {
           {searchPerformed ? (
             <span>
               {videos.length} {videos.length === 1 ? 'result' : 'results'} found
+              {totalPages > 1 && ` - Page ${currentPage} of ${totalPages}`}
             </span>
           ) : (
             <span>Enter a search term to find videos</span>
@@ -64,7 +76,10 @@ if (query.trim()) {
       <VideoGrid 
         videos={videos} 
         currentCategory="Search Results" 
-        showAllTab={false} 
+        showAllTab={false}
+        currentPage={currentPage}
+        itemsPerPage={itemsPerPage}
+        baseUrl={`/search?q=${encodeURIComponent(query)}`}
       />
     )}
 

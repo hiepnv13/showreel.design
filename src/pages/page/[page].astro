@@ -1,0 +1,49 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import VideoGrid from "../../components/VideoGrid.astro";
+import { getAllVideos, sortVideosByDate } from "../../utils/videoUtils";
+
+export async function getStaticPaths() {
+    const videos = sortVideosByDate(await getAllVideos());
+    const itemsPerPage = 24;
+    const totalPages = Math.ceil(videos.length / itemsPerPage);
+    
+    const paths: Array<{
+        params: { page: string };
+        props: { currentPage: number; totalPages: number };
+    }> = [];
+    
+    for (let i = 1; i <= totalPages; i++) {
+        paths.push({
+            params: { page: i.toString() },
+            props: { currentPage: i, totalPages }
+        });
+    }
+    
+    return paths;
+}
+
+interface Props {
+    currentPage: number;
+    totalPages: number;
+}
+
+const { currentPage, totalPages } = Astro.props as Props;
+const pageNumber = parseInt(Astro.params.page as string || '1');
+
+// Redirect to page 1 if invalid page number
+if (pageNumber < 1 || pageNumber > totalPages) {
+    return Astro.redirect('/');
+}
+
+const videos = sortVideosByDate(await getAllVideos());
+---
+
+<Layout title={`Flow Studio - Page ${pageNumber}`}>
+    <VideoGrid 
+        videos={videos}
+        currentPage={pageNumber}
+        itemsPerPage={24}
+        baseUrl="/page"
+    />
+</Layout>

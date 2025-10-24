@@ -5,16 +5,25 @@ import Hero from "../components/Hero.astro";
 import VideoGrid from "../components/VideoGrid.astro";
 import { getAllVideos, sortVideosByDate } from "../utils/videoUtils";
 
-// Homepage always shows all videos - no URL param filtering
+// Homepage shows first page of videos (24 videos)
 const allVideos = await getAllVideos();
 const videos = sortVideosByDate(allVideos);
+const itemsPerPage = 24;
+const totalPages = Math.ceil(videos.length / itemsPerPage);
 ---
 
 <Layout title="Showreel.design - Discover Amazing Motion Design & Animation">
     <Header />
     <main>
         <Hero />
-        <!-- Pass all videos to VideoGrid with currentCategory="All" -->
-        <VideoGrid videos={videos} currentCategory="All" showAllTab={true} />
+        <!-- Pass all videos to VideoGrid with pagination support -->
+        <VideoGrid 
+            videos={videos} 
+            currentCategory="All" 
+            showAllTab={true}
+            currentPage={1}
+            itemsPerPage={itemsPerPage}
+            baseUrl="/page"
+        />
     </main>
 </Layout>

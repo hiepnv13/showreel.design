@@ -1,32 +1,34 @@
-# Astro Starter Kit: Basics
+# Showreel Design
 
-```sh
-npm create astro@latest -- --template basics
-```
+This project is a web application for showcasing video showreels, built with Astro.
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+## 🚀 Development Setup
 
-## 🚀 Project Structure
+To get started with the project, follow these steps:
 
-Inside of your Astro project, you'll see the following folders and files:
+1.  **Install Dependencies:**
 
-```text
-/
-├── public/
-│   └── favicon.svg
-├── src
-│   ├── assets
-│   │   └── astro.svg
-│   ├── components
-│   │   └── Welcome.astro
-│   ├── layouts
-│   │   └── Layout.astro
-│   └── pages
-│       └── index.astro
-└── package.json
-```
+    ```sh
+    npm install
+    ```
 
-To learn more about the folder structure of an Astro project, refer to [our guide on project structure](https://docs.astro.build/en/basics/project-structure/).
+2.  **Environment Variables:**
+
+    Create a `.env` file in the root of the project by copying the example file:
+
+    ```sh
+    cp .env.example .env
+    ```
+
+    You will need to fill in the values for your Cloudflare R2 storage bucket.
+
+3.  **Run the Development Server:**
+
+    ```sh
+    npm run dev
+    ```
+
+    This will start the local development server at `http://localhost:4321/`.
 
 ## 🧞 Commands
 
