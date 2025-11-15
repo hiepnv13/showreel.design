@@ -30,8 +30,8 @@ export default {
         }
       },
       fontFamily: {
-        sans: ['Ronzino', 'sans-serif'],
-        serif: ['Ronzino', 'sans-serif'],
+        sans: ['Instrument Sans', 'sans-serif'],
+        serif: ['Instrument Sans', 'sans-serif'],
       },
       animation: {
         'fade-in': 'fadeIn 0.5s ease-in-out',
