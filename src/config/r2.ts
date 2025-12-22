@@ -98,6 +98,23 @@ export function generatePreviewUrl(fileName: string): string {
 }
 
 /**
+ * Generate thumbnail video URL from filename
+ * Thumbnails are stored in /Thumbnails folder with naming pattern: thumbnail_videos_{baseName}.mp4
+ * @param fileName - Video filename
+ * @returns Thumbnail video URL
+ */
+export function generateThumbnailUrl(fileName: string): string {
+  // Remove extension to get base name
+  const baseName = fileName.replace(/\.[^/.]+$/, '');
+  
+  // Generate thumbnail filename: thumbnail_videos_{baseName}.mp4
+  const thumbnailFileName = `thumbnail_videos_${baseName}.mp4`;
+  
+  // Build full URL pointing to /Thumbnails folder
+  return `${R2_CONFIG.BASE_URL}/Thumbnails/${thumbnailFileName}`;
+}
+
+/**
  * Verify if video URL is accessible
  * @param url - Video URL to check
  * @returns Promise<boolean>

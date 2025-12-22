@@ -4,11 +4,12 @@ export interface Props {
   author: string;
   thumbnail: string;
   videoUrl?: string;
+  fullVideoUrl?: string;
   category?: string;
   slug?: string;
 }
 
-const { title, author, thumbnail, videoUrl, category, slug } = Astro.props;
+const { title, author, thumbnail, videoUrl, fullVideoUrl, category, slug } = Astro.props;
 ---
 
 <a href={slug ? `/videos/${slug}` : '#'} class="video-card group cursor-pointer block" data-video-url={videoUrl}>
