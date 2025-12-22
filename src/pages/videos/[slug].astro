@@ -5,6 +5,9 @@ import Layout from "../../layouts/Layout.astro";
 import Header from "../../components/Header.astro";
 import type { GetStaticPaths } from "astro";
 
+// Force prerender in SSR mode to avoid 500 errors
+export const prerender = true;
+
 export const getStaticPaths: GetStaticPaths = async () => {
   const videos = await getAllVideos();
   return videos.map((video) => ({
