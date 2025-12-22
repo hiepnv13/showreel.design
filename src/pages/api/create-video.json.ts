@@ -109,6 +109,17 @@ soundMusic: ${formatTaxonomy(soundMusic)}
 
 export const POST: APIRoute = async ({ request }) => {
     try {
+        // Only allow in development mode
+        if (!import.meta.env.DEV) {
+            return new Response(
+                JSON.stringify({
+                    error: 'This endpoint is only available in development mode',
+                    message: 'Please run locally with npm run dev to create new videos'
+                }),
+                { status: 403, headers: { 'Content-Type': 'application/json' } }
+            );
+        }
+
         console.log('Request received:', request.method);
         console.log('Content-Type:', request.headers.get('content-type'));
         
