@@ -4,25 +4,17 @@ import { generateVideoUrl, generatePreviewUrl, generateVideoSources, generateThu
 // Get all videos from content collection
 export async function getAllVideos(): Promise<CollectionEntry<'videos'>[]> {
   const videos = await getCollection('videos');
-  return videos.map((video: any) => {
-    // Validate videoFileName exists
-    if (!video.data.videoFileName) {
-      console.error(`Video "${video.data.title}" missing videoFileName field`, video);
-      throw new Error(`Video "${video.data.title}" missing required videoFileName field`);
+  return videos.map((video: any) => ({
+    ...video,
+    // Generate video URLs from fileName
+    data: {
+      ...video.data,
+      videoUrl: generateVideoUrl(video.data.videoFileName, video.data.quality),
+      thumbnailUrl: generateThumbnailUrl(video.data.videoFileName),
+      previewUrl: generatePreviewUrl(video.data.videoFileName),
+      videoSources: generateVideoSources(video.data.videoFileName, video.data.quality)
     }
-    
-    return {
-      ...video,
-      // Generate video URLs from fileName
-      data: {
-        ...video.data,
-        videoUrl: generateVideoUrl(video.data.videoFileName, video.data.quality),
-        thumbnailUrl: generateThumbnailUrl(video.data.videoFileName),
-        previewUrl: generatePreviewUrl(video.data.videoFileName),
-        videoSources: generateVideoSources(video.data.videoFileName, video.data.quality)
-      }
-    };
-  });
+  }));
 }
 
 // Get videos by category

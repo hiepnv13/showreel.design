@@ -53,11 +53,6 @@ export function generateVideoUrl(
   quality?: VideoQuality,
   format?: VideoFormat
 ): string {
-  // Validate fileName is provided and is a string
-  if (!fileName || typeof fileName !== 'string') {
-    throw new Error(`Invalid fileName: expected non-empty string, got "${fileName}"`);
-  }
-  
   // Remove extension if present to normalize
   const baseName = fileName.replace(/\.[^/.]+$/, '');
   
@@ -87,11 +82,6 @@ export function generateVideoSources(
   fileName: string,
   quality: VideoQuality = '1080p'
 ): Array<{ src: string; type: string }> {
-  // Validate fileName is provided and is a string
-  if (!fileName || typeof fileName !== 'string') {
-    throw new Error(`Invalid fileName: expected non-empty string, got "${fileName}"`);
-  }
-  
   return R2_CONFIG.SUPPORTED_FORMATS.map(format => ({
     src: generateVideoUrl(fileName, quality, format),
     type: `video/${format === 'mov' ? 'quicktime' : format}`
@@ -104,11 +94,6 @@ export function generateVideoSources(
  * @returns Preview video URL
  */
 export function generatePreviewUrl(fileName: string): string {
-  // Validate fileName is provided and is a string
-  if (!fileName || typeof fileName !== 'string') {
-    throw new Error(`Invalid fileName: expected non-empty string, got "${fileName}"`);
-  }
-  
   return generateVideoUrl(fileName, 'preview', 'mp4');
 }
 
@@ -119,11 +104,6 @@ export function generatePreviewUrl(fileName: string): string {
  * @returns Thumbnail video URL
  */
 export function generateThumbnailUrl(fileName: string): string {
-  // Validate fileName is provided and is a string
-  if (!fileName || typeof fileName !== 'string') {
-    throw new Error(`Invalid fileName: expected non-empty string, got "${fileName}"`);
-  }
-  
   // Remove extension to get base name
   const baseName = fileName.replace(/\.[^/.]+$/, '');
   

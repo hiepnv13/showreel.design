@@ -35,16 +35,32 @@ function generateMarkdownContent(data: any): string {
         quality,
         content,
         highlights,
-        applications
+        applications,
+        // NEW fields
+        year,
+        duration,
+        sourceUrl,
+        industries,
+        styles,
+        techniques,
+        soundMusic
     } = data;
 
     // Format tags array
     const tagsArray = Array.isArray(tags) ? tags : [];
-    const tagsString = tagsArray.length > 0 
+    const tagsString = tagsArray.length > 0
         ? `[${tagsArray.map(tag => `"${tag}"`).join(', ')}]`
         : '[]';
 
-    // Generate frontmatter
+    // Format taxonomy arrays
+    const formatTaxonomy = (arr: any) => {
+        const array = Array.isArray(arr) ? arr : [];
+        return array.length > 0
+            ? `[${array.map(item => `"${item}"`).join(', ')}]`
+            : '[]';
+    };
+
+    // Generate frontmatter with new fields
     const frontmatter = `---
 title: "${title}"
 author: "${author}"
@@ -55,7 +71,11 @@ tags: ${tagsString}
 featured: ${featured === true || featured === 'true' ? 'true' : 'false'}
 publishDate: ${formatDate(publishDate)}
 description: "${description}"
-quality: "${quality || '1080p'}"
+quality: "${quality || '1080p'}"${year ? `\nyear: ${year}` : ''}${duration ? `\nduration: ${duration}` : ''}${sourceUrl ? `\nsourceUrl: "${sourceUrl}"` : ''}
+industries: ${formatTaxonomy(industries)}
+styles: ${formatTaxonomy(styles)}
+techniques: ${formatTaxonomy(techniques)}
+soundMusic: ${formatTaxonomy(soundMusic)}
 ---`;
 
     // Generate main content

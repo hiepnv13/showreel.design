@@ -30,8 +30,8 @@ export default {
         }
       },
       fontFamily: {
-        sans: ['Instrument Sans', 'sans-serif'],
-        serif: ['Instrument Sans', 'sans-serif'],
+        sans: ['JetBrains Mono', 'monospace'],
+        serif: ['JetBrains Mono', 'monospace'],
       },
       animation: {
         'fade-in': 'fadeIn 0.5s ease-in-out',

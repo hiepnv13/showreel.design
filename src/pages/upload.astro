@@ -2,237 +2,357 @@
 import Layout from "../layouts/Layout.astro";
 import Header from "../components/Header.astro";
 import { getAllCategories, getAllAuthors } from "../utils/videoUtils";
+import { TAXONOMIES } from "../config/taxonomies";
 
 // Get all categories and authors for dropdown
 const categories = await getAllCategories();
 const authors = await getAllAuthors();
 ---
 
-<Layout title="Upload Video - Showreel.design">
+<Layout title="Add New Showreel - Showreel.design">
     <Header />
     <main>
         <!-- Hero Section -->
-        <section class="py-20 bg-gray-900 text-white">
-            <div class="section-container text-center">
-                <h1 class="text-4xl md:text-6xl font-bold mb-6 leading-tight">
-                    Upload New Video
+        <section class="py-12 bg-gray-900 text-white">
+            <div class="max-w-4xl mx-auto px-5 text-center">
+                <h1 class="text-4xl font-bold mb-4">
+                    Add New Showreel
                 </h1>
-                <p class="text-xl md:text-2xl text-gray-300 mb-8">
-                    Create a new video post with all the details
+                <p class="text-lg text-gray-300">
+                    Fill in the details below to create a new showreel entry
                 </p>
             </div>
         </section>
 
         <!-- Upload Form -->
-        <section class="py-20 bg-gray-50">
-            <div class="section-container max-w-4xl mx-auto">
+        <section class="py-12 bg-gray-50">
+            <div class="max-w-4xl mx-auto px-5">
                 <form id="uploadForm" class="bg-white rounded-lg shadow-lg p-8">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <!-- Title -->
-                        <div class="md:col-span-2">
-                            <label for="title" class="block text-sm font-medium text-gray-700 mb-2">
-                                Title *
-                            </label>
-                            <input
-                                type="text"
-                                id="title"
-                                name="title"
-                                required
-                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                placeholder="Enter video title"
-                            />
-                        </div>
 
-                        <!-- Author -->
-                        <div>
-                            <label for="author" class="block text-sm font-medium text-gray-700 mb-2">
-                                Author *
-                            </label>
-                            <input
-                                type="text"
-                                id="author"
-                                name="author"
-                                list="authorList"
-                                required
-                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                placeholder="Select or enter author name"
-                            />
-                            <datalist id="authorList">
-                                {authors.map((author) => (
-                                    <option value={author}>{author}</option>
-                                ))}
-                            </datalist>
-                        </div>
+                    <!-- BASIC INFORMATION -->
+                    <div class="mb-10">
+                        <h2 class="text-2xl font-bold mb-6 pb-3 border-b-2 border-gray-200">
+                            Basic Information
+                        </h2>
+                        <div class="space-y-6">
+                            <!-- Video Name (becomes title and videoFileName) -->
+                            <div>
+                                <label for="videoName" class="block text-sm font-semibold text-gray-700 mb-2">
+                                    Video Name *
+                                </label>
+                                <input
+                                    type="text"
+                                    id="videoName"
+                                    name="videoName"
+                                    required
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    placeholder="Example: Buck Showreel 2024"
+                                />
+                                <p class="mt-1 text-sm text-gray-500">This will be used to generate the video filename automatically</p>
+                            </div>
 
-                        <!-- Video File Name -->
-                        <div>
-                            <label for="videoFileName" class="block text-sm font-medium text-gray-700 mb-2">
-                                Video File Name *
-                            </label>
-                            <input
-                                type="text"
-                                id="videoFileName"
-                                name="videoFileName"
-                                required
-                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                placeholder="video-file.mp4"
-                            />
-                        </div>
+                            <!-- Agency Name (becomes author) -->
+                            <div>
+                                <label for="author" class="block text-sm font-semibold text-gray-700 mb-2">
+                                    Agency Name *
+                                </label>
+                                <input
+                                    type="text"
+                                    id="author"
+                                    name="author"
+                                    list="authorList"
+                                    required
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    placeholder="Example: Buck, Gunner, ManvsMachine"
+                                />
+                                <datalist id="authorList">
+                                    {authors.map((author) => (
+                                        <option value={author}>{author}</option>
+                                    ))}
+                                </datalist>
+                            </div>
 
-                        <!-- Category -->
-                        <div>
-                            <label for="category" class="block text-sm font-medium text-gray-700 mb-2">
-                                Category *
-                            </label>
-                            <input
-                                type="text"
-                                id="category"
-                                name="category"
-                                list="categoryList"
-                                required
-                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                placeholder="Select or enter category"
-                            />
-                            <datalist id="categoryList">
-                                {categories.map((cat) => (
-                                    <option value={cat}>{cat}</option>
-                                ))}
-                            </datalist>
-                        </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <!-- Year Released -->
+                                <div>
+                                    <label for="year" class="block text-sm font-semibold text-gray-700 mb-2">
+                                        Year Released *
+                                    </label>
+                                    <input
+                                        type="number"
+                                        id="year"
+                                        name="year"
+                                        required
+                                        min="2000"
+                                        max="2099"
+                                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                        placeholder="2024"
+                                    />
+                                </div>
 
-                        <!-- Quality -->
-                        <div>
-                            <label for="quality" class="block text-sm font-medium text-gray-700 mb-2">
-                                Quality
-                            </label>
-                            <select
-                                id="quality"
-                                name="quality"
-                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                            >
-                                <option value="1080p">1080p</option>
-                                <option value="4K">4K</option>
-                                <option value="720p">720p</option>
-                            </select>
+                                <!-- Duration (optional) -->
+                                <div>
+                                    <label for="duration" class="block text-sm font-semibold text-gray-700 mb-2">
+                                        Duration (seconds)
+                                    </label>
+                                    <input
+                                        type="number"
+                                        id="duration"
+                                        name="duration"
+                                        min="1"
+                                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                        placeholder="120"
+                                    />
+                                    <p class="mt-1 text-sm text-gray-500">Leave empty to auto-detect</p>
+                                </div>
+                            </div>
                         </div>
+                    </div>
 
-                        <!-- Publish Date -->
-                        <div>
-                            <label for="publishDate" class="block text-sm font-medium text-gray-700 mb-2">
-                                Publish Date *
-                            </label>
-                            <input
-                                type="date"
-                                id="publishDate"
-                                name="publishDate"
-                                required
-                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                            />
+                    <!-- CATEGORIZATION -->
+                    <div class="mb-10">
+                        <h2 class="text-2xl font-bold mb-6 pb-3 border-b-2 border-gray-200">
+                            Categorization
+                        </h2>
+                        <div class="space-y-6">
+                            <!-- Industry (Multi-select) -->
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-3">
+                                    Industry * (Multiple select)
+                                </label>
+                                <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+                                    {TAXONOMIES.industries.map((industry) => (
+                                        <label class="flex items-center space-x-2 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                                            <input
+                                                type="checkbox"
+                                                name="industries"
+                                                value={industry.value}
+                                                class="w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                                            />
+                                            <span class="text-sm text-gray-700">{industry.label}</span>
+                                        </label>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <!-- Style (Multi-select) -->
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-3">
+                                    Style * (Multiple select)
+                                </label>
+                                <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+                                    {TAXONOMIES.styles.map((style) => (
+                                        <label class="flex items-center space-x-2 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                                            <input
+                                                type="checkbox"
+                                                name="styles"
+                                                value={style.value}
+                                                class="w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                                            />
+                                            <span class="text-sm text-gray-700">{style.label}</span>
+                                        </label>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <!-- Technique (Multi-select) -->
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-3">
+                                    Technique * (Multiple select)
+                                </label>
+                                <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+                                    {TAXONOMIES.techniques.map((technique) => (
+                                        <label class="flex items-center space-x-2 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                                            <input
+                                                type="checkbox"
+                                                name="techniques"
+                                                value={technique.value}
+                                                class="w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                                            />
+                                            <span class="text-sm text-gray-700">{technique.label}</span>
+                                        </label>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <!-- Sound/Music (Multi-select) -->
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-3">
+                                    Sound/Music (Multiple select)
+                                </label>
+                                <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+                                    {TAXONOMIES.soundMusic.map((sound) => (
+                                        <label class="flex items-center space-x-2 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                                            <input
+                                                type="checkbox"
+                                                name="soundMusic"
+                                                value={sound.value}
+                                                class="w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                                            />
+                                            <span class="text-sm text-gray-700">{sound.label}</span>
+                                        </label>
+                                    ))}
+                                </div>
+                            </div>
                         </div>
+                    </div>
 
-                        <!-- Featured -->
-                        <div class="flex items-center">
-                            <input
-                                type="checkbox"
-                                id="featured"
-                                name="featured"
-                                class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                            />
-                            <label for="featured" class="ml-2 block text-sm text-gray-700">
-                                Featured Video
-                            </label>
-                        </div>
+                    <!-- ADDITIONAL INFO -->
+                    <div class="mb-10">
+                        <h2 class="text-2xl font-bold mb-6 pb-3 border-b-2 border-gray-200">
+                            Additional Info
+                        </h2>
+                        <div class="space-y-6">
+                            <!-- Category (backward compatibility) -->
+                            <div>
+                                <label for="category" class="block text-sm font-semibold text-gray-700 mb-2">
+                                    Category *
+                                </label>
+                                <input
+                                    type="text"
+                                    id="category"
+                                    name="category"
+                                    list="categoryList"
+                                    required
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    placeholder="Showreel, Commercial, etc."
+                                />
+                                <datalist id="categoryList">
+                                    {categories.map((cat) => (
+                                        <option value={cat}>{cat}</option>
+                                    ))}
+                                </datalist>
+                            </div>
 
-                        <!-- Tags -->
-                        <div class="md:col-span-2">
-                            <label for="tags" class="block text-sm font-medium text-gray-700 mb-2">
-                                Tags (comma separated)
-                            </label>
-                            <input
-                                type="text"
-                                id="tags"
-                                name="tags"
-                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                placeholder="branding, animation, logo, motion"
-                            />
-                        </div>
+                            <!-- Tags (backward compatibility) -->
+                            <div>
+                                <label for="tags" class="block text-sm font-semibold text-gray-700 mb-2">
+                                    Tags (comma separated)
+                                </label>
+                                <input
+                                    type="text"
+                                    id="tags"
+                                    name="tags"
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    placeholder="animation, motion design, 3d"
+                                />
+                            </div>
 
-                        <!-- Description -->
-                        <div class="md:col-span-2">
-                            <label for="description" class="block text-sm font-medium text-gray-700 mb-2">
-                                Short Description *
-                            </label>
-                            <textarea
-                                id="description"
-                                name="description"
-                                required
-                                rows="3"
-                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                placeholder="Brief description of the video"
-                            ></textarea>
-                        </div>
+                            <!-- Description -->
+                            <div>
+                                <label for="description" class="block text-sm font-semibold text-gray-700 mb-2">
+                                    Description (Optional)
+                                </label>
+                                <textarea
+                                    id="description"
+                                    name="description"
+                                    rows="4"
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    placeholder="Brief description about this showreel..."
+                                ></textarea>
+                            </div>
 
-                        <!-- Main Content -->
-                        <div class="md:col-span-2">
-                            <label for="content" class="block text-sm font-medium text-gray-700 mb-2">
-                                Main Content
-                            </label>
-                            <textarea
-                                id="content"
-                                name="content"
-                                rows="8"
-                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                placeholder="Detailed description of the project, highlights, technical details, etc."
-                            ></textarea>
-                        </div>
+                            <!-- Source URL -->
+                            <div>
+                                <label for="sourceUrl" class="block text-sm font-semibold text-gray-700 mb-2">
+                                    Source URL *
+                                </label>
+                                <input
+                                    type="url"
+                                    id="sourceUrl"
+                                    name="sourceUrl"
+                                    required
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    placeholder="https://agency.com/work or social media link"
+                                />
+                                <p class="mt-1 text-sm text-gray-500">Where did you find this?</p>
+                            </div>
 
-                        <!-- Project Highlights -->
-                        <div class="md:col-span-2">
-                            <label for="highlights" class="block text-sm font-medium text-gray-700 mb-2">
-                                Project Highlights (one per line)
-                            </label>
-                            <textarea
-                                id="highlights"
-                                name="highlights"
-                                rows="4"
-                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                placeholder="Logo Animation: Smooth, professional logo reveals\nBrand Guidelines: Animated presentation of brand elements"
-                            ></textarea>
-                        </div>
+                            <!-- Publish Date -->
+                            <div>
+                                <label for="publishDate" class="block text-sm font-semibold text-gray-700 mb-2">
+                                    Publish Date *
+                                </label>
+                                <input
+                                    type="date"
+                                    id="publishDate"
+                                    name="publishDate"
+                                    required
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                />
+                            </div>
 
-                        <!-- Applications -->
-                        <div class="md:col-span-2">
-                            <label for="applications" class="block text-sm font-medium text-gray-700 mb-2">
-                                Applications (one per line)
-                            </label>
-                            <textarea
-                                id="applications"
-                                name="applications"
-                                rows="4"
-                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                placeholder="Corporate presentations\nWebsite headers\nSocial media content"
-                            ></textarea>
+                            <!-- Quality -->
+                            <div>
+                                <label for="quality" class="block text-sm font-semibold text-gray-700 mb-2">
+                                    Quality
+                                </label>
+                                <select
+                                    id="quality"
+                                    name="quality"
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                >
+                                    <option value="1080p">1080p</option>
+                                    <option value="4k">4K</option>
+                                    <option value="720p">720p</option>
+                                </select>
+                            </div>
+
+                            <!-- Featured -->
+                            <div class="flex items-center">
+                                <input
+                                    type="checkbox"
+                                    id="featured"
+                                    name="featured"
+                                    class="w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                                />
+                                <label for="featured" class="ml-2 text-sm font-semibold text-gray-700">
+                                    Featured Video
+                                </label>
+                            </div>
                         </div>
                     </div>
 
                     <!-- Submit Button -->
-                    <div class="mt-8 text-center">
+                    <div class="flex gap-4">
+                        <button
+                            type="button"
+                            id="previewBtn"
+                            class="flex-1 bg-gray-600 hover:bg-gray-700 text-white font-bold py-4 px-8 rounded-lg transition-colors duration-200"
+                        >
+                            Preview
+                        </button>
                         <button
                             type="submit"
-                            class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg transition-colors duration-200"
+                            class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-8 rounded-lg transition-colors duration-200"
                         >
-                            Create Video Post
+                            Submit
                         </button>
                     </div>
                 </form>
 
                 <!-- Success/Error Messages -->
-                <div id="message" class="mt-6 text-center hidden">
+                <div id="message" class="mt-6 hidden">
                     <div id="successMessage" class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded hidden">
                         Video post created successfully!
                     </div>
                     <div id="errorMessage" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded hidden">
                         Error creating video post. Please try again.
+                    </div>
+                </div>
+
+                <!-- Preview Panel -->
+                <div id="previewPanel" class="mt-6 bg-white rounded-lg shadow-lg p-8 hidden">
+                    <h3 class="text-2xl font-bold mb-4">Preview</h3>
+                    <div class="space-y-3 text-sm">
+                        <p><strong>Generated Slug:</strong> <span id="previewSlug" class="text-blue-600"></span></p>
+                        <p><strong>Video Filename:</strong> <span id="previewFilename" class="text-blue-600"></span></p>
+                        <p><strong>Video URL:</strong> <span id="previewVideoUrl" class="text-blue-600 break-all"></span></p>
+                        <p><strong>Thumbnail URL:</strong> <span id="previewThumbnailUrl" class="text-blue-600 break-all"></span></p>
+                        <p><strong>Selected Industries:</strong> <span id="previewIndustries" class="text-gray-700"></span></p>
+                        <p><strong>Selected Styles:</strong> <span id="previewStyles" class="text-gray-700"></span></p>
+                        <p><strong>Selected Techniques:</strong> <span id="previewTechniques" class="text-gray-700"></span></p>
+                        <p><strong>Selected Sound/Music:</strong> <span id="previewSound" class="text-gray-700"></span></p>
                     </div>
                 </div>
             </div>
@@ -248,23 +368,108 @@ const authors = await getAllAuthors();
         if (publishDateEl) publishDateEl.value = today;
     });
 
+    // Helper function to generate slug
+    function generateSlug(text: string): string {
+        return text
+            .toLowerCase()
+            .replace(/[^a-z0-9 -]/g, '')
+            .replace(/\s+/g, '-')
+            .replace(/-+/g, '-')
+            .trim()
+            .replace(/^-+|-+$/g, '');
+    }
+
+    // Preview functionality
+    document.getElementById('previewBtn')?.addEventListener('click', function() {
+        const videoName = (document.getElementById('videoName') as HTMLInputElement)?.value;
+
+        if (!videoName) {
+            alert('Please enter a video name first');
+            return;
+        }
+
+        const slug = generateSlug(videoName);
+        // Use original name for filename (matches R2)
+        const filename = `${videoName}.mp4`;
+        const videoUrl = `https://video.showreel.design/videos/${encodeURIComponent(filename)}`;
+        const thumbnailUrl = `https://video.showreel.design/Thumbnails/thumbnail_videos_${encodeURIComponent(videoName)}.mp4`;
+
+        // Get selected taxonomies
+        const getSelectedValues = (name: string) => {
+            return Array.from(document.querySelectorAll(`input[name="${name}"]:checked`))
+                .map(el => (el as HTMLInputElement).value)
+                .join(', ') || 'None';
+        };
+
+        const industries = getSelectedValues('industries');
+        const styles = getSelectedValues('styles');
+        const techniques = getSelectedValues('techniques');
+        const soundMusic = getSelectedValues('soundMusic');
+
+        // Update preview
+        (document.getElementById('previewSlug') as HTMLElement).textContent = slug;
+        (document.getElementById('previewFilename') as HTMLElement).textContent = filename;
+        (document.getElementById('previewVideoUrl') as HTMLElement).textContent = videoUrl;
+        (document.getElementById('previewThumbnailUrl') as HTMLElement).textContent = thumbnailUrl;
+        (document.getElementById('previewIndustries') as HTMLElement).textContent = industries;
+        (document.getElementById('previewStyles') as HTMLElement).textContent = styles;
+        (document.getElementById('previewTechniques') as HTMLElement).textContent = techniques;
+        (document.getElementById('previewSound') as HTMLElement).textContent = soundMusic;
+
+        // Show preview panel
+        document.getElementById('previewPanel')?.classList.remove('hidden');
+    });
+
     // Handle form submission
     document.getElementById('uploadForm')?.addEventListener('submit', async function(e) {
         e.preventDefault();
-        
-        const formData = new FormData(this as HTMLFormElement);
-        const data = Object.fromEntries(formData.entries()) as any;
-        
+
+        const form = this as HTMLFormElement;
+        const formData = new FormData(form);
+
+        // Get video name and generate slug + filename
+        const videoName = formData.get('videoName') as string;
+        const slug = generateSlug(videoName);
+        // Keep original name for videoFileName (matches R2 file naming)
+        const videoFileName = `${videoName}.mp4`;
+
+        // Collect multi-select values
+        const getMultiSelectValues = (name: string) => {
+            return Array.from(form.querySelectorAll(`input[name="${name}"]:checked`))
+                .map(el => (el as HTMLInputElement).value);
+        };
+
+        const industries = getMultiSelectValues('industries');
+        const styles = getMultiSelectValues('styles');
+        const techniques = getMultiSelectValues('techniques');
+        const soundMusic = getMultiSelectValues('soundMusic');
+
         // Convert tags to array
-        if (data.tags) {
-            data.tags = (data.tags as string).split(',').map((tag: string) => tag.trim()).filter((tag: string) => tag);
-        } else {
-            data.tags = [];
-        }
-        
-        // Convert featured to boolean
-        data.featured = formData.has('featured');
-        
+        const tagsInput = formData.get('tags') as string;
+        const tags = tagsInput ? tagsInput.split(',').map(tag => tag.trim()).filter(tag => tag) : [];
+
+        // Build data object
+        const data = {
+            title: videoName,
+            author: formData.get('author'),
+            videoFileName: videoFileName,
+            category: formData.get('category'),
+            tags: tags,
+            featured: formData.has('featured'),
+            publishDate: formData.get('publishDate'),
+            description: formData.get('description') || `${videoName} - A showcase of creative work`,
+            quality: formData.get('quality') || '1080p',
+            year: formData.get('year') ? parseInt(formData.get('year') as string) : undefined,
+            duration: formData.get('duration') ? parseInt(formData.get('duration') as string) : undefined,
+            sourceUrl: formData.get('sourceUrl'),
+            industries: industries,
+            styles: styles,
+            techniques: techniques,
+            soundMusic: soundMusic
+        };
+
+        console.log('Submitting data:', data);
+
         try {
             const response = await fetch('/api/create-video.json', {
                 method: 'POST',
@@ -273,18 +478,28 @@ const authors = await getAllAuthors();
                 },
                 body: JSON.stringify(data)
             });
-            
+
             const result = await response.json();
-            
+
             if (response.ok) {
                 (document.getElementById('successMessage') as HTMLElement)?.classList.remove('hidden');
                 (document.getElementById('errorMessage') as HTMLElement)?.classList.add('hidden');
                 (document.getElementById('message') as HTMLElement)?.classList.remove('hidden');
-                (this as HTMLFormElement).reset();
+                form.reset();
                 // Reset date to today
                 const today = new Date().toISOString().split('T')[0];
                 const publishDateEl = document.getElementById('publishDate') as HTMLInputElement;
                 if (publishDateEl) publishDateEl.value = today;
+
+                // Hide preview
+                document.getElementById('previewPanel')?.classList.add('hidden');
+
+                // Show success message with filename
+                const successMsg = document.getElementById('successMessage') as HTMLElement;
+                successMsg.textContent = `Video post created successfully! File: ${result.filename}`;
+
+                // Scroll to top
+                window.scrollTo({ top: 0, behavior: 'smooth' });
             } else {
                 throw new Error(result.error || 'Failed to create video post');
             }
