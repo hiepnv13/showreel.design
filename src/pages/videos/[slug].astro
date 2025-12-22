@@ -7,7 +7,7 @@ import type { GetStaticPaths } from "astro";
 
 export const getStaticPaths: GetStaticPaths = async () => {
   const videos = await getAllVideos();
-  return videos.map((video: CollectionEntry<"videos">) => ({
+  return videos.map((video) => ({
     params: { slug: video.slug },
     props: { video },
   }));
@@ -17,6 +17,7 @@ interface Props {
   video: CollectionEntry<"videos"> & {
     data: CollectionEntry<"videos">["data"] & {
       videoUrl: string;
+      thumbnailUrl: string;
       previewUrl: string;
       videoSources: { src: string; type: string }[];
     };
