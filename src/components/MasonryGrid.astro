@@ -1,0 +1,138 @@
+---
+interface Props {
+  videos: any[];
+}
+
+const { videos } = Astro.props;
+---
+
+<main class="w-full bg-white video-grid px-8">
+  <div class="grid grid-cols-3 gap-5">
+    {videos.map((video) => (
+      <a href={`/videos/${video.slug}`} class="video-item flex flex-col gap-1 group">
+        <div class="aspect-video relative overflow-hidden bg-gray-100">
+          <video
+            class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+            muted
+            loop
+            playsinline
+            preload="none"
+            data-src={video.data.thumbnailUrl}
+          >
+            <source data-src={video.data.thumbnailUrl} type="video/mp4" />
+          </video>
+        </div>
+        <div class="p-1">
+          <p class="text-[14px] text-black">{video.data.title}</p>
+        </div>
+      </a>
+    ))}
+  </div>
+</main>
+
+<script>
+  // Intersection Observer for lazy loading and autoplay
+  document.addEventListener('DOMContentLoaded', () => {
+    const CONFIG = {
+      rootMargin: '100px',
+      threshold: 0.1,
+      maxConcurrentVideos: 6,
+      playThreshold: 0.3
+    };
+
+    let currentlyPlayingVideos = new Set<HTMLVideoElement>();
+    let loadedVideos = new WeakSet<HTMLVideoElement>();
+
+    // Load observer - starts loading video when near viewport
+    const loadObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const video = entry.target as HTMLVideoElement;
+          loadVideo(video);
+        }
+      });
+    }, {
+      rootMargin: CONFIG.rootMargin,
+      threshold: CONFIG.threshold
+    });
+
+    // Play observer - plays video when visible
+    const playObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        const video = entry.target as HTMLVideoElement;
+
+        if (!loadedVideos.has(video)) return;
+
+        if (entry.isIntersecting && entry.intersectionRatio >= CONFIG.playThreshold) {
+          playVideo(video);
+        } else {
+          pauseVideo(video);
+        }
+      });
+    }, {
+      threshold: CONFIG.playThreshold
+    });
+
+    function loadVideo(video: HTMLVideoElement) {
+      if (loadedVideos.has(video)) return;
+
+      const dataSrc = video.getAttribute('data-src');
+      if (dataSrc) {
+        const source = video.querySelector('source');
+        if (source) {
+          source.src = dataSrc;
+        }
+        video.src = dataSrc;
+
+        video.addEventListener('canplay', () => {
+          loadedVideos.add(video);
+          video.style.opacity = '1';
+          playObserver.observe(video);
+        }, { once: true });
+
+        video.load();
+      }
+    }
+
+    function playVideo(video: HTMLVideoElement) {
+      if (currentlyPlayingVideos.size >= CONFIG.maxConcurrentVideos) {
+        const oldestVideo = currentlyPlayingVideos.values().next().value;
+        if (oldestVideo && oldestVideo !== video) {
+          pauseVideo(oldestVideo);
+        }
+      }
+
+      video.currentTime = 0;
+      video.play().then(() => {
+        currentlyPlayingVideos.add(video);
+      }).catch(() => {
+        // Autoplay blocked, silent fail
+      });
+    }
+
+    function pauseVideo(video: HTMLVideoElement) {
+      video.pause();
+      currentlyPlayingVideos.delete(video);
+    }
+
+    // Initialize observers
+    const videos = document.querySelectorAll('.video-item video');
+    videos.forEach(video => {
+      loadObserver.observe(video);
+    });
+
+    // Pause all when tab hidden
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        currentlyPlayingVideos.forEach(video => video.pause());
+      }
+    });
+  });
+</script>
+
+<style>
+  .video-item video {
+    opacity: 0;
+    transition: opacity 0.5s ease;
+  }
+</style>

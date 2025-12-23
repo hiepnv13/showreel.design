@@ -1,54 +1,69 @@
 ---
-// Header component
+// Header component matching Figma design
+const categories = [
+  { label: 'ALL', active: true },
+  { label: '3D', active: false },
+  { label: 'Agency', active: false },
+  { label: 'Showreel', active: false },
+  { label: 'Branding', active: false },
+  { label: 'Character', active: false },
+  { label: 'Motion Graphic', active: false },
+  { label: 'UI/UX', active: false },
+];
 ---
 
-<header class="bg-white/80 backdrop-blur-md border-b border-gray-100 sticky top-0 z-50">
-  <div class="w-full px-5">
-    <div class="flex justify-between items-center h-20">
-      <!-- Logo -->
-      <div class="flex items-center">
-        <a href="/" class="text-2xl font-bold text-gray-900 hover:text-gray-700 transition-colors">
-          Showreel.design
-        </a>
-      </div>
-      
-      <!-- Navigation -->
-      <nav class="hidden md:flex items-center space-x-6">
-        <a href="#" class="text-gray-700 hover:text-gray-900 transition-colors font-medium">About</a>
-        <!-- Search Bar -->
-        <div class="relative" id="search-container">
-          <form action="/search" method="get" class="relative">
-            <input 
-              type="text" 
-              name="q"
-              id="search-input"
-              placeholder="Search videos..." 
-              class="w-64 px-4 py-2 pl-10 text-sm border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent bg-gray-50 hover:bg-white transition-colors"
-              autocomplete="off"
-            />
-            <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-            </svg>
-          </form>
-          
-          <!-- Search Suggestions Dropdown -->
-          <div id="search-suggestions" class="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-lg shadow-lg mt-1 max-h-96 overflow-y-auto z-50 hidden">
-            <div id="suggestions-content" class="py-2">
-              <!-- Suggestions will be populated by JavaScript -->
-            </div>
-          </div>
-        </div>
-        
-      </nav>
-      
-      
-      <!-- Mobile menu button -->
-      <button class="md:hidden p-2 rounded-xl text-gray-700 hover:bg-gray-100 transition-colors">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-        </svg>
-      </button></div>
+<header class="w-full bg-white sticky top-0 z-50 px-8 pt-8 pb-4 flex flex-col gap-6">
+  <!-- Top Row: Logo, Filters, Search -->
+  <div class="flex items-center justify-between w-full">
+    <!-- Logo -->
+    <div class="pr-12 flex-shrink-0">
+      <a href="/" class="text-[30px] font-medium tracking-[-1.5px] text-[#1a1a1a] hover:opacity-70 transition-opacity whitespace-nowrap">
+        Showreel.design
+      </a>
     </div>
+
+    <!-- Category Filter Buttons -->
+    <div class="flex items-center gap-2">
+      {categories.map((cat) => (
+        <button
+          class={`filter-btn ${cat.active ? 'active' : ''}`}
+          data-filter={cat.label.toLowerCase().replace(/\s+/g, '-')}
+        >
+          {cat.label}
+        </button>
+      ))}
+    </div>
+
+    <!-- Search Bar -->
+    <div class="pl-10 flex-shrink-0" id="search-container">
+      <form action="/search" method="get" class="border-b border-gray-200 pb-2 flex items-center gap-4">
+        <input
+          type="text"
+          name="q"
+          id="search-input"
+          placeholder="Search showreel"
+          class="w-[180px] bg-transparent border-none outline-none text-[14px] placeholder-gray-500"
+          autocomplete="off"
+        />
+        <div class="bg-[#f0f0f0] px-2 py-1 rounded text-[12px] text-gray-500 border border-transparent">
+          ENTER
+        </div>
+      </form>
+
+      <!-- Search Suggestions Dropdown -->
+      <div id="search-suggestions" class="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-lg shadow-lg mt-1 max-h-96 overflow-y-auto z-50 hidden">
+        <div id="suggestions-content" class="py-2">
+          <!-- Suggestions will be populated by JavaScript -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Results Counter -->
+  <div class="w-full flex items-center">
+    <span class="text-[10px] tracking-[1.5px] text-gray-500 font-medium flex items-center gap-1 uppercase" id="results-counter">
+      Showing <span id="showing-count">20</span> <i class="fa-solid fa-caret-right text-[8px] mx-0.5 text-gray-400"></i> of <span id="total-count">11,286</span>
+    </span>
   </div>
 </header>
 
@@ -57,15 +72,15 @@
   #search-suggestions {
     z-index: 9999;
   }
-  
+
   .suggestion-item:hover {
     background-color: #f9fafb;
   }
-  
+
   .suggestion-item.bg-gray-100 {
     background-color: #f3f4f6;
   }
-  
+
   /* Ensure search container has proper stacking context */
   #search-container {
     position: relative;
@@ -76,4 +91,35 @@
 <script>
   // Import search handler for search functionality
   import '../scripts/searchHandler.js';
+
+  // Update results counter based on actual video count
+  document.addEventListener('DOMContentLoaded', () => {
+    const videoGrid = document.querySelector('.video-grid');
+    if (videoGrid) {
+      const videoCount = videoGrid.querySelectorAll('.video-item').length;
+      const showingCount = document.getElementById('showing-count');
+      const totalCount = document.getElementById('total-count');
+
+      if (showingCount) showingCount.textContent = videoCount.toString();
+      if (totalCount) totalCount.textContent = videoCount.toLocaleString();
+    }
+  });
+
+  // Filter button functionality
+  document.addEventListener('DOMContentLoaded', () => {
+    const filterButtons = document.querySelectorAll('.filter-btn');
+
+    filterButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        // Remove active class from all buttons
+        filterButtons.forEach(btn => btn.classList.remove('active'));
+        // Add active class to clicked button
+        button.classList.add('active');
+
+        // TODO: Implement filtering logic
+        const filter = button.getAttribute('data-filter');
+        console.log('Filter selected:', filter);
+      });
+    });
+  });
 </script>

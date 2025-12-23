@@ -1,28 +1,15 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import Header from "../components/Header.astro";
-import Hero from "../components/Hero.astro";
-import VideoGrid from "../components/VideoGrid.astro";
+import MasonryGrid from "../components/MasonryGrid.astro";
 import { getAllVideos, sortVideosByDate } from "../utils/videoUtils";
 
-// Homepage shows first page of videos (24 videos)
+// Get all videos sorted by date
 const allVideos = await getAllVideos();
 const videos = sortVideosByDate(allVideos);
-const itemsPerPage = 24;
-const totalPages = Math.ceil(videos.length / itemsPerPage);
 ---
 
-<Layout title="Showreel.design - Discover Amazing Motion Design & Animation">
+<Layout title="Showreel.design - Discover amazing showreels">
     <Header />
-    <main>
-    
-        <VideoGrid 
-            videos={videos} 
-            currentCategory="All" 
-            showAllTab={true}
-            currentPage={1}
-            itemsPerPage={itemsPerPage}
-            baseUrl="/page"
-        />
-    </main>
+    <MasonryGrid videos={videos} />
 </Layout>
