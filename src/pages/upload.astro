@@ -410,7 +410,7 @@ const authors = await getAllAuthors();
         // Use original name for filename (matches R2)
         const filename = `${videoName}.mp4`;
         const videoUrl = `https://video.showreel.design/videos/${encodeURIComponent(filename)}`;
-        const thumbnailUrl = `https://video.showreel.design/Thumbnails/thumbnail_videos_${encodeURIComponent(videoName)}.mp4`;
+        const thumbnailUrl = `https://video.showreel.design/Thumbnails/${encodeURIComponent(`thumbnail_videos_${videoName}.mp4`)}`;
 
         // Get selected taxonomies
         const getSelectedValues = (name: string) => {
