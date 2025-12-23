@@ -1,6 +1,6 @@
 ---
 import { getCollection, type CollectionEntry } from "astro:content";
-import { getAllVideos, generateSlug } from "../../utils/videoUtils";
+import { getAllVideos, getRelatedVideos, generateSlug } from "../../utils/videoUtils";
 import Layout from "../../layouts/Layout.astro";
 import Header from "../../components/Header.astro";
 import type { GetStaticPaths } from "astro";
@@ -23,222 +23,395 @@ interface Props {
       thumbnailUrl: string;
       previewUrl: string;
       videoSources: { src: string; type: string }[];
-      videoFileName: string; // Added: used in template at line 47
+      videoFileName: string;
     };
   };
 }
 
 const { video }: Props = Astro.props;
 const { Content } = await video.render();
+
+// Get related videos
+const relatedVideos = await getRelatedVideos(video.slug, video.data.category, 3);
+
+// Format duration helper
+function formatDuration(seconds: number | undefined): string {
+  if (!seconds) return "N/A";
+  const mins = Math.floor(seconds / 60);
+  const secs = seconds % 60;
+  return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+}
+
+// Format taxonomy values for display
+function formatTaxonomyValue(values: string[] | undefined): string {
+  if (!values || values.length === 0) return "N/A";
+  return values.map(v => v.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')).join(', ');
+}
 ---
 
 <Layout title={video.data.title}>
   <Header />
-  <main class="min-h-screen bg-gray-50">
-    <!-- Hero Section with Video -->
-    <section class="w-full bg-white">
-      <!-- Video Container -->
-      <div class="w-full">
-        <div class="bg-white overflow-hidden relative">
-          <video
-            class="w-full h-auto cursor-pointer"
-            autoplay
-            controls
-            controlslist="nodownload"
-            playsinline
-            style="object-fit: contain;"
-          >
-            <source src={video.data.videoUrl} type="video/mp4" />
-            <source
-              src={`/videos/${encodeURIComponent(video.data.videoFileName)}`}
-              type="video/mp4"
-            />
-            Your browser does not support the video tag.
-          </video>
 
-          <!-- Fullscreen Button -->
-          <button
-            id="fullscreen-btn"
-            class="absolute top-8 right-8 bg-black/50 hover:bg-black/70 text-white p-3 rounded-full transition-all duration-200 backdrop-blur-sm"
-            title="Toggle Fullscreen"
-          >
-            <svg
-              class="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 1v4m0 0h-4m4 0l-5-5"
-              ></path>
-            </svg>
-          </button>
+  <!-- Main Content: Video + Details Side by Side -->
+  <main class="flex flex-col lg:flex-row w-full video-detail-main">
+    <!-- Video Player Section (Left) -->
+    <div class="video-player-container bg-black flex items-center justify-center relative">
+      <video
+        id="main-video"
+        class="max-w-full max-h-full w-auto h-auto"
+        autoplay
+        muted
+        loop
+        playsinline
+        style="object-fit: contain;"
+      >
+        <source src={video.data.videoUrl} type="video/mp4" />
+        <source
+          src={`/videos/${encodeURIComponent(video.data.videoFileName)}`}
+          type="video/mp4"
+        />
+        Your browser does not support the video tag.
+      </video>
+
+      <!-- Close/Back Button -->
+      <a
+        href="/"
+        class="absolute top-6 right-6 bg-black/20 hover:bg-black/40 text-white p-2 rounded-full transition-all duration-200 backdrop-blur-sm"
+        title="Back to home"
+      >
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </a>
+
+      <!-- Play/Pause Overlay (shown on click) -->
+      <div id="play-overlay" class="absolute inset-0 flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-200">
+        <div class="bg-white/10 backdrop-blur-sm border border-white/20 rounded-full p-8">
+          <svg id="play-icon" class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M8 5v14l11-7z"/>
+          </svg>
+          <svg id="pause-icon" class="w-8 h-8 text-white hidden" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+          </svg>
         </div>
       </div>
-    </section>
+    </div>
 
-    <!-- Video Information Section -->
-    <section class="py-8 bg-white">
-      <div class="max-w-7xl mx-auto px-5">
-        <div class="text-center mb-12">
-          <div class="mb-6">
-            <a
-              href={`/category/${generateSlug(video.data.category)}`}
-              class="inline-block"
-            >
-            
-            </a>
-          </div>
-          <h1
-            class="text-4xl md:text-6xl font-bold mb-6 leading-tight text-gray-900"
-          >
+    <!-- Details Sidebar (Right) -->
+    <div class="details-sidebar bg-white border-l border-gray-100 overflow-y-auto">
+      <div class="p-5 flex flex-col gap-5">
+        <!-- Title & Author -->
+        <div class="flex flex-col gap-4">
+          <h1 class="text-[36px] leading-[48px] tracking-[-1.2px] text-gray-900">
             {video.data.title}
           </h1>
-          <p class="text-xl md:text-2xl text-gray-600 mb-8">
-            by <a
-              href={`/author/${generateSlug(video.data.author)}`}
-              class="text-blue-600 hover:text-blue-800 transition-colors"
-              >{video.data.author}</a
-            >
+          <p class="text-[16px] leading-[24px] text-gray-400">
+            by <a href={`/author/${generateSlug(video.data.author)}`} class="text-blue-600 hover:underline font-medium">{video.data.author}</a>
           </p>
-          <div class="flex flex-wrap justify-center gap-2 mb-8">
-            {
-              video.data.tags.map((tag: string) => (
-                <a
-                  href={`/tag/${generateSlug(tag)}`}
-                  class="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm hover:bg-gray-200 transition-colors"
-                >
-                  #{tag}
-                </a>
-              ))
-            }
-          </div>
-          <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+          <p class="text-[16px] leading-[24px] text-gray-500 pt-4">
             {video.data.description}
           </p>
         </div>
+
+        <!-- Project Details Section -->
+        <div class="border-t border-gray-100 pt-12 flex flex-col gap-10">
+          <!-- Project Details -->
+          <div class="flex flex-col gap-4">
+            <h3 class="text-[12px] tracking-[0.6px] uppercase text-gray-400 font-medium">Project Details</h3>
+            <div class="flex flex-col gap-3">
+              <!-- Year -->
+              <div class="flex items-center justify-between py-2 border-b border-gray-50">
+                <span class="text-[14px] text-gray-500">Year</span>
+                <span class="text-[14px] text-black">{video.data.year || "N/A"}</span>
+              </div>
+              <!-- Duration -->
+              <div class="flex items-center justify-between py-2 border-b border-gray-50">
+                <span class="text-[14px] text-gray-500">Duration</span>
+                <span class="text-[14px] text-black">{formatDuration(video.data.duration)}</span>
+              </div>
+              <!-- Category -->
+              <div class="flex items-center justify-between py-2 border-b border-gray-50">
+                <span class="text-[14px] text-gray-500">Category</span>
+                <a href={`/category/${generateSlug(video.data.category)}`} class="text-[14px] text-blue-600 hover:underline">{video.data.category}</a>
+              </div>
+              <!-- Style -->
+              <div class="flex items-center justify-between py-2 border-b border-gray-50">
+                <span class="text-[14px] text-gray-500">Style</span>
+                <span class="text-[14px] text-black">{formatTaxonomyValue(video.data.styles)}</span>
+              </div>
+              <!-- Technique -->
+              <div class="flex items-center justify-between py-2 border-b border-gray-50">
+                <span class="text-[14px] text-gray-500">Technique</span>
+                <span class="text-[14px] text-black">{formatTaxonomyValue(video.data.techniques)}</span>
+              </div>
+              <!-- Sound/Music -->
+              <div class="flex items-center justify-between py-2 border-b border-gray-50">
+                <span class="text-[14px] text-gray-500">Sound/Music</span>
+                <span class="text-[14px] text-black">{formatTaxonomyValue(video.data.soundMusic)}</span>
+              </div>
+              <!-- Link -->
+              {video.data.sourceUrl && (
+                <div class="flex items-center justify-between py-2 border-b border-gray-50">
+                  <span class="text-[14px] text-gray-500">Link</span>
+                  <a href={video.data.sourceUrl} target="_blank" rel="noopener noreferrer" class="text-[14px] text-blue-600 hover:underline truncate max-w-[250px]">{video.data.sourceUrl}</a>
+                </div>
+              )}
+            </div>
+          </div>
+
+          <!-- Tags -->
+          {video.data.tags && video.data.tags.length > 0 && (
+            <div class="flex flex-col gap-4">
+              <h3 class="text-[12px] tracking-[0.6px] uppercase text-gray-400 font-medium">Tags</h3>
+              <div class="flex flex-wrap gap-2">
+                {video.data.tags.map((tag: string) => (
+                  <a
+                    href={`/tag/${generateSlug(tag)}`}
+                    class="bg-gray-100 text-gray-600 px-3 py-1 rounded-sm text-[12px] font-medium hover:bg-gray-200 transition-colors"
+                  >
+                    {tag}
+                  </a>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <!-- Descriptions (Markdown Content) -->
+          <div class="flex flex-col gap-4">
+            <h3 class="text-[12px] tracking-[0.6px] uppercase text-gray-400 font-medium">Descriptions</h3>
+            <div class="prose prose-sm max-w-none text-[16px] leading-[24px] text-gray-700">
+              <Content />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Related Videos Section -->
+  {relatedVideos.length > 0 && (
+    <section class="w-full bg-white border-t border-white pt-10 pb-3 px-8">
+      <p class="text-[10px] tracking-[1.5px] uppercase text-gray-500 font-medium text-center mb-3">Explore more</p>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+        {relatedVideos.map((relatedVideo) => (
+          <a href={`/videos/${relatedVideo.slug}`} class="flex flex-col gap-1 group">
+            <div class="aspect-video relative overflow-hidden bg-gray-100">
+              <video
+                class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                muted
+                loop
+                playsinline
+                preload="none"
+                data-src={relatedVideo.data.thumbnailUrl}
+              >
+                <source data-src={relatedVideo.data.thumbnailUrl} type="video/mp4" />
+              </video>
+            </div>
+            <div class="p-1">
+              <p class="text-[14px] text-black">{relatedVideo.data.title}</p>
+            </div>
+          </a>
+        ))}
       </div>
     </section>
-
-    
-
-    <!-- Project Details Section -->
-    
-
-    
-  </main>
+  )}
 </Layout>
 
+<style>
+  /* Video detail layout */
+  .video-detail-main {
+    min-height: calc(100vh - 140px);
+  }
+
+  /* Video player takes most of the width */
+  .video-player-container {
+    flex: 1;
+    min-height: 400px;
+    max-height: calc(100vh - 140px);
+  }
+
+  /* Details sidebar fixed width on desktop */
+  .details-sidebar {
+    width: 100%;
+    max-height: none;
+  }
+
+  @media (min-width: 1024px) {
+    .video-player-container {
+      min-height: calc(100vh - 140px);
+    }
+
+    .details-sidebar {
+      width: 530px;
+      min-width: 530px;
+      max-height: calc(100vh - 140px);
+    }
+  }
+
+  @media (max-width: 1023px) {
+    .video-detail-main {
+      min-height: auto;
+    }
+
+    .video-player-container {
+      height: 50vh;
+      min-height: 300px;
+      max-height: 60vh;
+    }
+  }
+
+  /* Related video lazy loading */
+  section video {
+    opacity: 0;
+    transition: opacity 0.5s ease;
+  }
+
+  /* Prose styling for markdown content */
+  .prose p {
+    margin-bottom: 1em;
+  }
+
+  .prose h1, .prose h2, .prose h3 {
+    margin-top: 1.5em;
+    margin-bottom: 0.5em;
+    font-weight: 500;
+  }
+</style>
+
 <script>
-  // Video player functionality
   document.addEventListener("DOMContentLoaded", () => {
-    const video = document.querySelector("video") as HTMLVideoElement;
-    const fullscreenBtn = document.getElementById("fullscreen-btn");
+    const video = document.getElementById("main-video") as HTMLVideoElement;
+    const playOverlay = document.getElementById("play-overlay");
+    const playIcon = document.getElementById("play-icon");
+    const pauseIcon = document.getElementById("pause-icon");
 
-    if (video && fullscreenBtn) {
-      // Set initial volume to 0%
+    if (video) {
+      // Start muted for autoplay
+      video.muted = true;
       video.volume = 0;
-      let volumeAnimated = false;
 
-      // Function to animate volume from 0% to 25% over 3 seconds
-      function animateVolumeUp() {
-        if (volumeAnimated) return;
-        volumeAnimated = true;
-        
-        const startTime = Date.now();
-        const duration = 5000; // 5 seconds
-        const targetVolume = 0.25; // 25%
-        
-        function updateVolume() {
-          const elapsed = Date.now() - startTime;
-          const progress = Math.min(elapsed / duration, 1);
-          video.volume = targetVolume * progress;
-          
-          if (progress < 1) {
-            requestAnimationFrame(updateVolume);
-          }
+      // Unmute after user interaction
+      let hasInteracted = false;
+
+      function unmute() {
+        if (!hasInteracted) {
+          hasInteracted = true;
+          video.muted = false;
+          // Gradually increase volume
+          let vol = 0;
+          const fadeIn = setInterval(() => {
+            if (vol < 0.25) {
+              vol += 0.05;
+              video.volume = Math.min(vol, 0.25);
+            } else {
+              clearInterval(fadeIn);
+            }
+          }, 200);
         }
-        
-        requestAnimationFrame(updateVolume);
       }
 
-      // Play video on click
+      // Click to play/pause
       video.addEventListener("click", (e) => {
         e.preventDefault();
-        e.stopPropagation();
-        
+        unmute();
+
         if (video.paused) {
           video.play();
+          if (playIcon && pauseIcon) {
+            playIcon.classList.add("hidden");
+            pauseIcon.classList.remove("hidden");
+          }
         } else {
           video.pause();
+          if (playIcon && pauseIcon) {
+            playIcon.classList.remove("hidden");
+            pauseIcon.classList.add("hidden");
+          }
+        }
+
+        // Flash the overlay
+        if (playOverlay) {
+          playOverlay.classList.remove("opacity-0", "pointer-events-none");
+          setTimeout(() => {
+            playOverlay.classList.add("opacity-0", "pointer-events-none");
+          }, 300);
         }
       });
 
-      // Fullscreen functionality
-      fullscreenBtn.addEventListener("click", (e) => {
-        e.stopPropagation();
-
-        if (!document.fullscreenElement) {
-          if (video.requestFullscreen) {
-            video.requestFullscreen();
-          } else if ((video as any).webkitRequestFullscreen) {
-            (video as any).webkitRequestFullscreen();
-          } else if ((video as any).msRequestFullscreen) {
-            (video as any).msRequestFullscreen();
-          }
-        } else {
-          if (document.exitFullscreen) {
-            document.exitFullscreen();
-          } else if ((document as any).webkitExitFullscreen) {
-            (document as any).webkitExitFullscreen();
-          } else if ((document as any).msExitFullscreen) {
-            (document as any).msExitFullscreen();
-          }
+      // Update icons on play/pause events
+      video.addEventListener("play", () => {
+        if (playIcon && pauseIcon) {
+          playIcon.classList.add("hidden");
+          pauseIcon.classList.remove("hidden");
         }
       });
 
-      // Start volume animation when video loads
-      video.addEventListener("loadeddata", () => {
-        animateVolumeUp();
-        video.play().catch((e) => {
-          console.log("Auto-play prevented by browser:", e);
-          // Fallback: show a play button overlay if autoplay fails
-          showPlayButton();
-        });
+      video.addEventListener("pause", () => {
+        if (playIcon && pauseIcon) {
+          playIcon.classList.remove("hidden");
+          pauseIcon.classList.add("hidden");
+        }
       });
-
-      // Also start animation when metadata loads (backup)
-      video.addEventListener("loadedmetadata", () => {
-        animateVolumeUp();
-      });
-
-      // Show play button overlay if autoplay fails
-      function showPlayButton() {
-        const playOverlay = document.createElement("div");
-        playOverlay.className =
-          "absolute inset-0 flex items-center justify-center bg-black/20 cursor-pointer z-20";
-        playOverlay.innerHTML = `
-          <div class="bg-white/95 backdrop-blur-sm rounded-full p-6 shadow-lg hover:scale-110 transition-transform">
-            <svg class="w-12 h-12 text-gray-900" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M8 5v14l11-7z"/>
-            </svg>
-          </div>
-        `;
-
-        playOverlay.addEventListener("click", (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          animateVolumeUp();
-          video.play().then(() => {
-            playOverlay.remove();
-          });
-        });
-
-        video.parentElement?.appendChild(playOverlay);
-      }
     }
+
+    // Lazy load related videos
+    const CONFIG = {
+      rootMargin: '100px',
+      threshold: 0.1,
+      playThreshold: 0.3
+    };
+
+    let loadedVideos = new WeakSet<HTMLVideoElement>();
+
+    const loadObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const video = entry.target as HTMLVideoElement;
+          if (loadedVideos.has(video)) return;
+
+          const dataSrc = video.getAttribute('data-src');
+          if (dataSrc) {
+            const source = video.querySelector('source');
+            if (source) {
+              source.src = dataSrc;
+            }
+            video.src = dataSrc;
+
+            video.addEventListener('canplay', () => {
+              loadedVideos.add(video);
+              video.style.opacity = '1';
+            }, { once: true });
+
+            video.load();
+          }
+        }
+      });
+    }, {
+      rootMargin: CONFIG.rootMargin,
+      threshold: CONFIG.threshold
+    });
+
+    // Observe related videos
+    const relatedVideos = document.querySelectorAll('section video');
+    relatedVideos.forEach(video => {
+      loadObserver.observe(video);
+    });
+
+    // Hover to play related videos
+    const videoItems = document.querySelectorAll('section a.group');
+    videoItems.forEach(item => {
+      const video = item.querySelector('video') as HTMLVideoElement;
+      if (video) {
+        item.addEventListener('mouseenter', () => {
+          if (loadedVideos.has(video)) {
+            video.currentTime = 0;
+            video.play().catch(() => {});
+          }
+        });
+        item.addEventListener('mouseleave', () => {
+          video.pause();
+        });
+      }
+    });
   });
 </script>
