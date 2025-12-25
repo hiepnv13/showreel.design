@@ -15,18 +15,10 @@ const { title, author, thumbnail, videoUrl, fullVideoUrl, category, slug } = Ast
 <a href={slug ? `/videos/${slug}` : '#'} class="video-card group cursor-pointer block" data-video-url={videoUrl}>
   <!-- Video Container -->
   <div class="relative overflow-hidden aspect-video bg-black">
-    <!-- Pixelated Loading Preview (Low-res Thumbnail) -->
-    <img
-      src={thumbnail}
-      alt={title}
-      class="video-loading-preview absolute inset-0 w-full h-full"
-      style="object-fit: none; image-rendering: pixelated; image-rendering: crisp-edges;"
-    />
-
     <!-- Video Element -->
     {videoUrl ? (
       <video
-        class="video-element w-full h-full object-cover opacity-0 transition-opacity duration-700"
+        class="video-element w-full h-full object-cover opacity-0 transition-opacity duration-500"
         muted
         loop
         playsinline
@@ -44,7 +36,7 @@ const { title, author, thumbnail, videoUrl, fullVideoUrl, category, slug } = Ast
         loading="lazy"
       />
     )}
-    
+
     <!-- Video Overlay (subtle) -->
     <div class="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
   </div>
@@ -101,12 +93,8 @@ const { title, author, thumbnail, videoUrl, fullVideoUrl, category, slug } = Ast
     // Load video function
     function loadVideo(videoCard: Element) {
       const video = videoCard.querySelector('.video-element') as HTMLVideoElement;
-      const pixelPreview = videoCard.querySelector('.video-loading-preview') as HTMLImageElement;
 
       if (!video || loadedVideos.has(video)) return;
-
-      // Pixelated preview is already showing (from HTML)
-      // No need to start animation, it's pure CSS
 
       // Set video source
       const dataSrc = video.getAttribute('data-src');
@@ -122,17 +110,6 @@ const { title, author, thumbnail, videoUrl, fullVideoUrl, category, slug } = Ast
       video.addEventListener('canplay', () => {
         loadedVideos.add(video);
 
-        // Fade out pixelated preview
-        if (pixelPreview) {
-          pixelPreview.style.transition = 'opacity 500ms ease-out';
-          pixelPreview.style.opacity = '0';
-
-          // Remove from DOM after fade
-          setTimeout(() => {
-            pixelPreview.style.display = 'none';
-          }, 500);
-        }
-
         // Show video
         video.style.opacity = '1';
 
@@ -142,7 +119,6 @@ const { title, author, thumbnail, videoUrl, fullVideoUrl, category, slug } = Ast
 
       video.addEventListener('error', () => {
         console.warn('Video failed to load:', dataSrc);
-        // Keep pixelated preview visible on error (already there)
       });
 
       // Load the video
