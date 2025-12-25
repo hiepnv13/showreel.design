@@ -14,17 +14,15 @@ const { title, author, thumbnail, videoUrl, fullVideoUrl, category, slug } = Ast
 
 <a href={slug ? `/videos/${slug}` : '#'} class="video-card group cursor-pointer block" data-video-url={videoUrl}>
   <!-- Video Container -->
-  <div class="relative overflow-hidden aspect-video bg-gray-100">
-    <!-- Loading Skeleton -->
-    <div class="video-skeleton absolute inset-0 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 animate-pulse">
-      <div class="absolute inset-0 flex items-center justify-center">
-        <div class="w-12 h-12 border-4 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
-      </div>
-    </div>
-    
+  <div class="relative overflow-hidden aspect-video bg-black">
+    <!-- TV Noise Loading Canvas -->
+    <canvas
+      class="video-loading-canvas absolute inset-0 w-full h-full"
+    ></canvas>
+
     <!-- Video Element -->
     {videoUrl ? (
-      <video 
+      <video
         class="video-element w-full h-full object-cover opacity-0 transition-opacity duration-500"
         muted
         loop
@@ -36,8 +34,8 @@ const { title, author, thumbnail, videoUrl, fullVideoUrl, category, slug } = Ast
       </video>
     ) : (
       <!-- Fallback image if no video URL -->
-      <img 
-        src={thumbnail} 
+      <img
+        src={thumbnail}
         alt={title}
         class="w-full h-full object-cover"
         loading="lazy"
@@ -46,22 +44,6 @@ const { title, author, thumbnail, videoUrl, fullVideoUrl, category, slug } = Ast
     
     <!-- Video Overlay (subtle) -->
     <div class="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-    
-    <!-- Category Badge -->
-    <!--{category && (
-      <div class="absolute top-4 left-4 z-10">
-        <span class="bg-white/90 backdrop-blur-sm text-gray-900 px-3 py-1.5 rounded-full text-sm font-medium border border-gray-200 shadow-sm">
-          {category}
-        </span>
-      </div>
-    )} -->
-    
-    <!-- Video Status Indicator -->
-    <div class="video-status absolute bottom-4 right-4 opacity-0 transition-opacity duration-300">
-      <div class="bg-black/70 text-white px-2 py-1 rounded text-xs font-medium">
-        <span class="status-text">Loading...</span>
-      </div>
-    </div>
   </div>
   
   <!-- Card Content -->
@@ -78,11 +60,81 @@ const { title, author, thumbnail, videoUrl, fullVideoUrl, category, slug } = Ast
       rootMargin: '50px', // Start loading 50px before entering viewport
       threshold: 0.1, // Trigger when 10% of video is visible
       maxConcurrentVideos: 4, // Maximum videos playing simultaneously
-      playThreshold: 0.5 // Play when 50% visible
+      playThreshold: 0.5, // Play when 50% visible
+      noiseIntensity: 0.5, // TV noise intensity (0-1)
+      noiseFPS: 24 // Frames per second for noise animation
     };
 
     let currentlyPlayingVideos = new Set<HTMLVideoElement>();
     let loadedVideos = new WeakSet();
+    let noiseIntervals = new Map<HTMLCanvasElement, number>(); // Track noise animations
+
+    // Utility: Draw TV static noise on canvas
+    function drawTVNoise(canvas: HTMLCanvasElement) {
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
+
+      const width = canvas.width;
+      const height = canvas.height;
+
+      // Create ImageData for pixel manipulation
+      const imageData = ctx.createImageData(width, height);
+      const data = imageData.data;
+
+      // Generate random grayscale noise
+      for (let i = 0; i < data.length; i += 4) {
+        const noise = Math.random() * 255 * CONFIG.noiseIntensity;
+        data[i] = noise;     // Red
+        data[i + 1] = noise; // Green
+        data[i + 2] = noise; // Blue
+        data[i + 3] = 255;   // Alpha (fully opaque)
+      }
+
+      ctx.putImageData(imageData, 0, 0);
+    }
+
+    // Utility: Start TV noise animation
+    function startTVNoise(canvas: HTMLCanvasElement) {
+      // Stop any existing animation
+      const existingInterval = noiseIntervals.get(canvas);
+      if (existingInterval) {
+        clearInterval(existingInterval);
+      }
+
+      // Set canvas size
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = rect.width;
+      canvas.height = rect.height;
+
+      // Start noise animation
+      const interval = setInterval(() => {
+        drawTVNoise(canvas);
+      }, 1000 / CONFIG.noiseFPS) as unknown as number;
+
+      noiseIntervals.set(canvas, interval);
+    }
+
+    // Utility: Stop TV noise and fade out canvas
+    function stopTVNoise(canvas: HTMLCanvasElement) {
+      // Stop animation
+      const interval = noiseIntervals.get(canvas);
+      if (interval) {
+        clearInterval(interval);
+        noiseIntervals.delete(canvas);
+      }
+
+      // Fade out canvas
+      let opacity = 1;
+      const fadeInterval = setInterval(() => {
+        opacity -= 0.1;
+        canvas.style.opacity = opacity.toString();
+
+        if (opacity <= 0) {
+          clearInterval(fadeInterval);
+          canvas.style.display = 'none';
+        }
+      }, 50); // 500ms total fade
+    }
 
     // Create intersection observers
     const loadObserver = new IntersectionObserver((entries) => {
@@ -116,16 +168,13 @@ const { title, author, thumbnail, videoUrl, fullVideoUrl, category, slug } = Ast
     // Load video function
     function loadVideo(videoCard: Element) {
       const video = videoCard.querySelector('.video-element') as HTMLVideoElement;
-      const skeleton = videoCard.querySelector('.video-skeleton') as HTMLElement;
-      const statusIndicator = videoCard.querySelector('.video-status') as HTMLElement;
-      const statusText = videoCard.querySelector('.status-text') as HTMLElement;
-      
+      const canvas = videoCard.querySelector('.video-loading-canvas') as HTMLCanvasElement;
+
       if (!video || loadedVideos.has(video)) return;
 
-      // Show loading status
-      if (statusIndicator && statusText) {
-        statusText.textContent = 'Loading...';
-        statusIndicator.style.opacity = '1';
+      // Start TV noise animation on canvas
+      if (canvas) {
+        startTVNoise(canvas);
       }
 
       // Set video source
@@ -139,22 +188,14 @@ const { title, author, thumbnail, videoUrl, fullVideoUrl, category, slug } = Ast
       }
 
       // Handle video events
-      video.addEventListener('loadstart', () => {
-        if (statusText) statusText.textContent = 'Loading...';
-      });
-
       video.addEventListener('canplay', () => {
         loadedVideos.add(video);
-        
-        // Hide skeleton and show video
-        if (skeleton) skeleton.style.display = 'none';
+
+        // Stop TV noise and fade out canvas, then show video
+        if (canvas) {
+          stopTVNoise(canvas);
+        }
         video.style.opacity = '1';
-        
-        // Update status
-        if (statusText) statusText.textContent = 'Ready';
-        setTimeout(() => {
-          if (statusIndicator) statusIndicator.style.opacity = '0';
-        }, 1000);
 
         // Start observing for play/pause
         playObserver.observe(videoCard);
@@ -162,12 +203,14 @@ const { title, author, thumbnail, videoUrl, fullVideoUrl, category, slug } = Ast
 
       video.addEventListener('error', () => {
         console.warn('Video failed to load:', dataSrc);
-        if (statusText) statusText.textContent = 'Error';
-        if (statusIndicator) {
-          statusIndicator.style.opacity = '1';
-          setTimeout(() => {
-            statusIndicator.style.opacity = '0';
-          }, 2000);
+        // Stop noise but keep canvas visible as fallback on error
+        if (canvas) {
+          const interval = noiseIntervals.get(canvas);
+          if (interval) {
+            clearInterval(interval);
+            noiseIntervals.delete(canvas);
+          }
+          canvas.style.opacity = '0.3';
         }
       });
 
