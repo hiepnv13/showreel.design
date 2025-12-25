@@ -56,97 +56,30 @@ const categoryVideoCounts = categories.reduce(
 const totalVideoCount = allVideosForCount.length;
 ---
 
-<section class="py-8 bg-gray-50">
-    <div class="w-full px-5">
-        <!-- Filter Tabs -->
-        <div class="w-full mb-12">
-            <div class="flex justify-start" style="gap: -0.5px">
-            {
-                showAllTab && (
-                    <a
-                        href="/"
-                        data-category="all"
-                        title={`${totalVideoCount} videos`}
-                        class={`px-6 py-3 text-sm font-medium transition-all duration-200 ${
-                            currentCategory === "All"
-                                ? "bg-gray-900 text-white"
-                                : "bg-white text-gray-700 hover:bg-gray-100 border-y border-l border-gray-200 hover:border-gray-300"
-                        }`}
-                        style="border-width: 0.5px"
-                    >
-                        All
-                    </a>
-                )
-            }
-            {
-                categories.map((category: string) => (
-                    <a
-                        href={`/category/${generateSlug(category)}`}
-                        data-category={generateSlug(category)}
-                        title={`${categoryVideoCounts[category]} videos`}
-                        class={`px-6 py-3 text-sm font-medium transition-all duration-200 border-y border-r border-l border-gray-200 hover:border-gray-300 ${
-                            currentCategory === category
-                                ? "bg-gray-900 text-white"
-                                : "bg-white text-gray-700 hover:bg-gray-100"
-                        }`}
-                        style="border-width: 0.5px"
-                    >
-                        {category}
-                    </a>
-                ))
-            }
-
-            <!-- Additional Action Buttons -->
-            <button
-                data-shuffle
-                class="px-6 py-3 text-sm font-medium transition-all duration-200 bg-white text-gray-700 hover:bg-gray-100 border-y border-r border-gray-200 hover:border-gray-300"
-                style="border-width: 0.5px"
-                title="Shuffle items"
-            >
-                <svg
-                    class="w-4 h-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                >
-                    <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-                    ></path>
-                </svg>
-            </button>
-            </div>
-        </div>
-
-        <!-- Video Grid -->
-        <div
-            class="video-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
-        >
-            {
-                displayVideos.map((video: any, index: number) => (
-                    <VideoCard
-                        title={video.data.title}
-                        author={video.data.author}
-                        thumbnail={video.data.thumbnail}
-                        videoUrl={video.data.thumbnailUrl}
-                        fullVideoUrl={video.data.videoUrl}
-                        category={video.data.category}
-                        slug={video.slug}
-                    />
-                ))
-            }
-        </div>
-
-        <!-- Pagination -->
-        <Pagination 
-            currentPage={currentPage}
-            totalPages={totalPages}
-            baseUrl={baseUrl}
-        />
+<main class="w-full bg-white video-grid px-8">
+    <div class="grid grid-cols-3 gap-5">
+        {
+            displayVideos.map((video: any, index: number) => (
+                <VideoCard
+                    title={video.data.title}
+                    author={video.data.author}
+                    thumbnail={video.data.thumbnail}
+                    videoUrl={video.data.thumbnailUrl}
+                    fullVideoUrl={video.data.videoUrl}
+                    category={video.data.category}
+                    slug={video.slug}
+                />
+            ))
+        }
     </div>
-</section>
+
+    <!-- Pagination -->
+    <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        baseUrl={baseUrl}
+    />
+</main>
 
 <script>
     // Import grid actions for interactive animations

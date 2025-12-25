@@ -53,9 +53,9 @@ function formatTaxonomyValue(values: string[] | undefined): string {
   <Header />
 
   <!-- Main Content: Video + Details Side by Side -->
-  <main class="flex flex-col lg:flex-row w-full video-detail-main">
+  <main class="flex flex-col lg:flex-row w-full video-detail-main" id="video-main">
     <!-- Video Player Section (Left) -->
-    <div class="video-player-container bg-black flex items-center justify-center relative">
+    <div class="video-player-container bg-black flex items-center justify-center relative" id="video-container">
       <video
         id="main-video"
         class="max-w-full max-h-full w-auto h-auto"
@@ -73,17 +73,6 @@ function formatTaxonomyValue(values: string[] | undefined): string {
         Your browser does not support the video tag.
       </video>
 
-      <!-- Close/Back Button -->
-      <a
-        href="/"
-        class="absolute top-6 right-6 bg-black/20 hover:bg-black/40 text-white p-2 rounded-full transition-all duration-200 backdrop-blur-sm"
-        title="Back to home"
-      >
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-        </svg>
-      </a>
-
       <!-- Play/Pause Overlay (shown on click) -->
       <div id="play-overlay" class="absolute inset-0 flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-200">
         <div class="bg-white/10 backdrop-blur-sm border border-white/20 rounded-full p-8">
@@ -98,95 +87,189 @@ function formatTaxonomyValue(values: string[] | undefined): string {
     </div>
 
     <!-- Details Sidebar (Right) -->
-    <div class="details-sidebar bg-white border-l border-gray-100 overflow-y-auto">
-      <div class="p-5 flex flex-col gap-5">
-        <!-- Title & Author -->
-        <div class="flex flex-col gap-4">
-          <h1 class="text-[36px] leading-[48px] tracking-[-1.2px] text-gray-900">
-            {video.data.title}
-          </h1>
-          <p class="text-[16px] leading-[24px] text-gray-400">
-            by <a href={`/author/${generateSlug(video.data.author)}`} class="text-blue-600 hover:underline font-medium">{video.data.author}</a>
-          </p>
-          <p class="text-[16px] leading-[24px] text-gray-500 pt-4">
-            {video.data.description}
-          </p>
+    <div class="details-sidebar bg-white border-l border-gray-100 overflow-hidden" id="details-sidebar">
+      <!-- Toggle Button (inside sidebar) -->
+      <button
+        id="sidebar-toggle-inside"
+        class="sidebar-toggle-btn"
+        title="Toggle sidebar"
+      >
+        <div class="toggle-icon">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+          </svg>
         </div>
+      </button>
 
-        <!-- Project Details Section -->
-        <div class="border-t border-gray-100 pt-12 flex flex-col gap-10">
-          <!-- Project Details -->
+      <!-- Collapsed State - Vertical Labels -->
+      <div class="collapsed-labels" id="collapsed-labels">
+        <div class="collapsed-content">
+          <span class="vertical-text" data-section="project-details">Project Details</span>
+          <span class="vertical-text" data-section="tags">TAGS</span>
+          <span class="vertical-text" data-section="descriptions">DESCRIPTIONS</span>
+        </div>
+      </div>
+
+      <!-- Expanded Content -->
+      <div class="sidebar-content" id="sidebar-content">
+        <div class="p-5 flex flex-col gap-5">
+          <!-- Title & Author -->
           <div class="flex flex-col gap-4">
-            <h3 class="text-[12px] tracking-[0.6px] uppercase text-gray-400 font-medium">Project Details</h3>
-            <div class="flex flex-col gap-3">
-              <!-- Year -->
-              <div class="flex items-center justify-between py-2 border-b border-gray-50">
-                <span class="text-[14px] text-gray-500">Year</span>
-                <span class="text-[14px] text-black">{video.data.year || "N/A"}</span>
-              </div>
-              <!-- Duration -->
-              <div class="flex items-center justify-between py-2 border-b border-gray-50">
-                <span class="text-[14px] text-gray-500">Duration</span>
-                <span class="text-[14px] text-black">{formatDuration(video.data.duration)}</span>
-              </div>
-              <!-- Category -->
-              <div class="flex items-center justify-between py-2 border-b border-gray-50">
-                <span class="text-[14px] text-gray-500">Category</span>
-                <a href={`/category/${generateSlug(video.data.category)}`} class="text-[14px] text-blue-600 hover:underline">{video.data.category}</a>
-              </div>
-              <!-- Style -->
-              <div class="flex items-center justify-between py-2 border-b border-gray-50">
-                <span class="text-[14px] text-gray-500">Style</span>
-                <span class="text-[14px] text-black">{formatTaxonomyValue(video.data.styles)}</span>
-              </div>
-              <!-- Technique -->
-              <div class="flex items-center justify-between py-2 border-b border-gray-50">
-                <span class="text-[14px] text-gray-500">Technique</span>
-                <span class="text-[14px] text-black">{formatTaxonomyValue(video.data.techniques)}</span>
-              </div>
-              <!-- Sound/Music -->
-              <div class="flex items-center justify-between py-2 border-b border-gray-50">
-                <span class="text-[14px] text-gray-500">Sound/Music</span>
-                <span class="text-[14px] text-black">{formatTaxonomyValue(video.data.soundMusic)}</span>
-              </div>
-              <!-- Link -->
-              {video.data.sourceUrl && (
-                <div class="flex items-center justify-between py-2 border-b border-gray-50">
-                  <span class="text-[14px] text-gray-500">Link</span>
-                  <a href={video.data.sourceUrl} target="_blank" rel="noopener noreferrer" class="text-[14px] text-blue-600 hover:underline truncate max-w-[250px]">{video.data.sourceUrl}</a>
-                </div>
-              )}
-            </div>
+            <h1 class="text-[36px] leading-[48px] tracking-[-1.2px] text-gray-900">
+              {video.data.title}
+            </h1>
+            <p class="text-[16px] leading-[24px] text-gray-400">
+              by <a href={`/author/${generateSlug(video.data.author)}`} class="text-blue-600 hover:underline font-medium">{video.data.author}</a>
+            </p>
+            <p class="text-[16px] leading-[24px] text-gray-500 pt-4">
+              {video.data.description}
+            </p>
           </div>
 
-          <!-- Tags -->
-          {video.data.tags && video.data.tags.length > 0 && (
-            <div class="flex flex-col gap-4">
-              <h3 class="text-[12px] tracking-[0.6px] uppercase text-gray-400 font-medium">Tags</h3>
-              <div class="flex flex-wrap gap-2">
-                {video.data.tags.map((tag: string) => (
-                  <a
-                    href={`/tag/${generateSlug(tag)}`}
-                    class="bg-gray-100 text-gray-600 px-3 py-1 rounded-sm text-[12px] font-medium hover:bg-gray-200 transition-colors"
-                  >
-                    {tag}
-                  </a>
-                ))}
+          <!-- Project Details Section -->
+          <div class="border-t border-gray-100 pt-12 flex flex-col gap-10">
+            <!-- Project Details -->
+            <div class="flex flex-col gap-4" id="project-details-section">
+              <h3 class="text-[12px] tracking-[0.6px] uppercase text-gray-400 font-medium">Project Details</h3>
+              <div class="flex flex-col gap-3" id="project-details-list">
+                <!-- Year -->
+                <div class="flex items-center justify-between py-2 border-b border-gray-50">
+                  <span class="text-[14px] text-gray-500">Year</span>
+                  <span class="text-[14px] text-black">{video.data.year || "N/A"}</span>
+                </div>
+                <!-- Duration -->
+                <div class="flex items-center justify-between py-2 border-b border-gray-50">
+                  <span class="text-[14px] text-gray-500">Duration</span>
+                  <span class="text-[14px] text-black">{formatDuration(video.data.duration)}</span>
+                </div>
+                <!-- Category -->
+                <div class="flex items-center justify-between py-2 border-b border-gray-50">
+                  <span class="text-[14px] text-gray-500">Category</span>
+                  <a href={`/category/${generateSlug(video.data.category)}`} class="text-[14px] text-blue-600 hover:underline">{video.data.category}</a>
+                </div>
+                <!-- Style -->
+                <div class="flex items-center justify-between py-2 border-b border-gray-50">
+                  <span class="text-[14px] text-gray-500">Style</span>
+                  <span class="text-[14px] text-black">{formatTaxonomyValue(video.data.styles)}</span>
+                </div>
+                <!-- Technique -->
+                <div class="flex items-center justify-between py-2 border-b border-gray-50">
+                  <span class="text-[14px] text-gray-500">Technique</span>
+                  <span class="text-[14px] text-black">{formatTaxonomyValue(video.data.techniques)}</span>
+                </div>
+                <!-- Sound/Music -->
+                <div class="flex items-center justify-between py-2 border-b border-gray-50">
+                  <span class="text-[14px] text-gray-500">Sound/Music</span>
+                  <span class="text-[14px] text-black">{formatTaxonomyValue(video.data.soundMusic)}</span>
+                </div>
+                <!-- Link -->
+                {video.data.sourceUrl && (
+                  <div class="flex items-center justify-between py-2 border-b border-gray-50">
+                    <span class="text-[14px] text-gray-500">Link</span>
+                    <a href={video.data.sourceUrl} target="_blank" rel="noopener noreferrer" class="text-[14px] text-blue-600 hover:underline truncate max-w-[250px]">{video.data.sourceUrl}</a>
+                  </div>
+                )}
               </div>
             </div>
-          )}
 
-          <!-- Descriptions (Markdown Content) -->
-          <div class="flex flex-col gap-4">
-            <h3 class="text-[12px] tracking-[0.6px] uppercase text-gray-400 font-medium">Descriptions</h3>
-            <div class="prose prose-sm max-w-none text-[16px] leading-[24px] text-gray-700">
-              <Content />
+            <!-- Tags -->
+            {video.data.tags && video.data.tags.length > 0 && (
+              <div class="flex flex-col gap-4">
+                <h3 class="text-[12px] tracking-[0.6px] uppercase text-gray-400 font-medium">Tags</h3>
+                <div class="flex flex-wrap gap-2">
+                  {video.data.tags.map((tag: string) => (
+                    <a
+                      href={`/tag/${generateSlug(tag)}`}
+                      class="bg-gray-100 text-gray-600 px-3 py-1 rounded-sm text-[12px] font-medium hover:bg-gray-200 transition-colors"
+                    >
+                      {tag}
+                    </a>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <!-- Descriptions (Markdown Content) -->
+            <div class="flex flex-col gap-4">
+              <h3 class="text-[12px] tracking-[0.6px] uppercase text-gray-400 font-medium">Descriptions</h3>
+              <div class="prose prose-sm max-w-none text-[16px] leading-[24px] text-gray-700">
+                <Content />
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
   </main>
+
+  <!-- Hover Overlays (shows on vertical label hover when sidebar collapsed) -->
+
+  <!-- Project Details Overlay -->
+  <div class="hover-details-overlay" id="hover-overlay-project-details" data-section="project-details">
+    <div class="hover-details-card">
+      <h3 class="text-[12px] tracking-[0.6px] uppercase text-gray-400 font-medium mb-3">Project Details</h3>
+      <div class="flex flex-col gap-3">
+        <div class="flex items-center justify-between py-2 border-b border-gray-100">
+          <span class="text-[14px] text-gray-500">Year</span>
+          <span class="text-[14px] text-black">{video.data.year || "N/A"}</span>
+        </div>
+        <div class="flex items-center justify-between py-2 border-b border-gray-100">
+          <span class="text-[14px] text-gray-500">Duration</span>
+          <span class="text-[14px] text-black">{formatDuration(video.data.duration)}</span>
+        </div>
+        <div class="flex items-center justify-between py-2 border-b border-gray-100">
+          <span class="text-[14px] text-gray-500">Category</span>
+          <span class="text-[14px] text-black">{video.data.category}</span>
+        </div>
+        <div class="flex items-center justify-between py-2 border-b border-gray-100">
+          <span class="text-[14px] text-gray-500">Style</span>
+          <span class="text-[14px] text-black">{formatTaxonomyValue(video.data.styles)}</span>
+        </div>
+        <div class="flex items-center justify-between py-2 border-b border-gray-100">
+          <span class="text-[14px] text-gray-500">Technique</span>
+          <span class="text-[14px] text-black">{formatTaxonomyValue(video.data.techniques)}</span>
+        </div>
+        <div class="flex items-center justify-between py-2 border-b border-gray-100">
+          <span class="text-[14px] text-gray-500">Sound/Music</span>
+          <span class="text-[14px] text-black">{formatTaxonomyValue(video.data.soundMusic)}</span>
+        </div>
+        {video.data.sourceUrl && (
+          <div class="flex items-center justify-between py-2 border-b border-gray-100">
+            <span class="text-[14px] text-gray-500">Link</span>
+            <a href={video.data.sourceUrl} target="_blank" rel="noopener noreferrer" class="text-[14px] text-blue-600 hover:underline truncate max-w-[200px]">{video.data.sourceUrl.replace(/^https?:\/\//, '')}</a>
+          </div>
+        )}
+      </div>
+    </div>
+  </div>
+
+  <!-- Tags Overlay -->
+  <div class="hover-details-overlay" id="hover-overlay-tags" data-section="tags">
+    <div class="hover-details-card">
+      <h3 class="text-[12px] tracking-[0.6px] uppercase text-gray-400 font-medium mb-3">Tags</h3>
+      {video.data.tags && video.data.tags.length > 0 ? (
+        <div class="flex flex-wrap gap-2">
+          {video.data.tags.map((tag: string) => (
+            <span class="bg-gray-100 text-gray-600 px-3 py-1 rounded-sm text-[12px] font-medium">
+              {tag}
+            </span>
+          ))}
+        </div>
+      ) : (
+        <p class="text-[14px] text-gray-500">No tags available</p>
+      )}
+    </div>
+  </div>
+
+  <!-- Descriptions Overlay -->
+  <div class="hover-details-overlay" id="hover-overlay-descriptions" data-section="descriptions">
+    <div class="hover-details-card">
+      <h3 class="text-[12px] tracking-[0.6px] uppercase text-gray-400 font-medium mb-3">Descriptions</h3>
+      <div class="prose prose-sm max-w-none text-[14px] leading-[22px] text-gray-700">
+        <Content />
+      </div>
+    </div>
+  </div>
 
   <!-- Related Videos Section -->
   {relatedVideos.length > 0 && (
@@ -197,14 +280,14 @@ function formatTaxonomyValue(values: string[] | undefined): string {
           <a href={`/videos/${relatedVideo.slug}`} class="flex flex-col gap-1 group">
             <div class="aspect-video relative overflow-hidden bg-gray-100">
               <video
-                class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                class="related-video w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                 muted
                 loop
                 playsinline
                 preload="none"
-                data-src={relatedVideo.data.thumbnailUrl}
+                data-src={(relatedVideo.data as any).thumbnailUrl}
               >
-                <source data-src={relatedVideo.data.thumbnailUrl} type="video/mp4" />
+                <source data-src={(relatedVideo.data as any).thumbnailUrl} type="video/mp4" />
               </video>
             </div>
             <div class="p-1">
@@ -221,6 +304,7 @@ function formatTaxonomyValue(values: string[] | undefined): string {
   /* Video detail layout */
   .video-detail-main {
     min-height: calc(100vh - 140px);
+    position: relative;
   }
 
   /* Video player takes most of the width */
@@ -228,12 +312,121 @@ function formatTaxonomyValue(values: string[] | undefined): string {
     flex: 1;
     min-height: 400px;
     max-height: calc(100vh - 140px);
+    position: relative;
   }
 
-  /* Details sidebar fixed width on desktop */
+  /* Details sidebar - Three states: expanded, collapsed, hover */
   .details-sidebar {
     width: 100%;
     max-height: none;
+    transition: width 0.3s ease-in-out, min-width 0.3s ease-in-out;
+    position: relative;
+    display: flex;
+  }
+
+  /* Sidebar Toggle Button (inside sidebar) */
+  .sidebar-toggle-btn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 22px;
+    height: 22px;
+    background: transparent;
+    border: 1px solid #e5e7eb;
+    border-radius: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    z-index: 20;
+    color: #6b7280;
+  }
+
+  .sidebar-toggle-btn:hover {
+    background: #f3f4f6;
+    border-color: #d1d5db;
+  }
+
+  .sidebar-toggle-btn .toggle-icon {
+    transition: transform 0.3s ease;
+  }
+
+  /* Collapsed Labels (vertical text) */
+  .collapsed-labels {
+    opacity: 0;
+    pointer-events: none;
+    width: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    transition: opacity 0.3s ease, width 0.3s ease, padding 0.3s ease;
+  }
+
+  .collapsed-content {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    align-items: center;
+    padding: 62px 0;
+  }
+
+  .vertical-text {
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    transform: rotate(180deg);
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: #9ca3af;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: color 0.2s ease;
+    padding: 8px 0;
+  }
+
+  .vertical-text:hover {
+    color: #4b5563;
+  }
+
+  /* Sidebar Content */
+  .sidebar-content {
+    flex: 1;
+    overflow-y: auto;
+    opacity: 1;
+    transition: opacity 0.3s ease;
+  }
+
+  /* Hover Details Overlay */
+  .hover-details-overlay {
+    position: fixed;
+    right: 100px;
+    transform: translateX(20px);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s, top 0.3s ease;
+    z-index: 9999;
+  }
+
+  .hover-details-card {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 16px;
+    width: 320px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+
+  /* Show hover overlay when hovering over vertical labels (only when sidebar is collapsed) */
+  .hover-details-overlay.show {
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+    transform: translateX(0) !important;
   }
 
   @media (min-width: 1024px) {
@@ -242,9 +435,36 @@ function formatTaxonomyValue(values: string[] | undefined): string {
     }
 
     .details-sidebar {
-      width: 530px;
-      min-width: 530px;
+      width: 547px;
+      min-width: 547px;
       max-height: calc(100vh - 140px);
+      overflow-y: auto;
+    }
+
+    /* Collapsed state - show vertical labels */
+    .video-detail-main.sidebar-collapsed .details-sidebar {
+      width: 63px;
+      min-width: 63px;
+    }
+
+    .video-detail-main.sidebar-collapsed .sidebar-content {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .video-detail-main.sidebar-collapsed .collapsed-labels {
+      opacity: 1;
+      pointer-events: auto;
+      width: 63px;
+      padding: 0 12px;
+    }
+
+    .video-detail-main.sidebar-collapsed .sidebar-toggle-btn {
+      right: 13px;
+    }
+
+    .video-detail-main.sidebar-collapsed .sidebar-toggle-btn .toggle-icon {
+      transform: rotate(180deg);
     }
   }
 
@@ -258,12 +478,24 @@ function formatTaxonomyValue(values: string[] | undefined): string {
       min-height: 300px;
       max-height: 60vh;
     }
+
+    .sidebar-toggle-btn {
+      display: none;
+    }
+
+    .hover-details-overlay {
+      display: none;
+    }
   }
 
   /* Related video lazy loading */
-  section video {
+  .related-video {
     opacity: 0;
     transition: opacity 0.5s ease;
+  }
+
+  .related-video.loaded {
+    opacity: 1;
   }
 
   /* Prose styling for markdown content */
@@ -276,6 +508,24 @@ function formatTaxonomyValue(values: string[] | undefined): string {
     margin-bottom: 0.5em;
     font-weight: 500;
   }
+
+  /* Scrollbar styling for sidebar */
+  .details-sidebar::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .details-sidebar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .details-sidebar::-webkit-scrollbar-thumb {
+    background: #e5e7eb;
+    border-radius: 3px;
+  }
+
+  .details-sidebar::-webkit-scrollbar-thumb:hover {
+    background: #d1d5db;
+  }
 </style>
 
 <script>
@@ -284,6 +534,128 @@ function formatTaxonomyValue(values: string[] | undefined): string {
     const playOverlay = document.getElementById("play-overlay");
     const playIcon = document.getElementById("play-icon");
     const pauseIcon = document.getElementById("pause-icon");
+
+    // Sidebar toggle functionality
+    const videoMain = document.getElementById("video-main");
+    const sidebarToggleInside = document.getElementById("sidebar-toggle-inside");
+    const videoContainer = document.getElementById("video-container");
+    const hoverOverlay = document.getElementById("hover-overlay");
+
+    // Load saved state from localStorage
+    const sidebarState = localStorage.getItem('videoSidebarState') || 'open';
+
+    if (sidebarState === 'collapsed' && videoMain) {
+      videoMain.classList.add('sidebar-collapsed');
+    }
+
+    // Toggle sidebar on button click
+    sidebarToggleInside?.addEventListener('click', () => {
+      const isCollapsed = videoMain?.classList.contains('sidebar-collapsed');
+
+      if (isCollapsed) {
+        videoMain?.classList.remove('sidebar-collapsed');
+        localStorage.setItem('videoSidebarState', 'open');
+      } else {
+        videoMain?.classList.add('sidebar-collapsed');
+        localStorage.setItem('videoSidebarState', 'collapsed');
+      }
+    });
+
+    // Hover overlay functionality for vertical labels (only when sidebar is collapsed)
+    let hoverTimeout: NodeJS.Timeout | null = null;
+    let currentOverlay: HTMLElement | null = null;
+
+    // Get all vertical labels and overlays
+    const verticalLabels = document.querySelectorAll('.vertical-text');
+    const allOverlays = [
+      document.getElementById('hover-overlay-project-details'),
+      document.getElementById('hover-overlay-tags'),
+      document.getElementById('hover-overlay-descriptions')
+    ];
+
+    // Function to hide all overlays
+    function hideAllOverlays() {
+      allOverlays.forEach(overlay => {
+        overlay?.classList.remove('show');
+      });
+      currentOverlay = null;
+    }
+
+    // Function to show specific overlay
+    function showOverlay(section: string, labelElement: Element) {
+      if (!videoMain?.classList.contains('sidebar-collapsed')) return;
+
+      hideAllOverlays();
+
+      const overlay = document.getElementById(`hover-overlay-${section}`);
+      if (overlay) {
+        // Calculate position based on label element
+        const labelRect = labelElement.getBoundingClientRect();
+        const overlayCard = overlay.querySelector('.hover-details-card') as HTMLElement;
+
+        if (overlayCard) {
+          const overlayHeight = overlayCard.offsetHeight || 300; // fallback height
+          // Position overlay to align with the label, but keep it within viewport
+          let topPosition = labelRect.top + (labelRect.height / 2) - (overlayHeight / 2);
+
+          // Ensure overlay doesn't go off screen
+          const viewportHeight = window.innerHeight;
+          const minTop = 20;
+          const maxTop = viewportHeight - overlayHeight - 20;
+
+          topPosition = Math.max(minTop, Math.min(topPosition, maxTop));
+
+          overlay.style.top = `${topPosition}px`;
+        }
+
+        overlay.classList.add('show');
+        currentOverlay = overlay;
+      }
+    }
+
+    // Add hover listeners to vertical labels
+    verticalLabels.forEach(label => {
+      label.addEventListener('mouseenter', () => {
+        if (videoMain?.classList.contains('sidebar-collapsed')) {
+          if (hoverTimeout) {
+            clearTimeout(hoverTimeout);
+            hoverTimeout = null;
+          }
+          const section = label.getAttribute('data-section');
+          if (section) {
+            showOverlay(section, label);
+          }
+        }
+      });
+
+      label.addEventListener('mouseleave', () => {
+        if (videoMain?.classList.contains('sidebar-collapsed')) {
+          hoverTimeout = setTimeout(() => {
+            if (!currentOverlay?.matches(':hover')) {
+              hideAllOverlays();
+            }
+          }, 150);
+        }
+      });
+    });
+
+    // Keep overlay visible when hovering over it
+    allOverlays.forEach(overlay => {
+      overlay?.addEventListener('mouseenter', () => {
+        if (videoMain?.classList.contains('sidebar-collapsed')) {
+          if (hoverTimeout) {
+            clearTimeout(hoverTimeout);
+            hoverTimeout = null;
+          }
+        }
+      });
+
+      overlay?.addEventListener('mouseleave', () => {
+        hoverTimeout = setTimeout(() => {
+          hideAllOverlays();
+        }, 150);
+      });
+    });
 
     if (video) {
       // Start muted for autoplay
@@ -379,7 +751,7 @@ function formatTaxonomyValue(values: string[] | undefined): string {
 
             video.addEventListener('canplay', () => {
               loadedVideos.add(video);
-              video.style.opacity = '1';
+              video.classList.add('loaded');
             }, { once: true });
 
             video.load();
@@ -392,8 +764,8 @@ function formatTaxonomyValue(values: string[] | undefined): string {
     });
 
     // Observe related videos
-    const relatedVideos = document.querySelectorAll('section video');
-    relatedVideos.forEach(video => {
+    const relatedVideoElements = document.querySelectorAll('.related-video');
+    relatedVideoElements.forEach(video => {
       loadObserver.observe(video);
     });
 
@@ -415,3 +787,4 @@ function formatTaxonomyValue(values: string[] | undefined): string {
     });
   });
 </script>
+c

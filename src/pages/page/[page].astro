@@ -1,5 +1,6 @@
 ---
 import Layout from "../../layouts/Layout.astro";
+import Header from "../../components/Header.astro";
 import VideoGrid from "../../components/VideoGrid.astro";
 import { getAllVideos, sortVideosByDate } from "../../utils/videoUtils";
 
@@ -7,19 +8,19 @@ export async function getStaticPaths() {
     const videos = sortVideosByDate(await getAllVideos());
     const itemsPerPage = 24;
     const totalPages = Math.ceil(videos.length / itemsPerPage);
-    
+
     const paths: Array<{
         params: { page: string };
         props: { currentPage: number; totalPages: number };
     }> = [];
-    
+
     for (let i = 1; i <= totalPages; i++) {
         paths.push({
             params: { page: i.toString() },
             props: { currentPage: i, totalPages }
         });
     }
-    
+
     return paths;
 }
 
@@ -37,13 +38,21 @@ if (pageNumber < 1 || pageNumber > totalPages) {
 }
 
 const videos = sortVideosByDate(await getAllVideos());
+const itemsPerPage = 24;
+
+// Calculate counts for header
+const totalCount = videos.length;
+const startIndex = (pageNumber - 1) * itemsPerPage;
+const endIndex = Math.min(startIndex + itemsPerPage, totalCount);
+const showingCount = endIndex - startIndex;
 ---
 
-<Layout title={`Flow Studio - Page ${pageNumber}`}>
-    <VideoGrid 
+<Layout title={`Showreel.design - Page ${pageNumber}`}>
+    <Header showingCount={showingCount} totalCount={totalCount} />
+    <VideoGrid
         videos={videos}
         currentPage={pageNumber}
-        itemsPerPage={24}
-        baseUrl="/page"
+        itemsPerPage={itemsPerPage}
+        baseUrl="/"
     />
 </Layout>

@@ -54,7 +54,7 @@ const getPageUrl = (page: number) => {
     if (page === 1) {
         return baseUrl === "/" ? "/" : baseUrl;
     }
-    return baseUrl === "/" ? `/page/${page}` : `${baseUrl}/page/${page}`;
+    return baseUrl === "/" ? `/page/${page}` : `${baseUrl}/${page}`;
 };
 ---
 
@@ -117,9 +117,6 @@ const getPageUrl = (page: number) => {
             )}
         </nav>
         
-        <!-- Page Info -->
-        <p class="text-sm text-gray-600 mt-4">
-            Page {currentPage} of {totalPages}
-        </p>
+        
     </div>
 )}

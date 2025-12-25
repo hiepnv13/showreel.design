@@ -53,13 +53,20 @@ if (pageNumber < 1 || pageNumber > totalPages) {
 // Get videos for this category
 const allVideos = await getVideosByCategorySlug(categorySlug);
 const videos = sortVideosByDate(allVideos);
+const itemsPerPage = 24;
+
+// Calculate counts for header
+const totalCount = videos.length;
+const startIndex = (pageNumber - 1) * itemsPerPage;
+const endIndex = Math.min(startIndex + itemsPerPage, totalCount);
+const showingCount = endIndex - startIndex;
 
 // Get all categories for breadcrumb/navigation
 const allCategories = await getAllCategories();
 ---
 
 <Layout title={`${category} Videos - Page ${pageNumber} - Showreel.design`}>
-    <Header />
+    <Header showingCount={showingCount} totalCount={totalCount} />
     <main>
         <!-- Hero Section -->
         <section class="py-20 bg-gray-900 text-white">

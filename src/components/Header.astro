@@ -1,15 +1,36 @@
 ---
 // Header component matching Figma design
-const categories = [
-  { label: 'ALL', active: true },
-  { label: '3D', active: false },
-  { label: 'Agency', active: false },
-  { label: 'Showreel', active: false },
-  { label: 'Branding', active: false },
-  { label: 'Character', active: false },
-  { label: 'Motion Graphic', active: false },
-  { label: 'UI/UX', active: false },
+import { getAllCategories, generateSlug } from "../utils/videoUtils";
+
+// Props for showing video counts
+interface Props {
+  showingCount?: number;  // Number of videos showing on current page
+  totalCount?: number;    // Total number of videos in collection/category
+}
+
+const { showingCount, totalCount } = Astro.props;
+
+// Get current path to highlight active category
+const currentPath = Astro.url.pathname;
+
+// Get all categories dynamically
+const allCategories = await getAllCategories();
+
+// Build category buttons data
+const categoryButtons = [
+  { label: 'ALL', slug: '/', active: currentPath === '/' || currentPath.startsWith('/page/') }
 ];
+
+// Add dynamic categories
+for (const category of allCategories) {
+  const slug = generateSlug(category);
+  const isActive = currentPath.includes(`/category/${slug}`);
+  categoryButtons.push({
+    label: category,
+    slug: `/category/${slug}`,
+    active: isActive
+  });
+}
 ---
 
 <header class="w-full bg-white sticky top-0 z-50 px-8 pt-8 pb-4 flex flex-col gap-6">
@@ -24,13 +45,13 @@ const categories = [
 
     <!-- Category Filter Buttons -->
     <div class="flex items-center gap-2">
-      {categories.map((cat) => (
-        <button
+      {categoryButtons.map((cat) => (
+        <a
+          href={cat.slug}
           class={`filter-btn ${cat.active ? 'active' : ''}`}
-          data-filter={cat.label.toLowerCase().replace(/\s+/g, '-')}
         >
           {cat.label}
-        </button>
+        </a>
       ))}
     </div>
 
@@ -62,7 +83,7 @@ const categories = [
   <!-- Results Counter -->
   <div class="w-full flex items-center">
     <span class="text-[10px] tracking-[1.5px] text-gray-500 font-medium flex items-center gap-1 uppercase" id="results-counter">
-      Showing <span id="showing-count">20</span> <i class="fa-solid fa-caret-right text-[8px] mx-0.5 text-gray-400"></i> of <span id="total-count">11,286</span>
+      Showing <span id="showing-count">{showingCount || 0}</span> <i class="fa-solid fa-caret-right text-[8px] mx-0.5 text-gray-400"></i> of <span id="total-count">{totalCount?.toLocaleString() || 0}</span>
     </span>
   </div>
 </header>
@@ -91,35 +112,4 @@ const categories = [
 <script>
   // Import search handler for search functionality
   import '../scripts/searchHandler.js';
-
-  // Update results counter based on actual video count
-  document.addEventListener('DOMContentLoaded', () => {
-    const videoGrid = document.querySelector('.video-grid');
-    if (videoGrid) {
-      const videoCount = videoGrid.querySelectorAll('.video-item').length;
-      const showingCount = document.getElementById('showing-count');
-      const totalCount = document.getElementById('total-count');
-
-      if (showingCount) showingCount.textContent = videoCount.toString();
-      if (totalCount) totalCount.textContent = videoCount.toLocaleString();
-    }
-  });
-
-  // Filter button functionality
-  document.addEventListener('DOMContentLoaded', () => {
-    const filterButtons = document.querySelectorAll('.filter-btn');
-
-    filterButtons.forEach(button => {
-      button.addEventListener('click', () => {
-        // Remove active class from all buttons
-        filterButtons.forEach(btn => btn.classList.remove('active'));
-        // Add active class to clicked button
-        button.classList.add('active');
-
-        // TODO: Implement filtering logic
-        const filter = button.getAttribute('data-filter');
-        console.log('Filter selected:', filter);
-      });
-    });
-  });
 </script>

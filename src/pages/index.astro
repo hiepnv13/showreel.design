@@ -1,15 +1,25 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import Header from "../components/Header.astro";
-import MasonryGrid from "../components/MasonryGrid.astro";
+import VideoGrid from "../components/VideoGrid.astro";
 import { getAllVideos, sortVideosByDate } from "../utils/videoUtils";
 
 // Get all videos sorted by date
 const allVideos = await getAllVideos();
 const videos = sortVideosByDate(allVideos);
+
+// Calculate counts for header
+const itemsPerPage = 24;
+const totalCount = videos.length;
+const showingCount = Math.min(itemsPerPage, totalCount);
 ---
 
 <Layout title="Showreel.design - Discover amazing showreels">
-    <Header />
-    <MasonryGrid videos={videos} />
+    <Header showingCount={showingCount} totalCount={totalCount} />
+    <VideoGrid
+        videos={videos}
+        currentPage={1}
+        itemsPerPage={itemsPerPage}
+        baseUrl="/"
+    />
 </Layout>
