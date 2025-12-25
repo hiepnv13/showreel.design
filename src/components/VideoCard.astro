@@ -15,15 +15,18 @@ const { title, author, thumbnail, videoUrl, fullVideoUrl, category, slug } = Ast
 <a href={slug ? `/videos/${slug}` : '#'} class="video-card group cursor-pointer block" data-video-url={videoUrl}>
   <!-- Video Container -->
   <div class="relative overflow-hidden aspect-video bg-black">
-    <!-- TV Noise Loading Canvas -->
-    <canvas
-      class="video-loading-canvas absolute inset-0 w-full h-full"
-    ></canvas>
+    <!-- Pixelated Loading Preview (Low-res Thumbnail) -->
+    <img
+      src={thumbnail}
+      alt={title}
+      class="video-loading-preview absolute inset-0 w-full h-full"
+      style="object-fit: none; image-rendering: pixelated; image-rendering: crisp-edges;"
+    />
 
     <!-- Video Element -->
     {videoUrl ? (
       <video
-        class="video-element w-full h-full object-cover opacity-0 transition-opacity duration-500"
+        class="video-element w-full h-full object-cover opacity-0 transition-opacity duration-700"
         muted
         loop
         playsinline
@@ -60,81 +63,11 @@ const { title, author, thumbnail, videoUrl, fullVideoUrl, category, slug } = Ast
       rootMargin: '50px', // Start loading 50px before entering viewport
       threshold: 0.1, // Trigger when 10% of video is visible
       maxConcurrentVideos: 4, // Maximum videos playing simultaneously
-      playThreshold: 0.5, // Play when 50% visible
-      noiseIntensity: 0.5, // TV noise intensity (0-1)
-      noiseFPS: 24 // Frames per second for noise animation
+      playThreshold: 0.5 // Play when 50% visible
     };
 
     let currentlyPlayingVideos = new Set<HTMLVideoElement>();
     let loadedVideos = new WeakSet();
-    let noiseIntervals = new Map<HTMLCanvasElement, number>(); // Track noise animations
-
-    // Utility: Draw TV static noise on canvas
-    function drawTVNoise(canvas: HTMLCanvasElement) {
-      const ctx = canvas.getContext('2d');
-      if (!ctx) return;
-
-      const width = canvas.width;
-      const height = canvas.height;
-
-      // Create ImageData for pixel manipulation
-      const imageData = ctx.createImageData(width, height);
-      const data = imageData.data;
-
-      // Generate random grayscale noise
-      for (let i = 0; i < data.length; i += 4) {
-        const noise = Math.random() * 255 * CONFIG.noiseIntensity;
-        data[i] = noise;     // Red
-        data[i + 1] = noise; // Green
-        data[i + 2] = noise; // Blue
-        data[i + 3] = 255;   // Alpha (fully opaque)
-      }
-
-      ctx.putImageData(imageData, 0, 0);
-    }
-
-    // Utility: Start TV noise animation
-    function startTVNoise(canvas: HTMLCanvasElement) {
-      // Stop any existing animation
-      const existingInterval = noiseIntervals.get(canvas);
-      if (existingInterval) {
-        clearInterval(existingInterval);
-      }
-
-      // Set canvas size
-      const rect = canvas.getBoundingClientRect();
-      canvas.width = rect.width;
-      canvas.height = rect.height;
-
-      // Start noise animation
-      const interval = setInterval(() => {
-        drawTVNoise(canvas);
-      }, 1000 / CONFIG.noiseFPS) as unknown as number;
-
-      noiseIntervals.set(canvas, interval);
-    }
-
-    // Utility: Stop TV noise and fade out canvas
-    function stopTVNoise(canvas: HTMLCanvasElement) {
-      // Stop animation
-      const interval = noiseIntervals.get(canvas);
-      if (interval) {
-        clearInterval(interval);
-        noiseIntervals.delete(canvas);
-      }
-
-      // Fade out canvas
-      let opacity = 1;
-      const fadeInterval = setInterval(() => {
-        opacity -= 0.1;
-        canvas.style.opacity = opacity.toString();
-
-        if (opacity <= 0) {
-          clearInterval(fadeInterval);
-          canvas.style.display = 'none';
-        }
-      }, 50); // 500ms total fade
-    }
 
     // Create intersection observers
     const loadObserver = new IntersectionObserver((entries) => {
@@ -168,14 +101,12 @@ const { title, author, thumbnail, videoUrl, fullVideoUrl, category, slug } = Ast
     // Load video function
     function loadVideo(videoCard: Element) {
       const video = videoCard.querySelector('.video-element') as HTMLVideoElement;
-      const canvas = videoCard.querySelector('.video-loading-canvas') as HTMLCanvasElement;
+      const pixelPreview = videoCard.querySelector('.video-loading-preview') as HTMLImageElement;
 
       if (!video || loadedVideos.has(video)) return;
 
-      // Start TV noise animation on canvas
-      if (canvas) {
-        startTVNoise(canvas);
-      }
+      // Pixelated preview is already showing (from HTML)
+      // No need to start animation, it's pure CSS
 
       // Set video source
       const dataSrc = video.getAttribute('data-src');
@@ -191,10 +122,18 @@ const { title, author, thumbnail, videoUrl, fullVideoUrl, category, slug } = Ast
       video.addEventListener('canplay', () => {
         loadedVideos.add(video);
 
-        // Stop TV noise and fade out canvas, then show video
-        if (canvas) {
-          stopTVNoise(canvas);
+        // Fade out pixelated preview
+        if (pixelPreview) {
+          pixelPreview.style.transition = 'opacity 500ms ease-out';
+          pixelPreview.style.opacity = '0';
+
+          // Remove from DOM after fade
+          setTimeout(() => {
+            pixelPreview.style.display = 'none';
+          }, 500);
         }
+
+        // Show video
         video.style.opacity = '1';
 
         // Start observing for play/pause
@@ -203,15 +142,7 @@ const { title, author, thumbnail, videoUrl, fullVideoUrl, category, slug } = Ast
 
       video.addEventListener('error', () => {
         console.warn('Video failed to load:', dataSrc);
-        // Stop noise but keep canvas visible as fallback on error
-        if (canvas) {
-          const interval = noiseIntervals.get(canvas);
-          if (interval) {
-            clearInterval(interval);
-            noiseIntervals.delete(canvas);
-          }
-          canvas.style.opacity = '0.3';
-        }
+        // Keep pixelated preview visible on error (already there)
       });
 
       // Load the video
