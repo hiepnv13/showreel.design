@@ -69,41 +69,7 @@ const allCategories = await getAllCategories();
     <Header showingCount={showingCount} totalCount={totalCount} />
     <main>
         <!-- Hero Section -->
-        <section class="py-20 bg-gray-900 text-white">
-            <div class="section-container text-center">
-                <!-- Breadcrumb -->
-                <nav class="mb-8">
-                    <ol
-                        class="flex justify-center items-center space-x-2 text-sm text-gray-300"
-                    >
-                        <li>
-                            <a
-                                href="/"
-                                class="hover:text-white transition-colors"
-                                >Home</a>
-                        </li>
-                        <li class="text-gray-500">/</li>
-                        <li><span class="text-gray-400">Category</span></li>
-                        <li class="text-gray-500">/</li>
-                        <li class="text-white font-medium">{category}</li>
-                        <li class="text-gray-500">/</li>
-                        <li class="text-gray-400">Page {pageNumber}</li>
-                    </ol>
-                </nav>
-
-                <h1 class="text-4xl md:text-6xl font-bold mb-6 leading-tight">
-                    {category} Videos
-                </h1>
-                <p class="text-xl md:text-2xl text-gray-300 mb-8">
-                    Discover amazing {category.toLowerCase()} projects and animations
-                </p>
-                <div class="text-lg text-gray-400">
-                    {videos.length}
-                    {videos.length === 1 ? "project" : "projects"} found
-                    {totalPages > 1 && ` - Page ${pageNumber} of ${totalPages}`}
-                </div>
-            </div>
-        </section>
+      
 
         <!-- Use VideoGrid Component -->
         <VideoGrid

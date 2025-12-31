@@ -2,13 +2,14 @@
 // Header component matching Figma design
 import { getAllCategories, generateSlug } from "../utils/videoUtils";
 
-// Props for showing video counts
+// Props for showing video counts or breadcrumb
 interface Props {
   showingCount?: number;  // Number of videos showing on current page
   totalCount?: number;    // Total number of videos in collection/category
+  breadcrumb?: Array<{ label: string; href: string }>;  // Breadcrumb navigation for detail pages
 }
 
-const { showingCount, totalCount } = Astro.props;
+const { showingCount, totalCount, breadcrumb } = Astro.props;
 
 // Get current path to highlight active category
 const currentPath = Astro.url.pathname;
@@ -80,11 +81,30 @@ for (const category of allCategories) {
     </div>
   </div>
 
-  <!-- Results Counter -->
+  <!-- Results Counter / Breadcrumb -->
   <div class="w-full flex items-center">
-    <span class="text-[10px] tracking-[1.5px] text-gray-500 font-medium flex items-center gap-1 uppercase" id="results-counter">
-      Showing <span id="showing-count">{showingCount || 0}</span> <i class="fa-solid fa-caret-right text-[8px] mx-0.5 text-gray-400"></i> of <span id="total-count">{totalCount?.toLocaleString() || 0}</span>
-    </span>
+    {breadcrumb ? (
+      <!-- Breadcrumb Navigation -->
+      <nav class="text-[10px] tracking-[1.5px] text-gray-500 font-medium flex items-center gap-1 uppercase">
+        {breadcrumb.map((item, index) => (
+          <>
+            {item.href ? (
+              <a href={item.href} class="hover:text-gray-700 transition-colors">{item.label}</a>
+            ) : (
+              <span class="text-gray-400">{item.label}</span>
+            )}
+            {index < breadcrumb.length - 1 && (
+              <i class="fa-solid fa-caret-right text-[8px] mx-0.5 text-gray-400"></i>
+            )}
+          </>
+        ))}
+      </nav>
+    ) : (
+      <!-- Results Counter -->
+      <span class="text-[10px] tracking-[1.5px] text-gray-500 font-medium flex items-center gap-1 uppercase" id="results-counter">
+        Showing <span id="showing-count">{showingCount || 0}</span> <i class="fa-solid fa-caret-right text-[8px] mx-0.5 text-gray-400"></i> of <span id="total-count">{totalCount?.toLocaleString() || 0}</span>
+      </span>
+    )}
   </div>
 </header>
 
