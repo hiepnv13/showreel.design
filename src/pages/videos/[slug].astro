@@ -34,6 +34,13 @@ const { Content } = await video.render();
 // Get related videos
 const relatedVideos = await getRelatedVideos(video.slug, video.data.category, 3);
 
+// Build breadcrumb navigation
+const breadcrumb = [
+  { label: 'Home', href: '/' },
+  { label: video.data.category, href: `/category/${generateSlug(video.data.category)}` },
+  { label: video.data.title, href: '' }
+];
+
 // Format duration helper
 function formatDuration(seconds: number | undefined): string {
   if (!seconds) return "N/A";
@@ -50,7 +57,7 @@ function formatTaxonomyValue(values: string[] | undefined): string {
 ---
 
 <Layout title={video.data.title}>
-  <Header />
+  <Header breadcrumb={breadcrumb} />
 
   <!-- Main Content: Video + Details Side by Side -->
   <main class="flex flex-col lg:flex-row w-full video-detail-main" id="video-main">
@@ -785,6 +792,49 @@ function formatTaxonomyValue(values: string[] | undefined): string {
         });
       }
     });
+
+    // Sidebar scroll isolation - when hovering sidebar, only scroll sidebar content
+    const detailsSidebar = document.getElementById('details-sidebar');
+    const sidebarContent = document.getElementById('sidebar-content');
+
+    if (detailsSidebar && sidebarContent) {
+      // When mouse enters sidebar, prevent page scroll and enable sidebar scroll
+      detailsSidebar.addEventListener('mouseenter', () => {
+        // Only apply when sidebar is expanded (not collapsed)
+        if (!videoMain?.classList.contains('sidebar-collapsed')) {
+          document.body.style.overflow = 'hidden';
+        }
+      });
+
+      // When mouse leaves sidebar, restore page scroll
+      detailsSidebar.addEventListener('mouseleave', () => {
+        document.body.style.overflow = '';
+      });
+
+      // Handle wheel event on sidebar to scroll its content
+      detailsSidebar.addEventListener('wheel', (e) => {
+        // Only handle when sidebar is expanded
+        if (videoMain?.classList.contains('sidebar-collapsed')) return;
+
+        const scrollableContent = sidebarContent;
+        const { scrollTop, scrollHeight, clientHeight } = scrollableContent;
+        const deltaY = e.deltaY;
+
+        // Check if we're at the top or bottom of the sidebar scroll
+        const isAtTop = scrollTop === 0;
+        const isAtBottom = scrollTop + clientHeight >= scrollHeight - 1;
+
+        // Prevent page scroll when scrolling within sidebar bounds
+        if ((deltaY < 0 && !isAtTop) || (deltaY > 0 && !isAtBottom)) {
+          e.preventDefault();
+          scrollableContent.scrollTop += deltaY;
+        } else if ((deltaY < 0 && isAtTop) || (deltaY > 0 && isAtBottom)) {
+          // Allow page scroll when at bounds - do nothing, let it propagate
+        } else {
+          e.preventDefault();
+          scrollableContent.scrollTop += deltaY;
+        }
+      }, { passive: false });
+    }
   });
 </script>
-c
