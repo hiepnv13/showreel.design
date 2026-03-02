@@ -91,6 +91,61 @@ function formatTaxonomyValue(values: string[] | undefined): string {
           </svg>
         </div>
       </div>
+
+      <!-- Video Controls Bar -->
+      <div id="video-controls" class="video-controls">
+        <!-- Play/Pause Button -->
+        <button id="ctrl-play-pause" class="ctrl-btn" title="Play/Pause">
+          <svg id="ctrl-play-icon" class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M8 5v14l11-7z"/>
+          </svg>
+          <svg id="ctrl-pause-icon" class="w-4 h-4 hidden" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+          </svg>
+        </button>
+
+        <!-- Time Display -->
+        <span id="time-current" class="time-display">00:00</span>
+
+        <!-- Progress Bar -->
+        <div id="progress-container" class="progress-container">
+          <div id="progress-bar" class="progress-bar">
+            <div id="progress-filled" class="progress-filled"></div>
+            <div id="progress-handle" class="progress-handle"></div>
+          </div>
+        </div>
+
+        <!-- Duration Display -->
+        <span id="time-duration" class="time-display">00:00</span>
+
+        <!-- Mute/Unmute Button -->
+        <button id="ctrl-mute" class="ctrl-btn" title="Mute/Unmute">
+          <svg id="ctrl-volume-icon" class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
+          </svg>
+          <svg id="ctrl-mute-icon" class="w-4 h-4 hidden" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/>
+          </svg>
+        </button>
+
+        <!-- Volume Slider -->
+        <div id="volume-container" class="volume-container">
+          <div id="volume-bar" class="volume-bar">
+            <div id="volume-filled" class="volume-filled"></div>
+            <div id="volume-handle" class="volume-handle"></div>
+          </div>
+        </div>
+
+        <!-- Fullscreen Button -->
+        <button id="ctrl-fullscreen" class="ctrl-btn" title="Fullscreen">
+          <svg id="ctrl-expand-icon" class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>
+          </svg>
+          <svg id="ctrl-compress-icon" class="w-4 h-4 hidden" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/>
+          </svg>
+        </button>
+      </div>
     </div>
 
     <!-- Details Sidebar (Right) -->
@@ -122,7 +177,7 @@ function formatTaxonomyValue(values: string[] | undefined): string {
         <div class="p-5 flex flex-col gap-5">
           <!-- Title & Author -->
           <div class="flex flex-col gap-4">
-            <h1 class="text-[36px] leading-[48px] tracking-[-1.2px] text-gray-900">
+            <h1 class="text-[36px] leading-[48px] tracking-[0px] text-gray-900">
               {video.data.title}
             </h1>
             <p class="text-[16px] leading-[24px] text-gray-400">
@@ -533,6 +588,183 @@ function formatTaxonomyValue(values: string[] | undefined): string {
   .details-sidebar::-webkit-scrollbar-thumb:hover {
     background: #d1d5db;
   }
+
+  /* Video Controls Bar */
+  .video-controls {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 10;
+  }
+
+  .video-player-container:hover .video-controls {
+    opacity: 1;
+  }
+
+  /* Control Buttons */
+  .ctrl-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 2px;
+    color: white;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+  }
+
+  .ctrl-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.5);
+  }
+
+  /* Time Display */
+  .time-display {
+    font-size: 10px;
+    letter-spacing: 0.5px;
+    color: rgba(255, 255, 255, 0.8);
+    font-family: monospace;
+    min-width: 40px;
+    flex-shrink: 0;
+  }
+
+  /* Progress Bar */
+  .progress-container {
+    flex: 1;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    padding: 0 4px;
+  }
+
+  .progress-bar {
+    position: relative;
+    width: 100%;
+    height: 3px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 1.5px;
+  }
+
+  .progress-container:hover .progress-bar {
+    height: 5px;
+  }
+
+  .progress-filled {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background: white;
+    border-radius: 1.5px;
+    width: 0%;
+    transition: width 0.1s linear;
+  }
+
+  .progress-handle {
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 12px;
+    height: 12px;
+    background: white;
+    border-radius: 50%;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    left: 0%;
+  }
+
+  .progress-container:hover .progress-handle {
+    opacity: 1;
+  }
+
+  /* Volume Container */
+  .volume-container {
+    width: 60px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    padding: 0 4px;
+    flex-shrink: 0;
+  }
+
+  .volume-bar {
+    position: relative;
+    width: 100%;
+    height: 3px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 1.5px;
+  }
+
+  .volume-filled {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background: white;
+    border-radius: 1.5px;
+    width: 25%;
+  }
+
+  .volume-handle {
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 10px;
+    height: 10px;
+    background: white;
+    border-radius: 50%;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    left: 25%;
+  }
+
+  .volume-container:hover .volume-handle {
+    opacity: 1;
+  }
+
+  /* Fullscreen styles */
+  .video-player-container:fullscreen {
+    max-height: 100vh;
+  }
+
+  .video-player-container:fullscreen .video-controls {
+    padding: 16px 24px;
+  }
+
+  @media (max-width: 768px) {
+    .video-controls {
+      gap: 8px;
+      padding: 8px 12px;
+    }
+
+    .ctrl-btn {
+      width: 28px;
+      height: 28px;
+    }
+
+    .volume-container {
+      display: none;
+    }
+
+    .time-display {
+      font-size: 9px;
+      min-width: 32px;
+    }
+  }
 </style>
 
 <script>
@@ -541,6 +773,214 @@ function formatTaxonomyValue(values: string[] | undefined): string {
     const playOverlay = document.getElementById("play-overlay");
     const playIcon = document.getElementById("play-icon");
     const pauseIcon = document.getElementById("pause-icon");
+
+    // Video Controls Elements
+    const ctrlPlayPause = document.getElementById("ctrl-play-pause");
+    const ctrlPlayIcon = document.getElementById("ctrl-play-icon");
+    const ctrlPauseIcon = document.getElementById("ctrl-pause-icon");
+    const ctrlMute = document.getElementById("ctrl-mute");
+    const ctrlVolumeIcon = document.getElementById("ctrl-volume-icon");
+    const ctrlMuteIcon = document.getElementById("ctrl-mute-icon");
+    const ctrlFullscreen = document.getElementById("ctrl-fullscreen");
+    const ctrlExpandIcon = document.getElementById("ctrl-expand-icon");
+    const ctrlCompressIcon = document.getElementById("ctrl-compress-icon");
+    const timeCurrent = document.getElementById("time-current");
+    const timeDuration = document.getElementById("time-duration");
+    const progressContainer = document.getElementById("progress-container");
+    const progressFilled = document.getElementById("progress-filled");
+    const progressHandle = document.getElementById("progress-handle");
+    const volumeContainer = document.getElementById("volume-container");
+    const volumeFilled = document.getElementById("volume-filled");
+    const volumeHandle = document.getElementById("volume-handle");
+
+    // Format time helper
+    function formatTime(seconds: number): string {
+      if (isNaN(seconds)) return "00:00";
+      const mins = Math.floor(seconds / 60);
+      const secs = Math.floor(seconds % 60);
+      return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    }
+
+    // Update play/pause icons in controls
+    function updatePlayPauseIcons(isPlaying: boolean) {
+      if (ctrlPlayIcon && ctrlPauseIcon) {
+        if (isPlaying) {
+          ctrlPlayIcon.classList.add("hidden");
+          ctrlPauseIcon.classList.remove("hidden");
+        } else {
+          ctrlPlayIcon.classList.remove("hidden");
+          ctrlPauseIcon.classList.add("hidden");
+        }
+      }
+    }
+
+    // Update volume icons
+    function updateVolumeIcons(isMuted: boolean) {
+      if (ctrlVolumeIcon && ctrlMuteIcon) {
+        if (isMuted) {
+          ctrlVolumeIcon.classList.add("hidden");
+          ctrlMuteIcon.classList.remove("hidden");
+        } else {
+          ctrlVolumeIcon.classList.remove("hidden");
+          ctrlMuteIcon.classList.add("hidden");
+        }
+      }
+    }
+
+    // Update progress bar
+    function updateProgress() {
+      if (video && progressFilled && progressHandle) {
+        const percent = (video.currentTime / video.duration) * 100;
+        progressFilled.style.width = `${percent}%`;
+        progressHandle.style.left = `${percent}%`;
+      }
+      if (timeCurrent) {
+        timeCurrent.textContent = formatTime(video?.currentTime || 0);
+      }
+    }
+
+    // Update volume bar
+    function updateVolumeBar(volume: number) {
+      const percent = volume * 100;
+      if (volumeFilled) volumeFilled.style.width = `${percent}%`;
+      if (volumeHandle) volumeHandle.style.left = `${percent}%`;
+    }
+
+    // Video Controls Event Listeners
+    if (video) {
+      // Set duration when metadata loaded
+      video.addEventListener("loadedmetadata", () => {
+        if (timeDuration) {
+          timeDuration.textContent = formatTime(video.duration);
+        }
+      });
+
+      // Update progress as video plays
+      video.addEventListener("timeupdate", updateProgress);
+
+      // Sync play/pause state
+      video.addEventListener("play", () => updatePlayPauseIcons(true));
+      video.addEventListener("pause", () => updatePlayPauseIcons(false));
+
+      // Play/Pause button click
+      ctrlPlayPause?.addEventListener("click", (e) => {
+        e.stopPropagation();
+        if (video.paused) {
+          video.play();
+        } else {
+          video.pause();
+        }
+      });
+
+      // Mute button click
+      ctrlMute?.addEventListener("click", (e) => {
+        e.stopPropagation();
+        video.muted = !video.muted;
+        updateVolumeIcons(video.muted);
+        if (!video.muted && video.volume === 0) {
+          video.volume = 0.25;
+          updateVolumeBar(0.25);
+        }
+      });
+
+      // Volume change listener
+      video.addEventListener("volumechange", () => {
+        updateVolumeIcons(video.muted || video.volume === 0);
+        if (!video.muted) {
+          updateVolumeBar(video.volume);
+        }
+      });
+
+      // Progress bar click/drag
+      let isDraggingProgress = false;
+
+      function seekToPosition(e: MouseEvent) {
+        if (progressContainer && video) {
+          const rect = progressContainer.getBoundingClientRect();
+          const percent = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+          video.currentTime = percent * video.duration;
+        }
+      }
+
+      progressContainer?.addEventListener("mousedown", (e) => {
+        isDraggingProgress = true;
+        seekToPosition(e);
+      });
+
+      document.addEventListener("mousemove", (e) => {
+        if (isDraggingProgress) {
+          seekToPosition(e);
+        }
+      });
+
+      document.addEventListener("mouseup", () => {
+        isDraggingProgress = false;
+      });
+
+      // Volume bar click/drag
+      let isDraggingVolume = false;
+
+      function setVolumeFromPosition(e: MouseEvent) {
+        if (volumeContainer && video) {
+          const rect = volumeContainer.getBoundingClientRect();
+          const percent = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+          video.volume = percent;
+          video.muted = false;
+          updateVolumeBar(percent);
+          updateVolumeIcons(percent === 0);
+        }
+      }
+
+      volumeContainer?.addEventListener("mousedown", (e) => {
+        isDraggingVolume = true;
+        setVolumeFromPosition(e);
+      });
+
+      document.addEventListener("mousemove", (e) => {
+        if (isDraggingVolume) {
+          setVolumeFromPosition(e);
+        }
+      });
+
+      document.addEventListener("mouseup", () => {
+        isDraggingVolume = false;
+      });
+
+      // Fullscreen button
+      ctrlFullscreen?.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const container = document.getElementById("video-container");
+        if (!document.fullscreenElement) {
+          container?.requestFullscreen();
+          if (ctrlExpandIcon && ctrlCompressIcon) {
+            ctrlExpandIcon.classList.add("hidden");
+            ctrlCompressIcon.classList.remove("hidden");
+          }
+        } else {
+          document.exitFullscreen();
+          if (ctrlExpandIcon && ctrlCompressIcon) {
+            ctrlExpandIcon.classList.remove("hidden");
+            ctrlCompressIcon.classList.add("hidden");
+          }
+        }
+      });
+
+      // Listen for fullscreen change
+      document.addEventListener("fullscreenchange", () => {
+        if (ctrlExpandIcon && ctrlCompressIcon) {
+          if (document.fullscreenElement) {
+            ctrlExpandIcon.classList.add("hidden");
+            ctrlCompressIcon.classList.remove("hidden");
+          } else {
+            ctrlExpandIcon.classList.remove("hidden");
+            ctrlCompressIcon.classList.add("hidden");
+          }
+        }
+      });
+
+      // Initialize volume bar
+      updateVolumeBar(video.volume);
+    }
 
     // Sidebar toggle functionality
     const videoMain = document.getElementById("video-main");

@@ -14,7 +14,7 @@ const { title, author, thumbnail, videoUrl, fullVideoUrl, category, slug } = Ast
 
 <a href={slug ? `/videos/${slug}` : '#'} class="video-card group cursor-pointer block" data-video-url={videoUrl}>
   <!-- Video Container -->
-  <div class="relative overflow-hidden aspect-video bg-black">
+  <div class="relative overflow-hidden aspect-video bg-black rounded-[4px]">
     <!-- Video Element -->
     {videoUrl ? (
       <video
