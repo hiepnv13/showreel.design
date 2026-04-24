@@ -2,44 +2,82 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Aileron Font Faces */
-@font-face { font-family: 'Aileron'; src: url('/fonts/Aileron-Thin.otf') format('opentype'); font-weight: 100; font-style: normal; font-display: swap; }
-@font-face { font-family: 'Aileron'; src: url('/fonts/Aileron-ThinItalic.otf') format('opentype'); font-weight: 100; font-style: italic; font-display: swap; }
-@font-face { font-family: 'Aileron'; src: url('/fonts/Aileron-UltraLight.otf') format('opentype'); font-weight: 200; font-style: normal; font-display: swap; }
-@font-face { font-family: 'Aileron'; src: url('/fonts/Aileron-UltraLightItalic.otf') format('opentype'); font-weight: 200; font-style: italic; font-display: swap; }
-@font-face { font-family: 'Aileron'; src: url('/fonts/Aileron-Light.otf') format('opentype'); font-weight: 300; font-style: normal; font-display: swap; }
-@font-face { font-family: 'Aileron'; src: url('/fonts/Aileron-LightItalic.otf') format('opentype'); font-weight: 300; font-style: italic; font-display: swap; }
-@font-face { font-family: 'Aileron'; src: url('/fonts/Aileron-Regular.otf') format('opentype'); font-weight: 400; font-style: normal; font-display: swap; }
-@font-face { font-family: 'Aileron'; src: url('/fonts/Aileron-Italic.otf') format('opentype'); font-weight: 400; font-style: italic; font-display: swap; }
-@font-face { font-family: 'Aileron'; src: url('/fonts/Aileron-SemiBold.otf') format('opentype'); font-weight: 600; font-style: normal; font-display: swap; }
-@font-face { font-family: 'Aileron'; src: url('/fonts/Aileron-SemiBoldItalic.otf') format('opentype'); font-weight: 600; font-style: italic; font-display: swap; }
-@font-face { font-family: 'Aileron'; src: url('/fonts/Aileron-Bold.otf') format('opentype'); font-weight: 700; font-style: normal; font-display: swap; }
-@font-face { font-family: 'Aileron'; src: url('/fonts/Aileron-BoldItalic.otf') format('opentype'); font-weight: 700; font-style: italic; font-display: swap; }
-@font-face { font-family: 'Aileron'; src: url('/fonts/Aileron-Heavy.otf') format('opentype'); font-weight: 800; font-style: normal; font-display: swap; }
-@font-face { font-family: 'Aileron'; src: url('/fonts/Aileron-HeavyItalic.otf') format('opentype'); font-weight: 800; font-style: italic; font-display: swap; }
-@font-face { font-family: 'Aileron'; src: url('/fonts/Aileron-Black.otf') format('opentype'); font-weight: 900; font-style: normal; font-display: swap; }
-@font-face { font-family: 'Aileron'; src: url('/fonts/Aileron-BlackItalic.otf') format('opentype'); font-weight: 900; font-style: italic; font-display: swap; }
+@font-face {
+  font-family: 'Aileron';
+  src: url('/fonts/Aileron-Thin.otf') format('opentype');
+  font-weight: 100;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Aileron';
+  src: url('/fonts/Aileron-UltraLight.otf') format('opentype');
+  font-weight: 200;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Aileron';
+  src: url('/fonts/Aileron-Light.otf') format('opentype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Aileron';
+  src: url('/fonts/Aileron-Regular.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Aileron';
+  src: url('/fonts/Aileron-Italic.otf') format('opentype');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Aileron';
+  src: url('/fonts/Aileron-SemiBold.otf') format('opentype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Aileron';
+  src: url('/fonts/Aileron-Bold.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Aileron';
+  src: url('/fonts/Aileron-Heavy.otf') format('opentype');
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Aileron';
+  src: url('/fonts/Aileron-Black.otf') format('opentype');
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
 
 @layer base {
   html {
     font-family: 'Aileron', sans-serif;
-    font-weight: 400;
   }
 
   body {
     @apply bg-[#fdfdfd] min-h-screen text-[#1a1a1a];
-    font-weight: 400;
-  }
-
-  h1, h2, h3, h4, h5, h6 {
-    font-family: 'Aileron', sans-serif;
-    font-weight: 700;
   }
 
   /* Logo font */
   .font-logo {
     font-family: 'Aileron', sans-serif;
-    font-weight: 700;
   }
 
   /* Custom scrollbar */
@@ -193,3 +231,108 @@
     transform: scale(0.8);
   }
 }
+
+/* ─── Dark Mode ──────────────────────────────────────────── */
+
+html.dark {
+  color-scheme: dark;
+}
+
+html.dark body {
+  background-color: #0d0d0d;
+  color: #e0e0e0;
+}
+
+/* Surfaces */
+html.dark .bg-white { background-color: #111 !important; }
+html.dark .bg-\[#fdfdfd\] { background-color: #0d0d0d !important; }
+html.dark .bg-gray-50 { background-color: #161616 !important; }
+html.dark .bg-gray-100,
+html.dark .bg-\[#f5f5f5\],
+html.dark .bg-\[#f0f0f0\] { background-color: #1e1e1e !important; }
+
+/* Text */
+html.dark .text-gray-900 { color: #e0e0e0 !important; }
+html.dark [class*="text-[#1"] { color: #e0e0e0 !important; }
+html.dark .text-gray-700 { color: #aaa !important; }
+html.dark .text-gray-600 { color: #999 !important; }
+html.dark .text-gray-500 { color: #777 !important; }
+html.dark .text-gray-400 { color: #555 !important; }
+
+/* Borders */
+html.dark .border-gray-50,
+html.dark .border-gray-100 { border-color: #1f1f1f !important; }
+html.dark .border-gray-200 { border-color: #2a2a2a !important; }
+
+/* Filter buttons */
+html.dark .filter-btn {
+  background-color: #1e1e1e !important;
+  color: #888 !important;
+}
+html.dark .filter-btn.active {
+  background-color: #e0e0e0 !important;
+  color: #111 !important;
+}
+html.dark .filter-btn:hover:not(.active) {
+  background-color: #2a2a2a !important;
+}
+
+/* Input */
+html.dark input { color: #e0e0e0; }
+html.dark input::placeholder { color: #555 !important; }
+
+/* Header sticky */
+html.dark header { background-color: #111 !important; }
+
+/* Footer */
+html.dark footer {
+  background-color: #111 !important;
+  border-color: #1f1f1f !important;
+}
+
+/* Video info section (slug page custom classes) */
+html.dark .video-info,
+html.dark .related-section { background-color: #0d0d0d; }
+
+html.dark .info-title { color: #e0e0e0; }
+html.dark .info-by { color: #555; }
+html.dark .info-author-link { color: #999; border-color: #2a2a2a; }
+html.dark .info-author-link:hover { color: #e0e0e0; border-color: #e0e0e0; }
+html.dark .info-desc { color: #666; }
+
+html.dark .details-label,
+html.dark .tags-label,
+html.dark .related-label { color: #444; }
+
+html.dark .detail-row { border-color: #1a1a1a !important; }
+html.dark .detail-key { color: #555; }
+html.dark .detail-val { color: #bbb; }
+html.dark .detail-link { color: #bbb; border-color: #2a2a2a; }
+html.dark .detail-link:hover { border-color: #bbb; }
+
+html.dark .tag-pill {
+  background-color: #1e1e1e !important;
+  color: #777 !important;
+}
+html.dark .tag-pill:hover {
+  background-color: #2a2a2a !important;
+  color: #e0e0e0 !important;
+}
+
+html.dark .info-header,
+html.dark .info-tags,
+html.dark .info-markdown { border-color: #1a1a1a; }
+
+html.dark .prose-content { color: #666; }
+html.dark .prose-content h1,
+html.dark .prose-content h2,
+html.dark .prose-content h3 { color: #555; }
+html.dark .prose-content strong { color: #999; }
+
+html.dark .related-title { color: #777; }
+html.dark .related-item:hover .related-title { color: #e0e0e0; }
+html.dark .related-thumb { background-color: #1a1a1a; }
+
+/* Masonry / video grid cards */
+html.dark .masonry-item,
+html.dark .video-card { background-color: #111; }

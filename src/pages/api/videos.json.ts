@@ -11,7 +11,7 @@ export const GET: APIRoute = async () => {
       author: video.data.author,
       category: video.data.category,
       tags: video.data.tags,
-      slug: video.slug,
+      slug: video.id,
       description: video.data.description
     }));
     

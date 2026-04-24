@@ -1,7 +1,6 @@
 ---
 import SmoothScroll from '../components/SmoothScroll.astro';
 import Preloader from '../components/Preloader.astro';
-import Footer from '../components/Footer.astro';
 import '../styles/global.css';
 
 export interface Props {
@@ -22,11 +21,16 @@ const { title } = Astro.props;
     <meta name="view-transition" content="same-origin" />
     <title>{title}</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Inline: apply dark class before paint to avoid FOUC -->
+    <script is:inline>
+      if (localStorage.getItem('darkMode') === 'true') {
+        document.documentElement.classList.add('dark');
+      }
+    </script>
   </head>
   <body>
     <Preloader />
     <slot />
-    <Footer />
     <SmoothScroll />
   </body>
 </html>

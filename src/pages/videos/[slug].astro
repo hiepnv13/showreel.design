@@ -1,17 +1,17 @@
 ---
-import { getCollection, type CollectionEntry } from "astro:content";
+import { getCollection, render, type CollectionEntry } from "astro:content";
 import { getAllVideos, getRelatedVideos, generateSlug } from "../../utils/videoUtils";
 import Layout from "../../layouts/Layout.astro";
 import Header from "../../components/Header.astro";
+import Footer from "../../components/Footer.astro";
 import type { GetStaticPaths } from "astro";
 
-// Force prerender in SSR mode to avoid 500 errors
 export const prerender = true;
 
 export const getStaticPaths: GetStaticPaths = async () => {
   const videos = await getAllVideos();
   return videos.map((video) => ({
-    params: { slug: video.slug },
+    params: { slug: video.id },
     props: { video },
   }));
 };
@@ -29,19 +29,16 @@ interface Props {
 }
 
 const { video }: Props = Astro.props;
-const { Content } = await video.render();
+const { Content } = await render(video);
 
-// Get related videos
-const relatedVideos = await getRelatedVideos(video.slug, video.data.category, 3);
+const relatedVideos = await getRelatedVideos(video.id, video.data.category, 3);
 
-// Build breadcrumb navigation
 const breadcrumb = [
   { label: 'Home', href: '/' },
   { label: video.data.category, href: `/category/${generateSlug(video.data.category)}` },
   { label: video.data.title, href: '' }
 ];
 
-// Format duration helper
 function formatDuration(seconds: number | undefined): string {
   if (!seconds) return "N/A";
   const mins = Math.floor(seconds / 60);
@@ -49,40 +46,49 @@ function formatDuration(seconds: number | undefined): string {
   return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
 }
 
-// Format taxonomy values for display
 function formatTaxonomyValue(values: string[] | undefined): string {
-  if (!values || values.length === 0) return "N/A";
-  return values.map(v => v.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')).join(', ');
+  if (!values || values.length === 0) return "";
+  return values
+    .map(v => v.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' '))
+    .join(', ');
 }
+
+const hasStyles = video.data.styles && video.data.styles.length > 0;
+const hasTechniques = video.data.techniques && video.data.techniques.length > 0;
+const hasSoundMusic = video.data.soundMusic && video.data.soundMusic.length > 0;
+const hasTags = video.data.tags && video.data.tags.length > 0;
 ---
 
 <Layout title={video.data.title}>
   <Header breadcrumb={breadcrumb} />
 
-  <!-- Main Content: Video + Details Side by Side -->
-  <main class="flex flex-col lg:flex-row w-full video-detail-main" id="video-main">
-    <!-- Video Player Section (Left) -->
-    <div class="video-player-container bg-black flex items-center justify-center relative" id="video-container">
+  <!-- Video Player — Full Width -->
+  <div class="video-wrapper">
+    <div class="video-player-container" id="video-container" data-playing="false" data-activated="false">
+
+      <!-- Dark tint (fades out when playing) -->
+      <div class="vp-overlay"></div>
+
+      <!-- Title (fades out when playing) -->
+      <div class="vp-title">
+        <p class="vp-title-text">{video.data.title}</p>
+        <p class="vp-title-author">by {video.data.author}</p>
+      </div>
+
       <video
         id="main-video"
-        class="max-w-full max-h-full w-auto h-auto"
+        class="main-video"
         autoplay
         muted
-        loop
         playsinline
-        style="object-fit: contain;"
       >
         <source src={video.data.videoUrl} type="video/mp4" />
-        <source
-          src={`/videos/${encodeURIComponent(video.data.videoFileName)}`}
-          type="video/mp4"
-        />
-        Your browser does not support the video tag.
+        <source src={`/videos/${encodeURIComponent(video.data.videoFileName)}`} type="video/mp4" />
       </video>
 
-      <!-- Play/Pause Overlay (shown on click) -->
-      <div id="play-overlay" class="absolute inset-0 flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-200">
-        <div class="bg-white/10 backdrop-blur-sm border border-white/20 rounded-full p-8">
+      <!-- Click feedback flash -->
+      <div id="play-overlay" class="play-overlay">
+        <div class="play-overlay-ring">
           <svg id="play-icon" class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
             <path d="M8 5v14l11-7z"/>
           </svg>
@@ -94,255 +100,212 @@ function formatTaxonomyValue(values: string[] | undefined): string {
 
       <!-- Video Controls Bar -->
       <div id="video-controls" class="video-controls">
-        <!-- Play/Pause Button -->
         <button id="ctrl-play-pause" class="ctrl-btn" title="Play/Pause">
-          <svg id="ctrl-play-icon" class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M8 5v14l11-7z"/>
-          </svg>
-          <svg id="ctrl-pause-icon" class="w-4 h-4 hidden" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
-          </svg>
+          <svg id="ctrl-play-icon" class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+          <svg id="ctrl-pause-icon" class="w-4 h-4 hidden" fill="currentColor" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
         </button>
-
-        <!-- Time Display -->
         <span id="time-current" class="time-display">00:00</span>
-
-        <!-- Progress Bar -->
         <div id="progress-container" class="progress-container">
           <div id="progress-bar" class="progress-bar">
             <div id="progress-filled" class="progress-filled"></div>
             <div id="progress-handle" class="progress-handle"></div>
           </div>
         </div>
-
-        <!-- Duration Display -->
         <span id="time-duration" class="time-display">00:00</span>
-
-        <!-- Mute/Unmute Button -->
         <button id="ctrl-mute" class="ctrl-btn" title="Mute/Unmute">
-          <svg id="ctrl-volume-icon" class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
-          </svg>
-          <svg id="ctrl-mute-icon" class="w-4 h-4 hidden" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/>
-          </svg>
+          <svg id="ctrl-volume-icon" class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+          <svg id="ctrl-mute-icon" class="w-4 h-4 hidden" fill="currentColor" viewBox="0 0 24 24"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></svg>
         </button>
-
-        <!-- Volume Slider -->
         <div id="volume-container" class="volume-container">
           <div id="volume-bar" class="volume-bar">
             <div id="volume-filled" class="volume-filled"></div>
             <div id="volume-handle" class="volume-handle"></div>
           </div>
         </div>
-
-        <!-- Fullscreen Button -->
         <button id="ctrl-fullscreen" class="ctrl-btn" title="Fullscreen">
-          <svg id="ctrl-expand-icon" class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>
-          </svg>
-          <svg id="ctrl-compress-icon" class="w-4 h-4 hidden" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/>
+          <svg id="ctrl-expand-icon" class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+          <svg id="ctrl-compress-icon" class="w-4 h-4 hidden" fill="currentColor" viewBox="0 0 24 24"><path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/></svg>
+        </button>
+      </div>
+
+      <!-- Custom cursor (scoped to player) -->
+      <div id="vp-cursor" class="vp-cursor">
+        <span id="vp-cursor-label" class="vp-cursor-label"></span>
+      </div>
+
+      <!-- Film Credits Overlay -->
+      <div class="credits-overlay" id="credits-overlay">
+        <!-- Scrolling credits -->
+        <div class="credits-center" id="credits-center">
+          <div class="credits-roll" id="credits-roll">
+            <div class="c-title">{video.data.title}</div>
+            <div class="c-author">by {video.data.author}</div>
+
+            <div class="c-line"></div>
+
+            <div class="c-row">
+              <span class="c-role">Category</span>
+              <span class="c-val">{video.data.category}</span>
+            </div>
+            {video.data.year && (
+              <div class="c-row">
+                <span class="c-role">Year</span>
+                <span class="c-val">{video.data.year}</span>
+              </div>
+            )}
+            {video.data.duration && (
+              <div class="c-row">
+                <span class="c-role">Duration</span>
+                <span class="c-val">{formatDuration(video.data.duration)}</span>
+              </div>
+            )}
+            {hasStyles && (
+              <div class="c-row">
+                <span class="c-role">Style</span>
+                <span class="c-val">{formatTaxonomyValue(video.data.styles)}</span>
+              </div>
+            )}
+            {hasTechniques && (
+              <div class="c-row">
+                <span class="c-role">Technique</span>
+                <span class="c-val">{formatTaxonomyValue(video.data.techniques)}</span>
+              </div>
+            )}
+            {hasSoundMusic && (
+              <div class="c-row">
+                <span class="c-role">Sound &amp; Music</span>
+                <span class="c-val">{formatTaxonomyValue(video.data.soundMusic)}</span>
+              </div>
+            )}
+            {hasTags && (
+              <>
+                <div class="c-line"></div>
+                <div class="c-row c-tags-row">
+                  <span class="c-role">Tags</span>
+                  <span class="c-val">{video.data.tags.join(' · ')}</span>
+                </div>
+              </>
+            )}
+            {video.data.sourceUrl && (
+              <div class="c-row">
+                <span class="c-role">Link</span>
+                <span class="c-val c-link">{video.data.sourceUrl.replace(/^https?:\/\//, '')}</span>
+              </div>
+            )}
+
+            <div class="c-line"></div>
+
+            <div class="c-replay-area">
+              <button id="credits-replay-btn" class="c-replay-btn">↺ Replay</button>
+            </div>
+
+            <div class="credits-spacer"></div>
+          </div>
+        </div>
+
+        <!-- Dismiss -->
+        <button id="credits-dismiss" class="credits-dismiss-btn" title="Close">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 18L18 6M6 6l12 12"/>
           </svg>
         </button>
       </div>
     </div>
-
-    <!-- Details Sidebar (Right) -->
-    <div class="details-sidebar bg-white border-l border-gray-100 overflow-hidden" id="details-sidebar">
-      <!-- Toggle Button (inside sidebar) -->
-      <button
-        id="sidebar-toggle-inside"
-        class="sidebar-toggle-btn"
-        title="Toggle sidebar"
-      >
-        <div class="toggle-icon">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-          </svg>
-        </div>
-      </button>
-
-      <!-- Collapsed State - Vertical Labels -->
-      <div class="collapsed-labels" id="collapsed-labels">
-        <div class="collapsed-content">
-          <span class="vertical-text" data-section="project-details">Project Details</span>
-          <span class="vertical-text" data-section="tags">TAGS</span>
-          <span class="vertical-text" data-section="descriptions">DESCRIPTIONS</span>
-        </div>
-      </div>
-
-      <!-- Expanded Content -->
-      <div class="sidebar-content" id="sidebar-content">
-        <div class="p-5 flex flex-col gap-5">
-          <!-- Title & Author -->
-          <div class="flex flex-col gap-4">
-            <h1 class="text-[36px] leading-[48px] tracking-[0px] text-gray-900">
-              {video.data.title}
-            </h1>
-            <p class="text-[16px] leading-[24px] text-gray-400">
-              by <a href={`/author/${generateSlug(video.data.author)}`} class="text-blue-600 hover:underline font-medium">{video.data.author}</a>
-            </p>
-            <p class="text-[16px] leading-[24px] text-gray-500 pt-4">
-              {video.data.description}
-            </p>
-          </div>
-
-          <!-- Project Details Section -->
-          <div class="border-t border-gray-100 pt-12 flex flex-col gap-10">
-            <!-- Project Details -->
-            <div class="flex flex-col gap-4" id="project-details-section">
-              <h3 class="text-[12px] tracking-[0.6px] uppercase text-gray-400 font-medium">Project Details</h3>
-              <div class="flex flex-col gap-3" id="project-details-list">
-                <!-- Year -->
-                <div class="flex items-center justify-between py-2 border-b border-gray-50">
-                  <span class="text-[14px] text-gray-500">Year</span>
-                  <span class="text-[14px] text-black">{video.data.year || "N/A"}</span>
-                </div>
-                <!-- Duration -->
-                <div class="flex items-center justify-between py-2 border-b border-gray-50">
-                  <span class="text-[14px] text-gray-500">Duration</span>
-                  <span class="text-[14px] text-black">{formatDuration(video.data.duration)}</span>
-                </div>
-                <!-- Category -->
-                <div class="flex items-center justify-between py-2 border-b border-gray-50">
-                  <span class="text-[14px] text-gray-500">Category</span>
-                  <a href={`/category/${generateSlug(video.data.category)}`} class="text-[14px] text-blue-600 hover:underline">{video.data.category}</a>
-                </div>
-                <!-- Style -->
-                <div class="flex items-center justify-between py-2 border-b border-gray-50">
-                  <span class="text-[14px] text-gray-500">Style</span>
-                  <span class="text-[14px] text-black">{formatTaxonomyValue(video.data.styles)}</span>
-                </div>
-                <!-- Technique -->
-                <div class="flex items-center justify-between py-2 border-b border-gray-50">
-                  <span class="text-[14px] text-gray-500">Technique</span>
-                  <span class="text-[14px] text-black">{formatTaxonomyValue(video.data.techniques)}</span>
-                </div>
-                <!-- Sound/Music -->
-                <div class="flex items-center justify-between py-2 border-b border-gray-50">
-                  <span class="text-[14px] text-gray-500">Sound/Music</span>
-                  <span class="text-[14px] text-black">{formatTaxonomyValue(video.data.soundMusic)}</span>
-                </div>
-                <!-- Link -->
-                {video.data.sourceUrl && (
-                  <div class="flex items-center justify-between py-2 border-b border-gray-50">
-                    <span class="text-[14px] text-gray-500">Link</span>
-                    <a href={video.data.sourceUrl} target="_blank" rel="noopener noreferrer" class="text-[14px] text-blue-600 hover:underline truncate max-w-[250px]">{video.data.sourceUrl}</a>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            <!-- Tags -->
-            {video.data.tags && video.data.tags.length > 0 && (
-              <div class="flex flex-col gap-4">
-                <h3 class="text-[12px] tracking-[0.6px] uppercase text-gray-400 font-medium">Tags</h3>
-                <div class="flex flex-wrap gap-2">
-                  {video.data.tags.map((tag: string) => (
-                    <a
-                      href={`/tag/${generateSlug(tag)}`}
-                      class="bg-gray-100 text-gray-600 px-3 py-1 rounded-sm text-[12px] font-medium hover:bg-gray-200 transition-colors"
-                    >
-                      {tag}
-                    </a>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            <!-- Descriptions (Markdown Content) -->
-            <div class="flex flex-col gap-4">
-              <h3 class="text-[12px] tracking-[0.6px] uppercase text-gray-400 font-medium">Descriptions</h3>
-              <div class="prose prose-sm max-w-none text-[16px] leading-[24px] text-gray-700">
-                <Content />
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </main>
-
-  <!-- Hover Overlays (shows on vertical label hover when sidebar collapsed) -->
-
-  <!-- Project Details Overlay -->
-  <div class="hover-details-overlay" id="hover-overlay-project-details" data-section="project-details">
-    <div class="hover-details-card">
-      <h3 class="text-[12px] tracking-[0.6px] uppercase text-gray-400 font-medium mb-3">Project Details</h3>
-      <div class="flex flex-col gap-3">
-        <div class="flex items-center justify-between py-2 border-b border-gray-100">
-          <span class="text-[14px] text-gray-500">Year</span>
-          <span class="text-[14px] text-black">{video.data.year || "N/A"}</span>
-        </div>
-        <div class="flex items-center justify-between py-2 border-b border-gray-100">
-          <span class="text-[14px] text-gray-500">Duration</span>
-          <span class="text-[14px] text-black">{formatDuration(video.data.duration)}</span>
-        </div>
-        <div class="flex items-center justify-between py-2 border-b border-gray-100">
-          <span class="text-[14px] text-gray-500">Category</span>
-          <span class="text-[14px] text-black">{video.data.category}</span>
-        </div>
-        <div class="flex items-center justify-between py-2 border-b border-gray-100">
-          <span class="text-[14px] text-gray-500">Style</span>
-          <span class="text-[14px] text-black">{formatTaxonomyValue(video.data.styles)}</span>
-        </div>
-        <div class="flex items-center justify-between py-2 border-b border-gray-100">
-          <span class="text-[14px] text-gray-500">Technique</span>
-          <span class="text-[14px] text-black">{formatTaxonomyValue(video.data.techniques)}</span>
-        </div>
-        <div class="flex items-center justify-between py-2 border-b border-gray-100">
-          <span class="text-[14px] text-gray-500">Sound/Music</span>
-          <span class="text-[14px] text-black">{formatTaxonomyValue(video.data.soundMusic)}</span>
-        </div>
-        {video.data.sourceUrl && (
-          <div class="flex items-center justify-between py-2 border-b border-gray-100">
-            <span class="text-[14px] text-gray-500">Link</span>
-            <a href={video.data.sourceUrl} target="_blank" rel="noopener noreferrer" class="text-[14px] text-blue-600 hover:underline truncate max-w-[200px]">{video.data.sourceUrl.replace(/^https?:\/\//, '')}</a>
-          </div>
-        )}
-      </div>
-    </div>
   </div>
 
-  <!-- Tags Overlay -->
-  <div class="hover-details-overlay" id="hover-overlay-tags" data-section="tags">
-    <div class="hover-details-card">
-      <h3 class="text-[12px] tracking-[0.6px] uppercase text-gray-400 font-medium mb-3">Tags</h3>
-      {video.data.tags && video.data.tags.length > 0 ? (
-        <div class="flex flex-wrap gap-2">
+  <!-- Video Info (below video) -->
+  <div class="video-info">
+    <div class="info-header">
+      <!-- Title + description -->
+      <div class="info-title-area">
+        <h1 class="info-title">{video.data.title}</h1>
+        <p class="info-by">
+          by <a href={`/author/${generateSlug(video.data.author)}`} class="info-author-link">{video.data.author}</a>
+        </p>
+        <p class="info-desc">{video.data.description}</p>
+      </div>
+
+      <!-- Project details table -->
+      <div class="info-details-area">
+        <h3 class="details-label">Project Details</h3>
+        <div class="details-table">
+          <div class="detail-row">
+            <span class="detail-key">Year</span>
+            <span class="detail-val">{video.data.year || "N/A"}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-key">Duration</span>
+            <span class="detail-val">{formatDuration(video.data.duration)}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-key">Category</span>
+            <a href={`/category/${generateSlug(video.data.category)}`} class="detail-link">{video.data.category}</a>
+          </div>
+          {hasStyles && (
+            <div class="detail-row">
+              <span class="detail-key">Style</span>
+              <span class="detail-val">{formatTaxonomyValue(video.data.styles)}</span>
+            </div>
+          )}
+          {hasTechniques && (
+            <div class="detail-row">
+              <span class="detail-key">Technique</span>
+              <span class="detail-val">{formatTaxonomyValue(video.data.techniques)}</span>
+            </div>
+          )}
+          {hasSoundMusic && (
+            <div class="detail-row">
+              <span class="detail-key">Sound / Music</span>
+              <span class="detail-val">{formatTaxonomyValue(video.data.soundMusic)}</span>
+            </div>
+          )}
+          {video.data.sourceUrl && (
+            <div class="detail-row">
+              <span class="detail-key">Link</span>
+              <a
+                href={video.data.sourceUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="detail-link detail-link-truncate"
+              >
+                {video.data.sourceUrl.replace(/^https?:\/\//, '')}
+              </a>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+
+    <!-- Tags -->
+    {hasTags && (
+      <div class="info-tags">
+        <span class="tags-label">Tags</span>
+        <div class="tags-list">
           {video.data.tags.map((tag: string) => (
-            <span class="bg-gray-100 text-gray-600 px-3 py-1 rounded-sm text-[12px] font-medium">
-              {tag}
-            </span>
+            <a href={`/tag/${generateSlug(tag)}`} class="tag-pill">{tag}</a>
           ))}
         </div>
-      ) : (
-        <p class="text-[14px] text-gray-500">No tags available</p>
-      )}
-    </div>
-  </div>
+      </div>
+    )}
 
-  <!-- Descriptions Overlay -->
-  <div class="hover-details-overlay" id="hover-overlay-descriptions" data-section="descriptions">
-    <div class="hover-details-card">
-      <h3 class="text-[12px] tracking-[0.6px] uppercase text-gray-400 font-medium mb-3">Descriptions</h3>
-      <div class="prose prose-sm max-w-none text-[14px] leading-[22px] text-gray-700">
+    <!-- Markdown Description -->
+    <div class="info-markdown">
+      <div class="prose-content">
         <Content />
       </div>
     </div>
   </div>
 
-  <!-- Related Videos Section -->
+  <!-- Related Videos -->
   {relatedVideos.length > 0 && (
-    <section class="w-full bg-white border-t border-white pt-10 pb-3 px-8">
-      <p class="text-[10px] tracking-[1.5px] uppercase text-gray-500 font-medium text-center mb-3">Explore more</p>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+    <section class="related-section">
+      <p class="related-label">Explore more</p>
+      <div class="related-grid">
         {relatedVideos.map((relatedVideo) => (
-          <a href={`/videos/${relatedVideo.slug}`} class="flex flex-col gap-1 group">
-            <div class="aspect-video relative overflow-hidden bg-gray-100">
+          <a href={`/videos/${relatedVideo.id}`} class="related-item group">
+            <div class="related-thumb">
               <video
-                class="related-video w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                class="related-video"
                 muted
                 loop
                 playsinline
@@ -352,244 +315,164 @@ function formatTaxonomyValue(values: string[] | undefined): string {
                 <source data-src={(relatedVideo.data as any).thumbnailUrl} type="video/mp4" />
               </video>
             </div>
-            <div class="p-1">
-              <p class="text-[14px] text-black">{relatedVideo.data.title}</p>
-            </div>
+            <p class="related-title">{relatedVideo.data.title}</p>
           </a>
         ))}
       </div>
     </section>
   )}
+
+  <Footer />
 </Layout>
 
 <style>
-  /* Video detail layout */
-  .video-detail-main {
-    min-height: calc(100vh - 140px);
-    position: relative;
-  }
-
-  /* Video player takes most of the width */
-  .video-player-container {
-    flex: 1;
-    min-height: 400px;
-    max-height: calc(100vh - 140px);
-    position: relative;
-  }
-
-  /* Details sidebar - Three states: expanded, collapsed, hover */
-  .details-sidebar {
+  /* ─── Video Player ─────────────────────────────────────── */
+  .video-wrapper {
     width: 100%;
-    max-height: none;
-    transition: width 0.3s ease-in-out, min-width 0.3s ease-in-out;
+    background: #000;
+  }
+
+  .video-player-container {
+    width: 100%;
+    height: calc(100vh - 140px);
+    background: #000;
     position: relative;
     display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
   }
 
-  /* Sidebar Toggle Button (inside sidebar) */
-  .sidebar-toggle-btn {
+  .main-video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* ─── Dark Tint Overlay ───────────────────────────────── */
+  .vp-overlay {
     position: absolute;
-    top: 20px;
-    right: 20px;
-    width: 22px;
-    height: 22px;
-    background: transparent;
-    border: 1px solid #e5e7eb;
-    border-radius: 2px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.2s;
-    z-index: 20;
-    color: #6b7280;
-  }
-
-  .sidebar-toggle-btn:hover {
-    background: #f3f4f6;
-    border-color: #d1d5db;
-  }
-
-  .sidebar-toggle-btn .toggle-icon {
-    transition: transform 0.3s ease;
-  }
-
-  /* Collapsed Labels (vertical text) */
-  .collapsed-labels {
-    opacity: 0;
+    inset: 0;
+    background: rgba(0,0,0,0.32);
+    transition: opacity 0.7s ease;
     pointer-events: none;
-    width: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0;
-    transition: opacity 0.3s ease, width 0.3s ease, padding 0.3s ease;
+    z-index: 1;
   }
 
-  .collapsed-content {
-    display: flex;
-    flex-direction: column;
-    gap: 40px;
-    align-items: center;
-    padding: 62px 0;
-  }
-
-  .vertical-text {
-    writing-mode: vertical-rl;
-    text-orientation: mixed;
-    transform: rotate(180deg);
-    font-size: 10px;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    color: #9ca3af;
-    white-space: nowrap;
-    cursor: pointer;
-    transition: color 0.2s ease;
-    padding: 8px 0;
-  }
-
-  .vertical-text:hover {
-    color: #4b5563;
-  }
-
-  /* Sidebar Content */
-  .sidebar-content {
-    flex: 1;
-    overflow-y: auto;
-    opacity: 1;
-    transition: opacity 0.3s ease;
-  }
-
-  /* Hover Details Overlay */
-  .hover-details-overlay {
-    position: fixed;
-    right: 100px;
-    transform: translateX(20px);
+  .video-player-container[data-playing="true"] .vp-overlay {
     opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
-    transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s, top 0.3s ease;
-    z-index: 9999;
   }
 
-  .hover-details-card {
-    background: white;
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
-    padding: 16px;
-    width: 320px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-    max-height: 80vh;
-    overflow-y: auto;
-  }
-
-  /* Show hover overlay when hovering over vertical labels (only when sidebar is collapsed) */
-  .hover-details-overlay.show {
-    opacity: 1 !important;
-    visibility: visible !important;
-    pointer-events: auto !important;
-    transform: translateX(0) !important;
-  }
-
-  @media (min-width: 1024px) {
-    .video-player-container {
-      min-height: calc(100vh - 140px);
-    }
-
-    .details-sidebar {
-      width: 547px;
-      min-width: 547px;
-      max-height: calc(100vh - 140px);
-      overflow-y: auto;
-    }
-
-    /* Collapsed state - show vertical labels */
-    .video-detail-main.sidebar-collapsed .details-sidebar {
-      width: 63px;
-      min-width: 63px;
-    }
-
-    .video-detail-main.sidebar-collapsed .sidebar-content {
-      opacity: 0;
-      pointer-events: none;
-    }
-
-    .video-detail-main.sidebar-collapsed .collapsed-labels {
-      opacity: 1;
-      pointer-events: auto;
-      width: 63px;
-      padding: 0 12px;
-    }
-
-    .video-detail-main.sidebar-collapsed .sidebar-toggle-btn {
-      right: 13px;
-    }
-
-    .video-detail-main.sidebar-collapsed .sidebar-toggle-btn .toggle-icon {
-      transform: rotate(180deg);
-    }
-  }
-
-  @media (max-width: 1023px) {
-    .video-detail-main {
-      min-height: auto;
-    }
-
-    .video-player-container {
-      height: 50vh;
-      min-height: 300px;
-      max-height: 60vh;
-    }
-
-    .sidebar-toggle-btn {
-      display: none;
-    }
-
-    .hover-details-overlay {
-      display: none;
-    }
-  }
-
-  /* Related video lazy loading */
-  .related-video {
-    opacity: 0;
+  /* ─── Title Overlay ────────────────────────────────────── */
+  .vp-title {
+    position: absolute;
+    bottom: 52px;
+    left: 0;
+    right: 0;
+    padding: 40px 28px 18px;
+    background: linear-gradient(transparent, rgba(0,0,0,0.45));
+    z-index: 5;
     transition: opacity 0.5s ease;
+    pointer-events: none;
   }
 
-  .related-video.loaded {
+  .vp-title-text {
+    font-size: 20px;
+    font-weight: 400;
+    letter-spacing: 0.5px;
+    color: rgba(255,255,255,0.88);
+    line-height: 1.3;
+    margin: 0 0 6px;
+  }
+
+  .vp-title-author {
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.38);
+    margin: 0;
+  }
+
+  .video-player-container[data-playing="true"] .vp-title {
+    opacity: 0;
+  }
+
+  /* ─── Play/Pause Overlay ───────────────────────────────── */
+  .play-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+    z-index: 8;
+  }
+
+  .play-overlay-ring {
+    background: rgba(255,255,255,0.1);
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 50%;
+    padding: 32px;
+  }
+
+  /* ─── Custom Cursor ───────────────────────────────────── */
+  .video-player-container {
+    cursor: none;
+  }
+
+  .vp-cursor {
+    position: absolute;
+    top: 0; left: 0;
+    width: 54px;
+    height: 54px;
+    border: 1px solid rgba(255,255,255,0.35);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform: translate(-50%, -50%) scale(0);
+    transition: border-color 0.2s, width 0.2s, height 0.2s;
+    will-change: transform;
+    opacity: 0;
+  }
+
+  .video-player-container:hover .vp-cursor {
     opacity: 1;
   }
 
-  /* Prose styling for markdown content */
-  .prose p {
-    margin-bottom: 1em;
+  .vp-cursor.active {
+    transform: translate(var(--cx), var(--cy)) translate(-50%, -50%) scale(1);
   }
 
-  .prose h1, .prose h2, .prose h3 {
-    margin-top: 1.5em;
-    margin-bottom: 0.5em;
-    font-weight: 500;
+  .vp-cursor.pressing {
+    width: 40px;
+    height: 40px;
+    border-color: rgba(255,255,255,0.6);
   }
 
-  /* Scrollbar styling for sidebar */
-  .details-sidebar::-webkit-scrollbar {
-    width: 6px;
+  /* Snap to progress bar: smaller ring, brighter */
+  .vp-cursor.on-progress {
+    width: 40px;
+    height: 40px;
+    border-color: rgba(255,255,255,0.7);
+    transition: width 0.12s, height 0.12s, border-color 0.12s;
   }
 
-  .details-sidebar::-webkit-scrollbar-track {
-    background: transparent;
+  .vp-cursor-label {
+    font-family: 'Aileron', sans-serif;
+    font-size: 8px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.8);
+    user-select: none;
   }
 
-  .details-sidebar::-webkit-scrollbar-thumb {
-    background: #e5e7eb;
-    border-radius: 3px;
-  }
-
-  .details-sidebar::-webkit-scrollbar-thumb:hover {
-    background: #d1d5db;
-  }
-
-  /* Video Controls Bar */
+  /* ─── Video Controls ───────────────────────────────────── */
   .video-controls {
     position: absolute;
     bottom: 0;
@@ -598,18 +481,21 @@ function formatTaxonomyValue(values: string[] | undefined): string {
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 12px 16px;
-    background: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
-    opacity: 0;
-    transition: opacity 0.3s ease;
+    padding: 16px 16px 14px;
+    background: linear-gradient(transparent, rgba(0,0,0,0.65));
+    opacity: 1;
+    transition: opacity 0.4s ease;
     z-index: 10;
   }
 
-  .video-player-container:hover .video-controls {
-    opacity: 1;
+  .video-player-container[data-playing="true"] .video-controls {
+    opacity: 0;
   }
 
-  /* Control Buttons */
+  .video-player-container:hover .video-controls {
+    opacity: 1 !important;
+  }
+
   .ctrl-btn {
     display: flex;
     align-items: center;
@@ -617,30 +503,28 @@ function formatTaxonomyValue(values: string[] | undefined): string {
     width: 32px;
     height: 32px;
     background: transparent;
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    border: 1px solid rgba(255,255,255,0.3);
     border-radius: 2px;
     color: white;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.2s;
     flex-shrink: 0;
   }
 
   .ctrl-btn:hover {
-    background: rgba(255, 255, 255, 0.1);
-    border-color: rgba(255, 255, 255, 0.5);
+    background: rgba(255,255,255,0.1);
+    border-color: rgba(255,255,255,0.5);
   }
 
-  /* Time Display */
   .time-display {
     font-size: 10px;
     letter-spacing: 0.5px;
-    color: rgba(255, 255, 255, 0.8);
-    font-family: monospace;
+    color: rgba(255,255,255,0.8);
+    font-family: 'Aileron', sans-serif;
     min-width: 40px;
     flex-shrink: 0;
   }
 
-  /* Progress Bar */
   .progress-container {
     flex: 1;
     height: 32px;
@@ -653,44 +537,38 @@ function formatTaxonomyValue(values: string[] | undefined): string {
   .progress-bar {
     position: relative;
     width: 100%;
-    height: 3px;
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 1.5px;
+    height: 2px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 0;
+    transition: height 0.15s;
   }
 
-  .progress-container:hover .progress-bar {
-    height: 5px;
-  }
+  .progress-container:hover .progress-bar { height: 3px; }
 
   .progress-filled {
     position: absolute;
-    top: 0;
-    left: 0;
+    top: 0; left: 0;
     height: 100%;
     background: white;
-    border-radius: 1.5px;
+    border-radius: 0;
     width: 0%;
-    transition: width 0.1s linear;
   }
 
   .progress-handle {
     position: absolute;
     top: 50%;
     transform: translate(-50%, -50%);
-    width: 12px;
-    height: 12px;
+    width: 1.5px;
+    height: 14px;
     background: white;
-    border-radius: 50%;
+    border-radius: 0;
     opacity: 0;
-    transition: opacity 0.2s ease;
+    transition: opacity 0.2s;
     left: 0%;
   }
 
-  .progress-container:hover .progress-handle {
-    opacity: 1;
-  }
+  .progress-container:hover .progress-handle { opacity: 1; }
 
-  /* Volume Container */
   .volume-container {
     width: 60px;
     height: 32px;
@@ -705,17 +583,16 @@ function formatTaxonomyValue(values: string[] | undefined): string {
     position: relative;
     width: 100%;
     height: 3px;
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 1.5px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 2px;
   }
 
   .volume-filled {
     position: absolute;
-    top: 0;
-    left: 0;
+    top: 0; left: 0;
     height: 100%;
     background: white;
-    border-radius: 1.5px;
+    border-radius: 2px;
     width: 25%;
   }
 
@@ -728,42 +605,452 @@ function formatTaxonomyValue(values: string[] | undefined): string {
     background: white;
     border-radius: 50%;
     opacity: 0;
-    transition: opacity 0.2s ease;
+    transition: opacity 0.2s;
     left: 25%;
   }
 
-  .volume-container:hover .volume-handle {
+  .volume-container:hover .volume-handle { opacity: 1; }
+
+  .video-player-container:fullscreen { max-height: 100vh; }
+
+  /* ─── Film Credits Overlay ─────────────────────────────── */
+  .credits-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    background: rgba(0, 0, 0, 0.97);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 1.2s ease;
+    z-index: 40;
+    overflow: hidden;
+  }
+
+  .credits-overlay.visible {
     opacity: 1;
+    pointer-events: auto;
   }
 
-  /* Fullscreen styles */
-  .video-player-container:fullscreen {
-    max-height: 100vh;
+  /* Credits center */
+  .credits-center {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
   }
 
-  .video-player-container:fullscreen .video-controls {
-    padding: 16px 24px;
+  .credits-roll {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    text-align: center;
+    will-change: transform;
   }
 
-  @media (max-width: 768px) {
-    .video-controls {
-      gap: 8px;
-      padding: 8px 12px;
+  .credits-spacer {
+    height: 160px;
+  }
+
+  /* Credit text */
+  .c-title {
+    font-size: 18px;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.92);
+    margin-bottom: 10px;
+    padding: 0 32px;
+    line-height: 1.4;
+  }
+
+  .c-author {
+    font-size: 10px;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.35);
+    margin-bottom: 48px;
+  }
+
+  .c-line {
+    width: 48px;
+    height: 1px;
+    background: rgba(255,255,255,0.12);
+    margin: 36px auto;
+  }
+
+  .c-row {
+    display: flex;
+    justify-content: center;
+    align-items: baseline;
+    gap: 24px;
+    margin-bottom: 12px;
+    padding: 0 24px;
+  }
+
+  .c-role {
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.32);
+    text-align: right;
+    width: 150px;
+    flex-shrink: 0;
+  }
+
+  .c-val {
+    font-size: 12px;
+    letter-spacing: 0.3px;
+    color: rgba(255,255,255,0.82);
+    text-align: left;
+    width: 200px;
+    flex-shrink: 0;
+    line-height: 1.5;
+  }
+
+  .c-tags-row .c-val {
+    width: 240px;
+  }
+
+  .c-link {
+    font-size: 10px;
+    color: rgba(255,255,255,0.45);
+    word-break: break-all;
+    width: 200px;
+  }
+
+  .c-replay-area {
+    text-align: center;
+    margin-top: 8px;
+  }
+
+  .c-replay-btn {
+    font-family: 'Aileron', sans-serif;
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.4);
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.15);
+    padding: 10px 28px;
+    cursor: pointer;
+    transition: color 0.2s, border-color 0.2s;
+    border-radius: 1px;
+  }
+
+  .c-replay-btn:hover {
+    color: rgba(255,255,255,0.85);
+    border-color: rgba(255,255,255,0.35);
+  }
+
+  .credits-dismiss-btn {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 28px;
+    height: 28px;
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 2px;
+    color: rgba(255,255,255,0.35);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s, border-color 0.2s;
+    z-index: 10;
+  }
+
+  .credits-dismiss-btn:hover {
+    color: rgba(255,255,255,0.85);
+    border-color: rgba(255,255,255,0.35);
+  }
+
+  /* ─── Video Info Section ───────────────────────────────── */
+  .video-info {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 64px 80px 40px;
+  }
+
+  .info-header {
+    display: grid;
+    grid-template-columns: 1fr 360px;
+    gap: 80px;
+    padding-bottom: 48px;
+    border-bottom: 1px solid #f0f0f0;
+  }
+
+  .info-title {
+    font-size: 34px;
+    line-height: 1.2;
+    letter-spacing: -0.5px;
+    color: #111;
+    margin-bottom: 12px;
+  }
+
+  .info-by {
+    font-size: 13px;
+    color: #aaa;
+    margin-bottom: 24px;
+  }
+
+  .info-author-link {
+    color: #555;
+    text-decoration: none;
+    border-bottom: 1px solid #e0e0e0;
+    transition: border-color 0.2s, color 0.2s;
+  }
+
+  .info-author-link:hover {
+    color: #111;
+    border-color: #111;
+  }
+
+  .info-desc {
+    font-size: 15px;
+    line-height: 1.75;
+    color: #888;
+  }
+
+  .details-label {
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #bbb;
+    margin-bottom: 16px;
+  }
+
+  .details-table {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 10px 0;
+    border-bottom: 1px solid #f3f3f3;
+    gap: 16px;
+  }
+
+  .detail-key {
+    font-size: 11px;
+    color: #bbb;
+    flex-shrink: 0;
+    letter-spacing: 0.3px;
+  }
+
+  .detail-val {
+    font-size: 12px;
+    color: #333;
+    text-align: right;
+  }
+
+  .detail-link {
+    font-size: 12px;
+    color: #333;
+    text-decoration: none;
+    border-bottom: 1px solid #ececec;
+    transition: border-color 0.2s;
+  }
+
+  .detail-link:hover { border-color: #333; }
+
+  .detail-link-truncate {
+    max-width: 220px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: block;
+    text-align: right;
+  }
+
+  /* Tags */
+  .info-tags {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 28px 0;
+    border-bottom: 1px solid #f0f0f0;
+  }
+
+  .tags-label {
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #bbb;
+    flex-shrink: 0;
+  }
+
+  .tags-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .tag-pill {
+    font-size: 11px;
+    letter-spacing: 0.3px;
+    color: #777;
+    background: #f5f5f5;
+    padding: 5px 12px;
+    border-radius: 2px;
+    text-decoration: none;
+    transition: background 0.15s, color 0.15s;
+  }
+
+  .tag-pill:hover {
+    background: #ebebeb;
+    color: #111;
+  }
+
+  /* Markdown prose */
+  .info-markdown {
+    padding-top: 40px;
+  }
+
+  .prose-content {
+    font-size: 14px;
+    line-height: 1.85;
+    color: #777;
+    max-width: 680px;
+  }
+
+  .prose-content h1,
+  .prose-content h2,
+  .prose-content h3 {
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #aaa;
+    margin-top: 32px;
+    margin-bottom: 12px;
+    font-weight: 400;
+  }
+
+  .prose-content p { margin-bottom: 14px; }
+
+  .prose-content ul,
+  .prose-content ol {
+    margin-bottom: 14px;
+    padding-left: 20px;
+  }
+
+  .prose-content li { margin-bottom: 6px; }
+
+  .prose-content strong {
+    color: #444;
+    font-weight: 500;
+  }
+
+  /* ─── Related Videos ───────────────────────────────────── */
+  .related-section {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 80px 60px;
+    border-top: 1px solid #f0f0f0;
+  }
+
+  .related-label {
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #bbb;
+    text-align: center;
+    margin-bottom: 24px;
+  }
+
+  .related-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+
+  .related-item {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    text-decoration: none;
+  }
+
+  .related-thumb {
+    aspect-ratio: 16/9;
+    overflow: hidden;
+    background: #f3f3f3;
+  }
+
+  .related-video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    transition: opacity 0.5s ease, transform 0.7s ease;
+  }
+
+  .related-video.loaded { opacity: 1; }
+
+  .related-item:hover .related-video { transform: scale(1.04); }
+
+  .related-title {
+    font-size: 12px;
+    color: #555;
+    padding: 0 2px;
+    transition: color 0.15s;
+  }
+
+  .related-item:hover .related-title { color: #111; }
+
+  /* ─── Responsive ───────────────────────────────────────── */
+  @media (max-width: 1023px) {
+    .video-player-container {
+      height: 56vw;
+      min-height: 260px;
     }
 
-    .ctrl-btn {
+    .video-info {
+      padding: 40px 24px 32px;
+    }
+
+    .info-header {
+      grid-template-columns: 1fr;
+      gap: 40px;
+    }
+
+    .related-section {
+      padding: 32px 24px 48px;
+    }
+
+    .related-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 640px) {
+    .film-perf {
       width: 28px;
-      height: 28px;
     }
 
-    .volume-container {
-      display: none;
+    .perf-hole {
+      width: 14px;
+      height: 11px;
     }
 
-    .time-display {
-      font-size: 9px;
-      min-width: 32px;
+    .c-title {
+      font-size: 14px;
+      letter-spacing: 3px;
     }
+
+    .c-row { gap: 14px; }
+
+    .c-role { width: 110px; font-size: 8px; }
+    .c-val  { width: 140px; font-size: 11px; }
+    .c-tags-row .c-val { width: 160px; }
+
+    .related-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .volume-container { display: none; }
   }
 </style>
 
@@ -773,8 +1060,6 @@ function formatTaxonomyValue(values: string[] | undefined): string {
     const playOverlay = document.getElementById("play-overlay");
     const playIcon = document.getElementById("play-icon");
     const pauseIcon = document.getElementById("pause-icon");
-
-    // Video Controls Elements
     const ctrlPlayPause = document.getElementById("ctrl-play-pause");
     const ctrlPlayIcon = document.getElementById("ctrl-play-icon");
     const ctrlPauseIcon = document.getElementById("ctrl-pause-icon");
@@ -793,86 +1078,107 @@ function formatTaxonomyValue(values: string[] | undefined): string {
     const volumeFilled = document.getElementById("volume-filled");
     const volumeHandle = document.getElementById("volume-handle");
 
-    // Format time helper
-    function formatTime(seconds: number): string {
-      if (isNaN(seconds)) return "00:00";
-      const mins = Math.floor(seconds / 60);
-      const secs = Math.floor(seconds % 60);
-      return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    // Credits elements
+    const creditsOverlay = document.getElementById("credits-overlay");
+    const creditsCenter = document.getElementById("credits-center");
+    const creditsRoll = document.getElementById("credits-roll");
+    const creditsDismiss = document.getElementById("credits-dismiss");
+    const creditsReplayBtn = document.getElementById("credits-replay-btn");
+
+    // ── Helpers ──────────────────────────────────────────────
+    function formatTime(s: number): string {
+      if (isNaN(s)) return "00:00";
+      const m = Math.floor(s / 60);
+      const sec = Math.floor(s % 60);
+      return `${m.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
     }
 
-    // Update play/pause icons in controls
-    function updatePlayPauseIcons(isPlaying: boolean) {
-      if (ctrlPlayIcon && ctrlPauseIcon) {
-        if (isPlaying) {
-          ctrlPlayIcon.classList.add("hidden");
-          ctrlPauseIcon.classList.remove("hidden");
-        } else {
-          ctrlPlayIcon.classList.remove("hidden");
-          ctrlPauseIcon.classList.add("hidden");
-        }
-      }
+    function updatePlayPauseIcons(playing: boolean) {
+      ctrlPlayIcon?.classList.toggle("hidden", playing);
+      ctrlPauseIcon?.classList.toggle("hidden", !playing);
+      playIcon?.classList.toggle("hidden", playing);
+      pauseIcon?.classList.toggle("hidden", !playing);
     }
 
-    // Update volume icons
-    function updateVolumeIcons(isMuted: boolean) {
-      if (ctrlVolumeIcon && ctrlMuteIcon) {
-        if (isMuted) {
-          ctrlVolumeIcon.classList.add("hidden");
-          ctrlMuteIcon.classList.remove("hidden");
-        } else {
-          ctrlVolumeIcon.classList.remove("hidden");
-          ctrlMuteIcon.classList.add("hidden");
-        }
-      }
+    function updateVolumeIcons(muted: boolean) {
+      ctrlVolumeIcon?.classList.toggle("hidden", muted);
+      ctrlMuteIcon?.classList.toggle("hidden", !muted);
     }
 
-    // Update progress bar
     function updateProgress() {
-      if (video && progressFilled && progressHandle) {
-        const percent = (video.currentTime / video.duration) * 100;
-        progressFilled.style.width = `${percent}%`;
-        progressHandle.style.left = `${percent}%`;
-      }
-      if (timeCurrent) {
-        timeCurrent.textContent = formatTime(video?.currentTime || 0);
-      }
+      if (!video) return;
+      const pct = (video.currentTime / video.duration) * 100;
+      if (progressFilled) progressFilled.style.width = `${pct}%`;
+      if (progressHandle) progressHandle.style.left = `${pct}%`;
+      if (timeCurrent) timeCurrent.textContent = formatTime(video.currentTime);
     }
 
-    // Update volume bar
-    function updateVolumeBar(volume: number) {
-      const percent = volume * 100;
-      if (volumeFilled) volumeFilled.style.width = `${percent}%`;
-      if (volumeHandle) volumeHandle.style.left = `${percent}%`;
+    function updateVolumeBar(vol: number) {
+      if (volumeFilled) volumeFilled.style.width = `${vol * 100}%`;
+      if (volumeHandle) volumeHandle.style.left = `${vol * 100}%`;
     }
 
-    // Video Controls Event Listeners
+    // ── Video ─────────────────────────────────────────────────
+    const container = document.getElementById("video-container");
+
     if (video) {
-      // Set duration when metadata loaded
+      video.muted = true;
+      video.volume = 0;
+
       video.addEventListener("loadedmetadata", () => {
-        if (timeDuration) {
-          timeDuration.textContent = formatTime(video.duration);
-        }
+        if (timeDuration) timeDuration.textContent = formatTime(video.duration);
       });
 
-      // Update progress as video plays
       video.addEventListener("timeupdate", updateProgress);
 
-      // Sync play/pause state
-      video.addEventListener("play", () => updatePlayPauseIcons(true));
-      video.addEventListener("pause", () => updatePlayPauseIcons(false));
+      video.addEventListener("play", () => {
+        updatePlayPauseIcons(true);
+        container?.setAttribute("data-playing", "true");
+        container?.setAttribute("data-activated", "true");
+      });
 
-      // Play/Pause button click
-      ctrlPlayPause?.addEventListener("click", (e) => {
-        e.stopPropagation();
+      video.addEventListener("pause", () => {
+        updatePlayPauseIcons(false);
+        container?.setAttribute("data-playing", "false");
+      });
+
+      // Trigger film credits when video ends
+      video.addEventListener("ended", () => {
+        showCredits();
+      });
+
+      let hasInteracted = false;
+      function unmute() {
+        if (hasInteracted) return;
+        hasInteracted = true;
+        video.muted = false;
+        let vol = 0;
+        const fade = setInterval(() => {
+          vol = Math.min(vol + 0.05, 0.25);
+          video.volume = vol;
+          if (vol >= 0.25) clearInterval(fade);
+        }, 200);
+      }
+
+      video.addEventListener("click", (e) => {
+        e.preventDefault();
+        unmute();
         if (video.paused) {
           video.play();
         } else {
           video.pause();
         }
+        if (playOverlay) {
+          playOverlay.classList.remove("opacity-0", "pointer-events-none");
+          setTimeout(() => playOverlay.classList.add("opacity-0", "pointer-events-none"), 300);
+        }
       });
 
-      // Mute button click
+      ctrlPlayPause?.addEventListener("click", (e) => {
+        e.stopPropagation();
+        video.paused ? video.play() : video.pause();
+      });
+
       ctrlMute?.addEventListener("click", (e) => {
         e.stopPropagation();
         video.muted = !video.muted;
@@ -883,398 +1189,234 @@ function formatTaxonomyValue(values: string[] | undefined): string {
         }
       });
 
-      // Volume change listener
       video.addEventListener("volumechange", () => {
         updateVolumeIcons(video.muted || video.volume === 0);
-        if (!video.muted) {
-          updateVolumeBar(video.volume);
-        }
+        if (!video.muted) updateVolumeBar(video.volume);
       });
 
-      // Progress bar click/drag
-      let isDraggingProgress = false;
-
-      function seekToPosition(e: MouseEvent) {
-        if (progressContainer && video) {
-          const rect = progressContainer.getBoundingClientRect();
-          const percent = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
-          video.currentTime = percent * video.duration;
-        }
+      // Progress scrubbing
+      let draggingProgress = false;
+      function seekTo(e: MouseEvent) {
+        if (!progressContainer || !video) return;
+        const rect = progressContainer.getBoundingClientRect();
+        const pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+        video.currentTime = pct * video.duration;
       }
+      progressContainer?.addEventListener("mousedown", (e) => { draggingProgress = true; seekTo(e); });
+      document.addEventListener("mousemove", (e) => { if (draggingProgress) seekTo(e); });
+      document.addEventListener("mouseup", () => { draggingProgress = false; });
 
-      progressContainer?.addEventListener("mousedown", (e) => {
-        isDraggingProgress = true;
-        seekToPosition(e);
-      });
-
-      document.addEventListener("mousemove", (e) => {
-        if (isDraggingProgress) {
-          seekToPosition(e);
-        }
-      });
-
-      document.addEventListener("mouseup", () => {
-        isDraggingProgress = false;
-      });
-
-      // Volume bar click/drag
-      let isDraggingVolume = false;
-
-      function setVolumeFromPosition(e: MouseEvent) {
-        if (volumeContainer && video) {
-          const rect = volumeContainer.getBoundingClientRect();
-          const percent = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
-          video.volume = percent;
-          video.muted = false;
-          updateVolumeBar(percent);
-          updateVolumeIcons(percent === 0);
-        }
+      // Volume scrubbing
+      let draggingVolume = false;
+      function setVolFromPos(e: MouseEvent) {
+        if (!volumeContainer || !video) return;
+        const rect = volumeContainer.getBoundingClientRect();
+        const pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+        video.volume = pct;
+        video.muted = false;
+        updateVolumeBar(pct);
+        updateVolumeIcons(pct === 0);
       }
+      volumeContainer?.addEventListener("mousedown", (e) => { draggingVolume = true; setVolFromPos(e); });
+      document.addEventListener("mousemove", (e) => { if (draggingVolume) setVolFromPos(e); });
+      document.addEventListener("mouseup", () => { draggingVolume = false; });
 
-      volumeContainer?.addEventListener("mousedown", (e) => {
-        isDraggingVolume = true;
-        setVolumeFromPosition(e);
-      });
-
-      document.addEventListener("mousemove", (e) => {
-        if (isDraggingVolume) {
-          setVolumeFromPosition(e);
-        }
-      });
-
-      document.addEventListener("mouseup", () => {
-        isDraggingVolume = false;
-      });
-
-      // Fullscreen button
+      // Fullscreen
       ctrlFullscreen?.addEventListener("click", (e) => {
         e.stopPropagation();
-        const container = document.getElementById("video-container");
         if (!document.fullscreenElement) {
           container?.requestFullscreen();
-          if (ctrlExpandIcon && ctrlCompressIcon) {
-            ctrlExpandIcon.classList.add("hidden");
-            ctrlCompressIcon.classList.remove("hidden");
-          }
         } else {
           document.exitFullscreen();
-          if (ctrlExpandIcon && ctrlCompressIcon) {
-            ctrlExpandIcon.classList.remove("hidden");
-            ctrlCompressIcon.classList.add("hidden");
-          }
         }
       });
 
-      // Listen for fullscreen change
       document.addEventListener("fullscreenchange", () => {
-        if (ctrlExpandIcon && ctrlCompressIcon) {
-          if (document.fullscreenElement) {
-            ctrlExpandIcon.classList.add("hidden");
-            ctrlCompressIcon.classList.remove("hidden");
-          } else {
-            ctrlExpandIcon.classList.remove("hidden");
-            ctrlCompressIcon.classList.add("hidden");
-          }
-        }
+        const inFS = !!document.fullscreenElement;
+        ctrlExpandIcon?.classList.toggle("hidden", inFS);
+        ctrlCompressIcon?.classList.toggle("hidden", !inFS);
       });
 
-      // Initialize volume bar
       updateVolumeBar(video.volume);
-    }
 
-    // Sidebar toggle functionality
-    const videoMain = document.getElementById("video-main");
-    const sidebarToggleInside = document.getElementById("sidebar-toggle-inside");
-    const videoContainer = document.getElementById("video-container");
-    const hoverOverlay = document.getElementById("hover-overlay");
-
-    // Load saved state from localStorage
-    const sidebarState = localStorage.getItem('videoSidebarState') || 'open';
-
-    if (sidebarState === 'collapsed' && videoMain) {
-      videoMain.classList.add('sidebar-collapsed');
-    }
-
-    // Toggle sidebar on button click
-    sidebarToggleInside?.addEventListener('click', () => {
-      const isCollapsed = videoMain?.classList.contains('sidebar-collapsed');
-
-      if (isCollapsed) {
-        videoMain?.classList.remove('sidebar-collapsed');
-        localStorage.setItem('videoSidebarState', 'open');
-      } else {
-        videoMain?.classList.add('sidebar-collapsed');
-        localStorage.setItem('videoSidebarState', 'collapsed');
-      }
-    });
-
-    // Hover overlay functionality for vertical labels (only when sidebar is collapsed)
-    let hoverTimeout: NodeJS.Timeout | null = null;
-    let currentOverlay: HTMLElement | null = null;
-
-    // Get all vertical labels and overlays
-    const verticalLabels = document.querySelectorAll('.vertical-text');
-    const allOverlays = [
-      document.getElementById('hover-overlay-project-details'),
-      document.getElementById('hover-overlay-tags'),
-      document.getElementById('hover-overlay-descriptions')
-    ];
-
-    // Function to hide all overlays
-    function hideAllOverlays() {
-      allOverlays.forEach(overlay => {
-        overlay?.classList.remove('show');
-      });
-      currentOverlay = null;
-    }
-
-    // Function to show specific overlay
-    function showOverlay(section: string, labelElement: Element) {
-      if (!videoMain?.classList.contains('sidebar-collapsed')) return;
-
-      hideAllOverlays();
-
-      const overlay = document.getElementById(`hover-overlay-${section}`);
-      if (overlay) {
-        // Calculate position based on label element
-        const labelRect = labelElement.getBoundingClientRect();
-        const overlayCard = overlay.querySelector('.hover-details-card') as HTMLElement;
-
-        if (overlayCard) {
-          const overlayHeight = overlayCard.offsetHeight || 300; // fallback height
-          // Position overlay to align with the label, but keep it within viewport
-          let topPosition = labelRect.top + (labelRect.height / 2) - (overlayHeight / 2);
-
-          // Ensure overlay doesn't go off screen
-          const viewportHeight = window.innerHeight;
-          const minTop = 20;
-          const maxTop = viewportHeight - overlayHeight - 20;
-
-          topPosition = Math.max(minTop, Math.min(topPosition, maxTop));
-
-          overlay.style.top = `${topPosition}px`;
-        }
-
-        overlay.classList.add('show');
-        currentOverlay = overlay;
+      // Sync state if video is already playing (autoplay)
+      if (!video.paused) {
+        container?.setAttribute("data-playing", "true");
+        container?.setAttribute("data-activated", "true");
+        updatePlayPauseIcons(true);
       }
     }
 
-    // Add hover listeners to vertical labels
-    verticalLabels.forEach(label => {
-      label.addEventListener('mouseenter', () => {
-        if (videoMain?.classList.contains('sidebar-collapsed')) {
-          if (hoverTimeout) {
-            clearTimeout(hoverTimeout);
-            hoverTimeout = null;
-          }
-          const section = label.getAttribute('data-section');
-          if (section) {
-            showOverlay(section, label);
-          }
-        }
-      });
+    // ── Custom Cursor ─────────────────────────────────────────
+    const vpCursor = document.getElementById('vp-cursor');
+    const vpCursorLabel = document.getElementById('vp-cursor-label');
+    const videoContainer2 = document.getElementById('video-container');
 
-      label.addEventListener('mouseleave', () => {
-        if (videoMain?.classList.contains('sidebar-collapsed')) {
-          hoverTimeout = setTimeout(() => {
-            if (!currentOverlay?.matches(':hover')) {
-              hideAllOverlays();
-            }
-          }, 150);
-        }
-      });
-    });
+    if (vpCursor && videoContainer2) {
+      const cursor = vpCursor as HTMLElement;
+      let cx = 0, cy = 0;      // target (mouse)
+      let rx2 = 0, ry2 = 0;    // lerped
+      let onProgress = false;
+      let cursorRaf: number;
 
-    // Keep overlay visible when hovering over it
-    allOverlays.forEach(overlay => {
-      overlay?.addEventListener('mouseenter', () => {
-        if (videoMain?.classList.contains('sidebar-collapsed')) {
-          if (hoverTimeout) {
-            clearTimeout(hoverTimeout);
-            hoverTimeout = null;
-          }
-        }
-      });
-
-      overlay?.addEventListener('mouseleave', () => {
-        hoverTimeout = setTimeout(() => {
-          hideAllOverlays();
-        }, 150);
-      });
-    });
-
-    if (video) {
-      // Start muted for autoplay
-      video.muted = true;
-      video.volume = 0;
-
-      // Unmute after user interaction
-      let hasInteracted = false;
-
-      function unmute() {
-        if (!hasInteracted) {
-          hasInteracted = true;
-          video.muted = false;
-          // Gradually increase volume
-          let vol = 0;
-          const fadeIn = setInterval(() => {
-            if (vol < 0.25) {
-              vol += 0.05;
-              video.volume = Math.min(vol, 0.25);
-            } else {
-              clearInterval(fadeIn);
-            }
-          }, 200);
-        }
+      function fmt(s: number) {
+        if (isNaN(s)) return '0:00';
+        const m = Math.floor(s / 60);
+        const sec = Math.floor(s % 60);
+        return `${m}:${sec.toString().padStart(2,'0')}`;
       }
 
-      // Click to play/pause
-      video.addEventListener("click", (e) => {
-        e.preventDefault();
-        unmute();
+      function updateCursorLabel() {
+        if (!vpCursorLabel || !videoContainer2) return;
+        if (onProgress) return;
+        const creditsVisible = document.getElementById('credits-overlay')?.classList.contains('visible');
+        if (creditsVisible) { vpCursorLabel.textContent = 'Replay'; return; }
+        const playing = videoContainer2.getAttribute('data-playing') === 'true';
+        vpCursorLabel.textContent = playing ? 'Pause' : 'Play';
+      }
 
-        if (video.paused) {
-          video.play();
-          if (playIcon && pauseIcon) {
-            playIcon.classList.add("hidden");
-            pauseIcon.classList.remove("hidden");
-          }
-        } else {
-          video.pause();
-          if (playIcon && pauseIcon) {
-            playIcon.classList.remove("hidden");
-            pauseIcon.classList.add("hidden");
-          }
-        }
+      function tickCursor() {
+        cursor.style.setProperty('--cx', `${cx}px`);
+        cursor.style.setProperty('--cy', `${cy}px`);
+        cursorRaf = requestAnimationFrame(tickCursor);
+      }
 
-        // Flash the overlay
-        if (playOverlay) {
-          playOverlay.classList.remove("opacity-0", "pointer-events-none");
-          setTimeout(() => {
-            playOverlay.classList.add("opacity-0", "pointer-events-none");
-          }, 300);
-        }
+      // Progress bar: snap cursor + show time
+      const progressContainer2 = document.getElementById('progress-container');
+      if (progressContainer2) {
+        progressContainer2.addEventListener('mouseenter', () => {
+          onProgress = true;
+          cursor.classList.add('on-progress');
+        });
+
+        progressContainer2.addEventListener('mousemove', (e) => {
+          const rect = progressContainer2.getBoundingClientRect();
+          const pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+          const containerRect = videoContainer2.getBoundingClientRect();
+          // snap X along progress bar, Y to center of progress bar
+          cx = e.clientX - containerRect.left;
+          cy = rect.top + rect.height / 2 - containerRect.top;
+          if (vpCursorLabel && video) {
+            vpCursorLabel.textContent = fmt(pct * (video.duration || 0));
+          }
+        });
+
+        progressContainer2.addEventListener('mouseleave', () => {
+          onProgress = false;
+          cursor.classList.remove('on-progress');
+          updateCursorLabel();
+        });
+      }
+
+      videoContainer2.addEventListener('mouseenter', () => {
+        cursor.classList.add('active');
+        // Snap to current mouse position on entry (no lag flash)
+        rx2 = cx; ry2 = cy;
+        updateCursorLabel();
+        tickCursor();
       });
 
-      // Update icons on play/pause events
-      video.addEventListener("play", () => {
-        if (playIcon && pauseIcon) {
-          playIcon.classList.add("hidden");
-          pauseIcon.classList.remove("hidden");
-        }
+      videoContainer2.addEventListener('mouseleave', () => {
+        cursor.classList.remove('active');
+        onProgress = false;
+        cursor.classList.remove('on-progress');
+        cancelAnimationFrame(cursorRaf);
       });
 
-      video.addEventListener("pause", () => {
-        if (playIcon && pauseIcon) {
-          playIcon.classList.remove("hidden");
-          pauseIcon.classList.add("hidden");
-        }
+      videoContainer2.addEventListener('mousemove', (e) => {
+        if (onProgress) return; // handled by progress listener
+        const rect = videoContainer2.getBoundingClientRect();
+        cx = e.clientX - rect.left;
+        cy = e.clientY - rect.top;
+        updateCursorLabel();
+      });
+
+      videoContainer2.addEventListener('mousedown', () => cursor.classList.add('pressing'));
+      videoContainer2.addEventListener('mouseup', () => cursor.classList.remove('pressing'));
+
+      video?.addEventListener('play', updateCursorLabel);
+      video?.addEventListener('pause', updateCursorLabel);
+      video?.addEventListener('ended', () => requestAnimationFrame(updateCursorLabel));
+      document.addEventListener('credits:hide', updateCursorLabel);
+    }
+
+    // ── Film Credits ──────────────────────────────────────────
+    function showCredits() {
+      if (!creditsOverlay || !creditsCenter || !creditsRoll) return;
+
+      // Reveal overlay first so dimensions are valid
+      creditsOverlay.classList.add("visible");
+
+      const centerH = creditsCenter.clientHeight;
+      const rollH = creditsRoll.scrollHeight;
+      const duration = Math.max(15, (centerH + rollH) / 50);
+
+      // Set start position with no transition
+      creditsRoll.style.transition = "none";
+      creditsRoll.style.transform = `translateY(${centerH}px)`;
+
+      // Double rAF: wait for browser to paint the start position before animating
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          creditsRoll.style.transition = `transform ${duration}s linear`;
+          creditsRoll.style.transform = `translateY(-${rollH}px)`;
+
+          creditsRoll.addEventListener("transitionend", () => {
+            hideCredits();
+          }, { once: true });
+        });
       });
     }
 
-    // Lazy load related videos
-    const CONFIG = {
-      rootMargin: '100px',
-      threshold: 0.1,
-      playThreshold: 0.3
-    };
+    function hideCredits() {
+      if (!creditsOverlay || !creditsRoll) return;
+      creditsOverlay.classList.remove("visible");
+      creditsRoll.style.transition = "none";
+      document.dispatchEvent(new CustomEvent('credits:hide'));
+    }
 
-    let loadedVideos = new WeakSet<HTMLVideoElement>();
+    function replayVideo() {
+      hideCredits();
+      if (video) {
+        video.currentTime = 0;
+        video.play();
+      }
+    }
+
+    creditsDismiss?.addEventListener("click", hideCredits);
+    creditsReplayBtn?.addEventListener("click", replayVideo);
+
+    // ── Related Videos Lazy Load ──────────────────────────────
+    const relatedVids = document.querySelectorAll<HTMLVideoElement>('.related-video');
+    const loadedSet = new WeakSet<HTMLVideoElement>();
 
     const loadObserver = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          const video = entry.target as HTMLVideoElement;
-          if (loadedVideos.has(video)) return;
-
-          const dataSrc = video.getAttribute('data-src');
-          if (dataSrc) {
-            const source = video.querySelector('source');
-            if (source) {
-              source.src = dataSrc;
-            }
-            video.src = dataSrc;
-
-            video.addEventListener('canplay', () => {
-              loadedVideos.add(video);
-              video.classList.add('loaded');
-            }, { once: true });
-
-            video.load();
-          }
-        }
+        if (!entry.isIntersecting) return;
+        const vid = entry.target as HTMLVideoElement;
+        if (loadedSet.has(vid)) return;
+        const src = vid.getAttribute('data-src');
+        if (!src) return;
+        const source = vid.querySelector('source');
+        if (source) source.src = src;
+        vid.src = src;
+        vid.addEventListener('canplay', () => {
+          loadedSet.add(vid);
+          vid.classList.add('loaded');
+        }, { once: true });
+        vid.load();
       });
-    }, {
-      rootMargin: CONFIG.rootMargin,
-      threshold: CONFIG.threshold
-    });
+    }, { rootMargin: '100px', threshold: 0.1 });
 
-    // Observe related videos
-    const relatedVideoElements = document.querySelectorAll('.related-video');
-    relatedVideoElements.forEach(video => {
-      loadObserver.observe(video);
-    });
+    relatedVids.forEach(v => loadObserver.observe(v));
 
-    // Hover to play related videos
-    const videoItems = document.querySelectorAll('section a.group');
-    videoItems.forEach(item => {
-      const video = item.querySelector('video') as HTMLVideoElement;
-      if (video) {
-        item.addEventListener('mouseenter', () => {
-          if (loadedVideos.has(video)) {
-            video.currentTime = 0;
-            video.play().catch(() => {});
-          }
-        });
-        item.addEventListener('mouseleave', () => {
-          video.pause();
-        });
-      }
-    });
-
-    // Sidebar scroll isolation - when hovering sidebar, only scroll sidebar content
-    const detailsSidebar = document.getElementById('details-sidebar');
-    const sidebarContent = document.getElementById('sidebar-content');
-
-    if (detailsSidebar && sidebarContent) {
-      // When mouse enters sidebar, prevent page scroll and enable sidebar scroll
-      detailsSidebar.addEventListener('mouseenter', () => {
-        // Only apply when sidebar is expanded (not collapsed)
-        if (!videoMain?.classList.contains('sidebar-collapsed')) {
-          document.body.style.overflow = 'hidden';
-        }
+    document.querySelectorAll('.related-item').forEach(item => {
+      const vid = item.querySelector('video') as HTMLVideoElement;
+      if (!vid) return;
+      item.addEventListener('mouseenter', () => {
+        if (loadedSet.has(vid)) { vid.currentTime = 0; vid.play().catch(() => {}); }
       });
-
-      // When mouse leaves sidebar, restore page scroll
-      detailsSidebar.addEventListener('mouseleave', () => {
-        document.body.style.overflow = '';
-      });
-
-      // Handle wheel event on sidebar to scroll its content
-      detailsSidebar.addEventListener('wheel', (e) => {
-        // Only handle when sidebar is expanded
-        if (videoMain?.classList.contains('sidebar-collapsed')) return;
-
-        const scrollableContent = sidebarContent;
-        const { scrollTop, scrollHeight, clientHeight } = scrollableContent;
-        const deltaY = e.deltaY;
-
-        // Check if we're at the top or bottom of the sidebar scroll
-        const isAtTop = scrollTop === 0;
-        const isAtBottom = scrollTop + clientHeight >= scrollHeight - 1;
-
-        // Prevent page scroll when scrolling within sidebar bounds
-        if ((deltaY < 0 && !isAtTop) || (deltaY > 0 && !isAtBottom)) {
-          e.preventDefault();
-          scrollableContent.scrollTop += deltaY;
-        } else if ((deltaY < 0 && isAtTop) || (deltaY > 0 && isAtBottom)) {
-          // Allow page scroll when at bounds - do nothing, let it propagate
-        } else {
-          e.preventDefault();
-          scrollableContent.scrollTop += deltaY;
-        }
-      }, { passive: false });
-    }
+      item.addEventListener('mouseleave', () => vid.pause());
+    });
   });
 </script>

@@ -1,15 +1,14 @@
 import { defineCollection, z } from 'astro:content';
+import { glob } from 'astro/loaders';
 
 const videosCollection = defineCollection({
-  type: 'content',
+  loader: glob({ pattern: '**/*.md', base: './src/content/videos' }),
   schema: z.object({
     title: z.string(),
     author: z.string(),
     thumbnail: z.string(),
-    // Changed from videoUrl to videoFileName for R2 auto-generation
     videoFileName: z.string().refine(
       (fileName) => {
-        // Validate file extension
         const validExtensions = ['mp4', 'webm', 'mov', 'avi'];
         const extension = fileName.split('.').pop()?.toLowerCase();
         return extension && validExtensions.includes(extension);
@@ -23,15 +22,12 @@ const videosCollection = defineCollection({
     featured: z.boolean().default(false),
     publishDate: z.date(),
     description: z.string(),
-    // Optional quality preference
     quality: z.enum(['4k', '1080p', '720p', 'preview']).default('1080p'),
 
-    // NEW: Additional showreel fields (all optional for migration)
     year: z.number().min(2000).max(2099).optional(),
-    duration: z.number().optional(), // in seconds
+    duration: z.number().optional(),
     sourceUrl: z.string().url().optional(),
 
-    // NEW: Multi-select taxonomies (optional)
     industries: z.array(z.enum([
       'tech-saas',
       'fashion-luxury',

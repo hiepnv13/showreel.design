@@ -1,6 +1,7 @@
 ---
 import Layout from "../../layouts/Layout.astro";
 import Header from "../../components/Header.astro";
+import Footer from "../../components/Footer.astro";
 import VideoGrid from "../../components/VideoGrid.astro";
 import { getAllVideos, sortVideosByDate } from "../../utils/videoUtils";
 
@@ -55,4 +56,5 @@ const showingCount = endIndex - startIndex;
         itemsPerPage={itemsPerPage}
         baseUrl="/"
     />
+  <Footer />
 </Layout>

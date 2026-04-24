@@ -3,6 +3,7 @@ import { getCollection, type CollectionEntry } from 'astro:content';
 import { getVideosByTagSlug, getAllTags, sortVideosByDate, generateSlug } from '../../utils/videoUtils';
 import Layout from '../../layouts/Layout.astro';
 import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
 import VideoCard from '../../components/VideoCard.astro';
 import type { GetStaticPaths } from 'astro';
 
@@ -97,7 +98,7 @@ const allTags = await getAllTags();
               thumbnail={video.data.thumbnail}
               videoUrl={video.data.videoUrl}
               category={video.data.category}
-              slug={video.slug}
+              slug={video.id}
             />
           ))}
         </div>
@@ -128,6 +129,7 @@ const allTags = await getAllTags();
       </div>
     </section>
   </main>
+  <Footer />
 </Layout>
 
 <script>

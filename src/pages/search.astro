@@ -1,6 +1,7 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
 import VideoGrid from "../components/VideoGrid.astro";
 import { searchVideos, sortVideosByDate } from "../utils/videoUtils";
 import type { CollectionEntry } from 'astro:content';
@@ -124,6 +125,7 @@ if (query.trim()) {
       </section>
     )}
   </main>
+  <Footer />
 </Layout>
 
 <script>

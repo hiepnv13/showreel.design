@@ -3,6 +3,7 @@ import { getCollection, type CollectionEntry } from 'astro:content';
 import { getVideosByAuthorSlug, getAllAuthors, sortVideosByDate, generateSlug } from '../../utils/videoUtils';
 import Layout from '../../layouts/Layout.astro';
 import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
 import VideoCard from '../../components/VideoCard.astro';
 import type { GetStaticPaths } from 'astro';
 
@@ -171,7 +172,7 @@ const tags = [...new Set(videos.flatMap(v => v.data.tags))];
               thumbnail={video.data.thumbnail}
               videoUrl={video.data.videoUrl}
               category={video.data.category}
-              slug={video.slug}
+              slug={video.id}
             />
           ))}
         </div>
@@ -202,6 +203,7 @@ const tags = [...new Set(videos.flatMap(v => v.data.tags))];
       </div>
     </section>
   </main>
+  <Footer />
 </Layout>
 
 <script>

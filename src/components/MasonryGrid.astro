@@ -9,7 +9,7 @@ const { videos } = Astro.props;
 <main class="w-full bg-white video-grid px-8">
   <div class="grid grid-cols-3 gap-5">
     {videos.map((video) => (
-      <a href={`/videos/${video.slug}`} class="video-item flex flex-col gap-1 group">
+      <a href={`/videos/${video.id}`} class="video-item flex flex-col gap-1 group">
         <div class="aspect-video relative overflow-hidden bg-gray-100">
           <video
             class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"

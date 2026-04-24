@@ -1,6 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 export default {
   content: ['./src/**/*.{astro,html,js,jsx,md,mdx,svelte,ts,tsx,vue}'],
+  darkMode: 'class',
   theme: {
     extend: {
       colors: {
@@ -30,8 +31,8 @@ export default {
         }
       },
       fontFamily: {
-        sans: ['Aileron', 'sans-serif'],
-        serif: ['Aileron', 'sans-serif'],
+        sans: ['JetBrains Mono', 'monospace'],
+        serif: ['JetBrains Mono', 'monospace'],
       },
       animation: {
         'fade-in': 'fadeIn 0.5s ease-in-out',

@@ -94,7 +94,7 @@ export function sortVideosByDate(videos: CollectionEntry<'videos'>[]): Collectio
 // Get video by slug
 export async function getVideoBySlug(slug: string): Promise<CollectionEntry<'videos'> | undefined> {
   const allVideos = await getAllVideos();
-  return allVideos.find(video => video.slug === slug);
+  return allVideos.find(video => video.id === slug);
 }
 
 // Search videos by title or description
@@ -117,7 +117,7 @@ export async function getRelatedVideos(
   limit: number = 3
 ): Promise<CollectionEntry<'videos'>[]> {
   const categoryVideos = await getVideosByCategory(category);
-  const relatedVideos = categoryVideos.filter(video => video.slug !== currentSlug);
+  const relatedVideos = categoryVideos.filter(video => video.id !== currentSlug);
   return sortVideosByDate(relatedVideos).slice(0, limit);
 }
 
