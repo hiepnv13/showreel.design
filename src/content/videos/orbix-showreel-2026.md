@@ -11,6 +11,7 @@ description: We are a product design agency that specializes in providing
   are not just all talk, we take action and use our skills and knowledge to
   bring your design ideas to life.
 year: 2026
+duration: 44
 quality: 1080p
 sourceUrl: https://www.orbix.studio/
 tags: []
