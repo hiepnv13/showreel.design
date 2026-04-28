@@ -12,6 +12,7 @@ description: Jones Knowles Ritchie(JKR) is a creative agency based in London,
   impactful brand identities.
 year: 2025
 quality: 1080p
+sourceUrl: https://www.jkrglobal.com/
 tags: []
 industries:
   - advertising-commercial
