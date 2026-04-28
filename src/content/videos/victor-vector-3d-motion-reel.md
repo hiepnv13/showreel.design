@@ -8,7 +8,8 @@ videoFileName: Victor Vector 3D motion reel.mp4
 thumbnail: /placeholder.svg
 description: Victor Vector is a full-time freelancer working as a CG Generalist,
   3D Motion Artist, and Art Director.
-year: 2023
+year: 2025
+duration: 72
 quality: 1080p
 sourceUrl: https://vimeo.com/cremart
 tags: []
