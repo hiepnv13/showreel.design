@@ -6,8 +6,8 @@ videoFileName: "FLOW STUDIO SHOWREEL 2025.mp4"
 category: "Showreel"
 tags: ["Branding & Identity", "UX/UI", "3D", "AI"]
 featured: false
-publishDate: 2025-19-08
-description: "CThis showreel captures the essence of what we do—designing and building digital experiences that expand imagination and move brands forward."
+publishDate: 2025-08-19
+description: "This showreel captures the essence of what we do—designing and building digital experiences that expand imagination and move brands forward."
 quality: "1080p"
 ---
 

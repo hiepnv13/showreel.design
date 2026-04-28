@@ -56,8 +56,8 @@ const categoryVideoCounts = categories.reduce(
 const totalVideoCount = allVideosForCount.length;
 ---
 
-<main class="w-full bg-white video-grid px-8 pb-10">
-    <div class="grid grid-cols-3 gap-5">
+<main class="w-full bg-white video-grid px-4 sm:px-8 pb-10">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
         {
             displayVideos.map((video: any, index: number) => (
                 <VideoCard

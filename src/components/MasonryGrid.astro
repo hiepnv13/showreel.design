@@ -6,8 +6,8 @@ interface Props {
 const { videos } = Astro.props;
 ---
 
-<main class="w-full bg-white video-grid px-8">
-  <div class="grid grid-cols-3 gap-5">
+<main class="w-full bg-white video-grid px-4 sm:px-8">
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
     {videos.map((video) => (
       <a href={`/videos/${video.id}`} class="video-item flex flex-col gap-1 group">
         <div class="aspect-video relative overflow-hidden bg-gray-100">

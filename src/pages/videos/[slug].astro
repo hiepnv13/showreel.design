@@ -1051,6 +1051,33 @@ const hasTags = video.data.tags && video.data.tags.length > 0;
     }
 
     .volume-container { display: none; }
+
+    /* Mobile-specific overrides */
+    .video-player-container {
+      height: 56vw;
+      min-height: 220px;
+    }
+
+    .video-info {
+      padding: 24px 16px 20px;
+    }
+
+    .info-title {
+      font-size: 22px;
+    }
+
+    .related-section {
+      padding: 24px 16px 40px;
+    }
+
+    .vp-title-text {
+      font-size: 14px;
+    }
+
+    .ctrl-btn {
+      width: 28px;
+      height: 28px;
+    }
   }
 </style>
 
@@ -1257,6 +1284,7 @@ const hasTags = video.data.tags && video.data.tags.length > 0;
       let cx = 0, cy = 0;      // target (mouse)
       let rx2 = 0, ry2 = 0;    // lerped
       let onProgress = false;
+      let onVolume = false;
       let cursorRaf: number;
 
       function fmt(s: number) {
@@ -1268,7 +1296,7 @@ const hasTags = video.data.tags && video.data.tags.length > 0;
 
       function updateCursorLabel() {
         if (!vpCursorLabel || !videoContainer2) return;
-        if (onProgress) return;
+        if (onProgress || onVolume) return;
         const creditsVisible = document.getElementById('credits-overlay')?.classList.contains('visible');
         if (creditsVisible) { vpCursorLabel.textContent = 'Replay'; return; }
         const playing = videoContainer2.getAttribute('data-playing') === 'true';
@@ -1323,8 +1351,34 @@ const hasTags = video.data.tags && video.data.tags.length > 0;
         cancelAnimationFrame(cursorRaf);
       });
 
+      // Volume bar: snap cursor + show volume %
+      const volumeContainer2 = document.getElementById('volume-container');
+      if (volumeContainer2) {
+        volumeContainer2.addEventListener('mouseenter', () => {
+          onVolume = true;
+          cursor.classList.add('on-progress'); // reuse same ring style
+        });
+
+        volumeContainer2.addEventListener('mousemove', (e) => {
+          const rect = volumeContainer2.getBoundingClientRect();
+          const pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+          const containerRect = videoContainer2.getBoundingClientRect();
+          cx = e.clientX - containerRect.left;
+          cy = rect.top + rect.height / 2 - containerRect.top;
+          if (vpCursorLabel) {
+            vpCursorLabel.textContent = `${Math.round(pct * 100)}%`;
+          }
+        });
+
+        volumeContainer2.addEventListener('mouseleave', () => {
+          onVolume = false;
+          cursor.classList.remove('on-progress');
+          updateCursorLabel();
+        });
+      }
+
       videoContainer2.addEventListener('mousemove', (e) => {
-        if (onProgress) return; // handled by progress listener
+        if (onProgress || onVolume) return; // handled by their own listeners
         const rect = videoContainer2.getBoundingClientRect();
         cx = e.clientX - rect.left;
         cy = e.clientY - rect.top;

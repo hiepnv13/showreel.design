@@ -1,0 +1,197 @@
+backend:
+  name: git-gateway
+  branch: main
+
+# Disable media library — using R2 URLs pasted directly into fields
+media_folder: "public/uploads"
+public_folder: "/uploads"
+
+# Slug: lowercase, hyphenated
+slug:
+  encoding: ascii
+  clean_accents: true
+  sanitize_replacement: "-"
+
+collections:
+  - name: "videos"
+    label: "Videos"
+    label_singular: "Video"
+    folder: "src/content/videos"
+    create: true
+    delete: true
+    slug: "{{slug}}"
+    identifier_field: title
+    summary: "{{title}} — {{author}} ({{category}})"
+    sortable_fields: ["title", "author", "publishDate", "category"]
+    view_filters:
+      - label: "Featured"
+        field: featured
+        pattern: true
+    fields:
+      - label: "Title"
+        name: title
+        widget: string
+
+      - label: "Author / Studio"
+        name: author
+        widget: string
+
+      - label: "Category"
+        name: category
+        widget: select
+        options:
+          - "3D"
+          - "Agency"
+          - "Branding"
+          - "Character"
+          - "Motion Graphics"
+          - "Showreel"
+          - "UI/UX"
+
+      - label: "Publish Date"
+        name: publishDate
+        widget: datetime
+        format: "YYYY-MM-DD"
+        date_format: "YYYY-MM-DD"
+        time_format: false
+
+      - label: "Featured"
+        name: featured
+        widget: boolean
+        default: false
+
+      - label: "Video File Name"
+        name: videoFileName
+        widget: string
+        hint: "Tên file trên R2 — ví dụ: My Showreel 2025.mp4"
+
+      - label: "Thumbnail URL (R2)"
+        name: thumbnail
+        widget: string
+        hint: "Paste URL từ R2, hoặc để /placeholder.svg nếu chưa có"
+        default: "/placeholder.svg"
+
+      - label: "Description"
+        name: description
+        widget: text
+
+      - label: "Year"
+        name: year
+        widget: number
+        value_type: int
+        min: 2000
+        max: 2099
+        required: false
+
+      - label: "Duration (seconds)"
+        name: duration
+        widget: number
+        value_type: int
+        min: 1
+        required: false
+
+      - label: "Quality"
+        name: quality
+        widget: select
+        options:
+          - { label: "4K", value: "4k" }
+          - { label: "1080p", value: "1080p" }
+          - { label: "720p", value: "720p" }
+          - { label: "Preview", value: "preview" }
+        default: "1080p"
+
+      - label: "Source URL"
+        name: sourceUrl
+        widget: string
+        required: false
+        hint: "Link gốc của video (Vimeo, website agency...)"
+
+      - label: "Tags"
+        name: tags
+        widget: list
+        default: []
+        hint: "Nhập từng tag rồi Enter"
+
+      - label: "Industries"
+        name: industries
+        widget: select
+        multiple: true
+        required: false
+        default: []
+        options:
+          - { label: "Tech / SaaS", value: "tech-saas" }
+          - { label: "Fashion / Luxury", value: "fashion-luxury" }
+          - { label: "Advertising / Commercial", value: "advertising-commercial" }
+          - { label: "Entertainment / Media", value: "entertainment-media" }
+          - { label: "Finance / Banking", value: "finance-banking" }
+          - { label: "Automotive", value: "automotive" }
+          - { label: "Sports / Fitness", value: "sports-fitness" }
+          - { label: "Food & Beverage", value: "food-beverage" }
+          - { label: "Healthcare", value: "healthcare" }
+          - { label: "Education", value: "education" }
+          - { label: "Real Estate", value: "real-estate" }
+          - { label: "Other", value: "other" }
+
+      - label: "Styles"
+        name: styles
+        widget: select
+        multiple: true
+        required: false
+        default: []
+        options:
+          - { label: "Minimal / Clean", value: "minimal-clean" }
+          - { label: "Bold / Vibrant", value: "bold-vibrant" }
+          - { label: "3D / CGI", value: "3d-cgi" }
+          - { label: "Hand Drawn", value: "hand-drawn" }
+          - { label: "Retro / Vintage", value: "retro-vintage" }
+          - { label: "Futuristic / Tech", value: "futuristic-tech" }
+          - { label: "Organic / Natural", value: "organic-natural" }
+          - { label: "Geometric / Abstract", value: "geometric-abstract" }
+          - { label: "Cinematic / Dramatic", value: "cinematic-dramatic" }
+          - { label: "Playful / Quirky", value: "playful-quirky" }
+          - { label: "Elegant / Sophisticated", value: "elegant-sophisticated" }
+          - { label: "Dark / Moody", value: "dark-moody" }
+
+      - label: "Techniques"
+        name: techniques
+        widget: select
+        multiple: true
+        required: false
+        default: []
+        options:
+          - { label: "2D Animation", value: "2d-animation" }
+          - { label: "3D / CGI", value: "3d-cgi" }
+          - { label: "Mixed Media", value: "mixed-media" }
+          - { label: "Kinetic Typography", value: "kinetic-typography" }
+          - { label: "Motion Graphics", value: "motion-graphics" }
+          - { label: "Stop Motion", value: "stop-motion" }
+          - { label: "Live Action + VFX", value: "live-action-vfx" }
+          - { label: "Cel Animation", value: "cel-animation" }
+          - { label: "Liquid Simulation", value: "liquid-simulation" }
+          - { label: "Particle Effects", value: "particle-effects" }
+          - { label: "Character Animation", value: "character-animation" }
+          - { label: "Logo Animation", value: "logo-animation" }
+
+      - label: "Sound / Music"
+        name: soundMusic
+        widget: select
+        multiple: true
+        required: false
+        default: []
+        options:
+          - { label: "Electronic / Synth", value: "electronic-synth" }
+          - { label: "Epic Cinematic", value: "epic-cinematic" }
+          - { label: "Chill / Ambient", value: "chill-ambient" }
+          - { label: "Jazz / Acoustic", value: "jazz-acoustic" }
+          - { label: "Rock / Energetic", value: "rock-energetic" }
+          - { label: "Orchestral / Classical", value: "orchestral-classical" }
+          - { label: "Hip-hop / Urban", value: "hip-hop-urban" }
+          - { label: "No Sound", value: "no-sound" }
+          - { label: "Voiceover Heavy", value: "voiceover-heavy" }
+          - { label: "Sound Design Focused", value: "sound-design-focused" }
+
+      - label: "Notes (Markdown)"
+        name: body
+        widget: markdown
+        required: false
+        hint: "Optional — ghi chú thêm về video"

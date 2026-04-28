@@ -34,18 +34,18 @@ for (const category of allCategories) {
 }
 ---
 
-<header class="w-full bg-white sticky top-0 z-50 px-8 pt-8 pb-4 flex flex-col gap-6">
-  <!-- Top Row: Logo, Filters, Search -->
+<header class="w-full bg-white sticky top-0 z-50 px-4 sm:px-8 pt-4 sm:pt-8 pb-3 sm:pb-4 flex flex-col gap-3 sm:gap-6">
+  <!-- Top Row: Logo, Filters (desktop), Search -->
   <div class="flex items-center justify-between w-full">
     <!-- Logo -->
-    <div class="pr-12 flex-shrink-0">
-      <a href="/" class="text-[30px] font-medium tracking-[0px] text-[#1a1a1a] hover:opacity-70 transition-opacity whitespace-nowrap">
+    <div class="pr-4 sm:pr-12 flex-shrink-0">
+      <a href="/" class="text-[24px] sm:text-[30px] font-medium tracking-[0px] text-[#1a1a1a] hover:opacity-70 transition-opacity whitespace-nowrap">
         SR.D
       </a>
     </div>
 
-    <!-- Category Filter Buttons -->
-    <div class="flex items-center gap-2">
+    <!-- Category Filter Buttons — desktop only (center) -->
+    <div class="hidden sm:flex items-center gap-2 flex-1 justify-center">
       {categoryButtons.map((cat) => (
         <a
           href={cat.slug}
@@ -56,39 +56,54 @@ for (const category of allCategories) {
       ))}
     </div>
 
-    <!-- Dark Mode Toggle -->
-    <button id="dark-toggle" class="dark-toggle" title="Toggle dark mode" aria-label="Toggle dark mode">
-      <svg id="icon-moon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
-      </svg>
-      <svg id="icon-sun" class="w-4 h-4 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <circle cx="12" cy="12" r="5" stroke-width="1.5"/><path stroke-linecap="round" stroke-width="1.5" d="M12 2v2M12 20v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M2 12h2M20 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
-      </svg>
-    </button>
+    <!-- Right controls: Dark Mode + Search -->
+    <div class="flex items-center gap-2 sm:gap-0 flex-shrink-0">
+      <!-- Dark Mode Toggle -->
+      <button id="dark-toggle" class="dark-toggle" title="Toggle dark mode" aria-label="Toggle dark mode">
+        <svg id="icon-moon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+        <svg id="icon-sun" class="w-4 h-4 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="5" stroke-width="1.5"/><path stroke-linecap="round" stroke-width="1.5" d="M12 2v2M12 20v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M2 12h2M20 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+        </svg>
+      </button>
 
-    <!-- Search Bar -->
-    <div class="pl-4 flex-shrink-0" id="search-container">
-      <form action="/search" method="get" class="border-b border-gray-200 pb-2 flex items-center gap-4">
-        <input
-          type="text"
-          name="q"
-          id="search-input"
-          placeholder="Search showreel"
-          class="w-[180px] bg-transparent border-none outline-none text-[14px] placeholder-gray-500"
-          autocomplete="off"
-        />
-        <div class="bg-[#f0f0f0] px-2 py-1 rounded text-[12px] text-gray-500 border border-transparent">
-          ENTER
-        </div>
-      </form>
+      <!-- Search Bar -->
+      <div class="pl-2 sm:pl-4 flex-shrink-0" id="search-container">
+        <form action="/search" method="get" class="border-b border-gray-200 pb-2 flex items-center gap-2 sm:gap-4">
+          <input
+            type="text"
+            name="q"
+            id="search-input"
+            placeholder="Search"
+            class="w-[100px] sm:w-[180px] bg-transparent border-none outline-none text-[13px] sm:text-[14px] placeholder-gray-500"
+            autocomplete="off"
+          />
+          <div class="hidden sm:block bg-[#f0f0f0] px-2 py-1 rounded text-[12px] text-gray-500 border border-transparent">
+            ENTER
+          </div>
+        </form>
 
-      <!-- Search Suggestions Dropdown -->
-      <div id="search-suggestions" class="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-lg shadow-lg mt-1 max-h-96 overflow-y-auto z-50 hidden">
-        <div id="suggestions-content" class="py-2">
-          <!-- Suggestions will be populated by JavaScript -->
+        <!-- Search Suggestions Dropdown -->
+        <div id="search-suggestions" class="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-lg shadow-lg mt-1 max-h-96 overflow-y-auto z-50 hidden">
+          <div id="suggestions-content" class="py-2">
+            <!-- Suggestions will be populated by JavaScript -->
+          </div>
         </div>
       </div>
     </div>
+  </div>
+
+  <!-- Category Filter Buttons — mobile only (scrollable row) -->
+  <div class="flex sm:hidden items-center gap-2 overflow-x-auto pb-1 -mx-4 px-4" style="scrollbar-width:none;-ms-overflow-style:none;">
+    {categoryButtons.map((cat) => (
+      <a
+        href={cat.slug}
+        class={`filter-btn flex-shrink-0 ${cat.active ? 'active' : ''}`}
+      >
+        {cat.label}
+      </a>
+    ))}
   </div>
 
   <!-- Results Counter / Breadcrumb -->
