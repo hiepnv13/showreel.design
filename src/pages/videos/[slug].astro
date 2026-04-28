@@ -220,7 +220,11 @@ const hasTags = video.data.tags && video.data.tags.length > 0;
       <div class="info-title-area">
         <h1 class="info-title">{video.data.title}</h1>
         <p class="info-by">
-          by <a href={`/author/${generateSlug(video.data.author)}`} class="info-author-link">{video.data.author}</a>
+          {video.data.sourceUrl ? (
+            <a href={video.data.sourceUrl} target="_blank" rel="noopener noreferrer" class="info-author-link">{video.data.author}</a>
+          ) : (
+            <span class="info-author-link" style="border-color:transparent;cursor:default;">{video.data.author}</span>
+          )}
         </p>
         <p class="info-desc">{video.data.description}</p>
       </div>

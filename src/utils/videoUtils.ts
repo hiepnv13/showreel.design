@@ -49,18 +49,6 @@ export async function getVideosByTagSlug(tagSlug: string): Promise<CollectionEnt
   );
 }
 
-// Get videos by author
-export async function getVideosByAuthor(author: string): Promise<CollectionEntry<'videos'>[]> {
-  const allVideos = await getAllVideos();
-  return allVideos.filter(video => video.data.author === author);
-}
-
-// Get videos by author slug
-export async function getVideosByAuthorSlug(authorSlug: string): Promise<CollectionEntry<'videos'>[]> {
-  const allVideos = await getAllVideos();
-  return allVideos.filter(video => generateSlug(video.data.author) === authorSlug);
-}
-
 // Get all unique categories
 export async function getAllCategories(): Promise<string[]> {
   const videos = await getCollection('videos');
