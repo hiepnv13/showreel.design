@@ -8,7 +8,7 @@ videoFileName: Intently showreel 2026.mp4
 thumbnail: /placeholder.svg
 description: We help Fintech Startups grow with  2D/3D Launch, Explainer & Promo videos
 year: 2022
-duration: ""
+duration: 43
 quality: 1080p
 sourceUrl: https://intently.agency/
 tags: []
