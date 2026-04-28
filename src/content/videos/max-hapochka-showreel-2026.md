@@ -10,7 +10,8 @@ description: They are a 3D artist who creates engaging animations and immersive
   visual experiences, with a strong focus on realistic lighting, detailed
   materials, and dynamic storytelling. Passionate about exploring new
   techniques, they are always open to creative collaborations.
-year: 2023
+year: 2026
+duration: 44
 quality: 1080p
 sourceUrl: https://www.behance.net/maxhapochka
 tags: []
