@@ -12,6 +12,7 @@ description: Martin Naumann is a visual artist and multidisciplinary designer
   described as futuristic, his work blends experimental and abstract techniques
   with strong visual motifs inspired by nature and science.
 year: 2025
+duration: 111
 quality: 1080p
 sourceUrl: https://martin-naumann.com/
 tags: []
