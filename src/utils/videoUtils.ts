@@ -49,6 +49,44 @@ export async function getVideosByTagSlug(tagSlug: string): Promise<CollectionEnt
   );
 }
 
+// Industry label map
+const INDUSTRY_LABELS: Record<string, string> = {
+  'tech-saas': 'Tech / SaaS',
+  'fashion-luxury': 'Fashion & Luxury',
+  'advertising-commercial': 'Commercial & Advertising',
+  'entertainment-media': 'Entertainment & Media',
+  'finance-banking': 'Finance & Fintech',
+  'automotive': 'Automotive',
+  'sports-fitness': 'Sports & Fitness',
+  'food-beverage': 'Food & Beverage',
+  'healthcare': 'Healthcare',
+  'education': 'Education',
+  'real-estate': 'Real Estate',
+  'other': 'Other',
+};
+
+export function getIndustryLabel(slug: string): string {
+  return INDUSTRY_LABELS[slug] ?? slug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+}
+
+// Get all industries that have at least one video (sorted by count desc)
+export async function getAllIndustries(): Promise<string[]> {
+  const videos = await getCollection('videos');
+  const counts: Record<string, number> = {};
+  videos.forEach((video: CollectionEntry<'videos'>) => {
+    (video.data.industries ?? []).forEach((ind: string) => {
+      counts[ind] = (counts[ind] ?? 0) + 1;
+    });
+  });
+  return Object.keys(counts).sort((a, b) => counts[b] - counts[a]);
+}
+
+// Get videos by industry slug
+export async function getVideosByIndustry(slug: string): Promise<CollectionEntry<'videos'>[]> {
+  const allVideos = await getAllVideos();
+  return allVideos.filter(video => (video.data.industries ?? []).includes(slug as any));
+}
+
 // Get all unique years (sorted descending)
 export async function getAllYears(): Promise<number[]> {
   const videos = await getCollection('videos');

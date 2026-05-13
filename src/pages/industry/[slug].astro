@@ -1,7 +1,12 @@
 ---
 export const prerender = true;
 
-import { getVideosByYear, getAllYears, sortVideosByDate } from "../../utils/videoUtils";
+import {
+  getVideosByIndustry,
+  getAllIndustries,
+  getIndustryLabel,
+  sortVideosByDate,
+} from "../../utils/videoUtils";
 import Layout from "../../layouts/Layout.astro";
 import Header from "../../components/Header.astro";
 import Footer from "../../components/Footer.astro";
@@ -9,21 +14,22 @@ import VideoGrid from "../../components/VideoGrid.astro";
 import type { GetStaticPaths } from "astro";
 
 export const getStaticPaths: GetStaticPaths = async () => {
-  const years = await getAllYears();
-  return years.map((year: number) => ({
-    params: { year: String(year) },
-    props: { year },
+  const industries = await getAllIndustries();
+  return industries.map((slug: string) => ({
+    params: { slug },
+    props: { slug },
   }));
 };
 
 interface Props {
-  year: number;
+  slug: string;
 }
 
-const { year } = Astro.props;
-const allYears = await getAllYears();
+const { slug } = Astro.props;
+const allIndustries = await getAllIndustries();
+const label = getIndustryLabel(slug);
 
-const allVideos = await getVideosByYear(year);
+const allVideos = await getVideosByIndustry(slug);
 const videos = sortVideosByDate(allVideos);
 const itemsPerPage = 24;
 const totalCount = videos.length;
@@ -31,17 +37,22 @@ const showingCount = Math.min(itemsPerPage, totalCount);
 
 const breadcrumb = [
   { label: 'Home', href: '/' },
-  { label: String(year), href: '' },
+  { label, href: '' },
 ];
 ---
 
-<Layout title={`${year} Motion Design Showreels — Showreel.design`}>
+<Layout title={`${label} Motion Design — Showreel.design`}>
   <Header showingCount={showingCount} totalCount={totalCount} breadcrumb={breadcrumb} />
 
-  <!-- Year filter chips -->
-  <div class="year-chips">
-    {allYears.map((y) => (
-      <a href={`/year/${y}`} class={`filter-btn${y === year ? ' active' : ''}`}>{y}</a>
+  <!-- Industry filter chips -->
+  <div class="industry-chips">
+    {allIndustries.map((ind) => (
+      <a
+        href={`/industry/${ind}`}
+        class={`filter-btn${ind === slug ? ' active' : ''}`}
+      >
+        {getIndustryLabel(ind)}
+      </a>
     ))}
   </div>
 
@@ -49,13 +60,13 @@ const breadcrumb = [
     videos={videos}
     currentPage={1}
     itemsPerPage={itemsPerPage}
-    baseUrl={`/year/${year}`}
+    baseUrl={`/industry/${slug}`}
   />
   <Footer />
 </Layout>
 
 <style>
-  .year-chips {
+  .industry-chips {
     display: flex;
     align-items: center;
     gap: 8px;
