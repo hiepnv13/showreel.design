@@ -12,15 +12,16 @@ export const getStaticPaths: GetStaticPaths = async () => {
   const years = await getAllYears();
   return years.map((year: number) => ({
     params: { year: String(year) },
-    props: { year },
+    props: { year, allYears: years },
   }));
 };
 
 interface Props {
   year: number;
+  allYears: number[];
 }
 
-const { year } = Astro.props;
+const { year, allYears } = Astro.props;
 
 const allVideos = await getVideosByYear(year);
 const videos = sortVideosByDate(allVideos);
@@ -36,6 +37,14 @@ const breadcrumb = [
 
 <Layout title={`${year} Motion Design Showreels — Showreel.design`}>
   <Header showingCount={showingCount} totalCount={totalCount} breadcrumb={breadcrumb} />
+
+  <!-- Year filter chips -->
+  <div class="year-chips">
+    {allYears.map((y) => (
+      <a href={`/year/${y}`} class={`filter-btn${y === year ? ' active' : ''}`}>{y}</a>
+    ))}
+  </div>
+
   <VideoGrid
     videos={videos}
     currentPage={1}
@@ -44,3 +53,13 @@ const breadcrumb = [
   />
   <Footer />
 </Layout>
+
+<style>
+  .year-chips {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 16px 32px 0;
+    flex-wrap: wrap;
+  }
+</style>
