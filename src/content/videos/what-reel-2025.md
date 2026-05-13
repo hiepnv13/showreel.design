@@ -8,7 +8,6 @@ videoFileName: What?reel 2025.mp4
 thumbnail: /placeholder.svg
 description: CG // Motion design // Animation
 year: 2025
-duration: 60
 quality: 1080p
 sourceUrl: https://what-cg.com/
 tags: []
@@ -19,8 +18,6 @@ styles:
   - 3d-cgi
   - bold-vibrant
   - cinematic-dramatic
-techniques:
-  - 3d-cgi
 soundMusic:
   - rock-energetic
 ---

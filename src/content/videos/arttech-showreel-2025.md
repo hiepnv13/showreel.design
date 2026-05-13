@@ -13,7 +13,6 @@ year: 2025
 sourceUrl: "https://portfolio.artistechnology.com/"
 industries: ["tech-saas"]
 styles: ["bold-vibrant"]
-techniques: ["motion-graphics"]
 soundMusic: ["rock-energetic"]
 ---
 

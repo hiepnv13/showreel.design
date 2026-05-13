@@ -39,13 +39,6 @@ const breadcrumb = [
   { label: video.data.title, href: '' }
 ];
 
-function formatDuration(seconds: number | undefined): string {
-  if (!seconds) return "N/A";
-  const mins = Math.floor(seconds / 60);
-  const secs = seconds % 60;
-  return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-}
-
 function formatTaxonomyValue(values: string[] | undefined): string {
   if (!values || values.length === 0) return "";
   return values
@@ -54,7 +47,6 @@ function formatTaxonomyValue(values: string[] | undefined): string {
 }
 
 const hasStyles = video.data.styles && video.data.styles.length > 0;
-const hasTechniques = video.data.techniques && video.data.techniques.length > 0;
 const hasSoundMusic = video.data.soundMusic && video.data.soundMusic.length > 0;
 const hasTags = video.data.tags && video.data.tags.length > 0;
 ---
@@ -153,22 +145,10 @@ const hasTags = video.data.tags && video.data.tags.length > 0;
                 <span class="c-val">{video.data.year}</span>
               </div>
             )}
-            {video.data.duration && (
-              <div class="c-row">
-                <span class="c-role">Duration</span>
-                <span class="c-val">{formatDuration(video.data.duration)}</span>
-              </div>
-            )}
             {hasStyles && (
               <div class="c-row">
                 <span class="c-role">Style</span>
                 <span class="c-val">{formatTaxonomyValue(video.data.styles)}</span>
-              </div>
-            )}
-            {hasTechniques && (
-              <div class="c-row">
-                <span class="c-role">Technique</span>
-                <span class="c-val">{formatTaxonomyValue(video.data.techniques)}</span>
               </div>
             )}
             {hasSoundMusic && (
@@ -238,10 +218,6 @@ const hasTags = video.data.tags && video.data.tags.length > 0;
             <span class="detail-val">{video.data.year || "N/A"}</span>
           </div>
           <div class="detail-row">
-            <span class="detail-key">Duration</span>
-            <span class="detail-val">{formatDuration(video.data.duration)}</span>
-          </div>
-          <div class="detail-row">
             <span class="detail-key">Category</span>
             <a href={`/category/${generateSlug(video.data.category)}`} class="detail-link">{video.data.category}</a>
           </div>
@@ -249,12 +225,6 @@ const hasTags = video.data.tags && video.data.tags.length > 0;
             <div class="detail-row">
               <span class="detail-key">Style</span>
               <span class="detail-val">{formatTaxonomyValue(video.data.styles)}</span>
-            </div>
-          )}
-          {hasTechniques && (
-            <div class="detail-row">
-              <span class="detail-key">Technique</span>
-              <span class="detail-val">{formatTaxonomyValue(video.data.techniques)}</span>
             </div>
           )}
           {hasSoundMusic && (

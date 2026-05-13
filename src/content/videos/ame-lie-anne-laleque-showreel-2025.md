@@ -22,8 +22,6 @@ industries:
   - advertising-commercial
 styles:
   - hand-drawn
-techniques:
-  - motion-graphics
 soundMusic:
   - electronic-synth
 ---

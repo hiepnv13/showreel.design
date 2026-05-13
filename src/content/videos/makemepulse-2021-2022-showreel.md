@@ -13,7 +13,6 @@ year: 2022
 sourceUrl: "https://www.makemepulse.com/"
 industries: ["tech-saas"]
 styles: ["minimal-clean", "hand-drawn"]
-techniques: ["2d-animation"]
 soundMusic: ["electronic-synth"]
 ---
 

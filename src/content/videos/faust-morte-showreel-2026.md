@@ -8,7 +8,6 @@ videoFileName: Faust Morte Showreel 2026.mp4
 thumbnail: /placeholder.svg
 description: CG Generalist / Motion Designer
 year: 2026
-duration: 62
 quality: 1080p
 sourceUrl: https://www.behance.net/faustmorte
 tags: []
@@ -17,8 +16,6 @@ industries:
 styles:
   - bold-vibrant
   - geometric-abstract
-techniques:
-  - 2d-animation
 soundMusic:
   - electronic-synth
 ---

@@ -23,8 +23,6 @@ industries:
   - advertising-commercial
 styles:
   - bold-vibrant
-techniques:
-  - 2d-animation
 soundMusic:
   - jazz-acoustic
 ---

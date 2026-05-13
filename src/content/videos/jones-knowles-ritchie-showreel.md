@@ -17,6 +17,5 @@ tags: []
 industries:
   - advertising-commercial
 styles: []
-techniques: []
 soundMusic: []
 ---

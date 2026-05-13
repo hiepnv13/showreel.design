@@ -13,7 +13,6 @@ year: 2025
 sourceUrl: "https://www.7nights.studio/"
 industries: ["tech-saas", "entertainment-media"]
 styles: ["bold-vibrant"]
-techniques: ["3d-cgi"]
 soundMusic: ["epic-cinematic"]
 ---
 

@@ -16,8 +16,6 @@ industries:
 styles:
   - 3d-cgi
   - futuristic-tech
-techniques:
-  - 3d-cgi
 soundMusic:
   - electronic-synth
 ---

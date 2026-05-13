@@ -13,7 +13,6 @@ year: 2024
 sourceUrl: "https://x.com/rennesis"
 industries: ["tech-saas"]
 styles: ["bold-vibrant", "retro-vintage"]
-techniques: ["3d-cgi"]
 soundMusic: ["electronic-synth"]
 ---
 

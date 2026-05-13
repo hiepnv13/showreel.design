@@ -13,7 +13,6 @@ year: 2025
 sourceUrl: "https://x.com/danzeyss"
 industries: ["tech-saas", "entertainment-media", "sports-fitness"]
 styles: ["hand-drawn", "retro-vintage", "organic-natural"]
-techniques: ["2d-animation"]
 soundMusic: ["hip-hop-urban"]
 ---
 

@@ -11,7 +11,6 @@ description: They are a 3D artist who creates engaging animations and immersive
   materials, and dynamic storytelling. Passionate about exploring new
   techniques, they are always open to creative collaborations.
 year: 2026
-duration: 44
 quality: 1080p
 sourceUrl: https://www.behance.net/maxhapochka
 tags: []
@@ -20,8 +19,5 @@ industries:
 styles:
   - 3d-cgi
   - dark-moody
-techniques:
-  - motion-graphics
-  - 3d-cgi
 soundMusic: []
 ---

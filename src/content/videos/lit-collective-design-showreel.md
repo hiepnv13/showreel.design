@@ -13,7 +13,6 @@ year: 2025
 sourceUrl: "https://www.litcollective.xyz/"
 industries: ["tech-saas"]
 styles: ["geometric-abstract"]
-techniques: ["2d-animation"]
 soundMusic: ["rock-energetic"]
 ---
 

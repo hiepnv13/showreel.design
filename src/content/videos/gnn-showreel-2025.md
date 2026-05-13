@@ -13,7 +13,6 @@ year: 2025
 sourceUrl: "https://gnn.myportfolio.com/"
 industries: ["tech-saas"]
 styles: ["bold-vibrant", "retro-vintage"]
-techniques: ["2d-animation", "3d-cgi"]
 soundMusic: ["electronic-synth"]
 ---
 

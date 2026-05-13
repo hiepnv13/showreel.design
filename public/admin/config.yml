@@ -82,13 +82,6 @@ collections:
         max: 2099
         required: false
 
-      - label: "Duration (seconds)"
-        name: duration
-        widget: number
-        value_type: int
-        min: 1
-        required: false
-
       - label: "Quality"
         name: quality
         widget: select
@@ -150,26 +143,6 @@ collections:
           - { label: "Playful / Quirky", value: "playful-quirky" }
           - { label: "Elegant / Sophisticated", value: "elegant-sophisticated" }
           - { label: "Dark / Moody", value: "dark-moody" }
-
-      - label: "Techniques"
-        name: techniques
-        widget: select
-        multiple: true
-        required: false
-        default: []
-        options:
-          - { label: "2D Animation", value: "2d-animation" }
-          - { label: "3D / CGI", value: "3d-cgi" }
-          - { label: "Mixed Media", value: "mixed-media" }
-          - { label: "Kinetic Typography", value: "kinetic-typography" }
-          - { label: "Motion Graphics", value: "motion-graphics" }
-          - { label: "Stop Motion", value: "stop-motion" }
-          - { label: "Live Action + VFX", value: "live-action-vfx" }
-          - { label: "Cel Animation", value: "cel-animation" }
-          - { label: "Liquid Simulation", value: "liquid-simulation" }
-          - { label: "Particle Effects", value: "particle-effects" }
-          - { label: "Character Animation", value: "character-animation" }
-          - { label: "Logo Animation", value: "logo-animation" }
 
       - label: "Sound / Music"
         name: soundMusic

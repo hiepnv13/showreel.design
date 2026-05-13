@@ -18,8 +18,6 @@ industries:
   - tech-saas
 styles:
   - geometric-abstract
-techniques:
-  - motion-graphics
 soundMusic:
   - hip-hop-urban
 ---

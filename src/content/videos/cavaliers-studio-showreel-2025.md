@@ -17,8 +17,6 @@ industries:
   - tech-saas
 styles:
   - 3d-cgi
-techniques:
-  - motion-graphics
 soundMusic:
   - hip-hop-urban
 ---

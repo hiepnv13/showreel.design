@@ -13,7 +13,6 @@ year: 2022
 sourceUrl: "https://www.immersivestudios.de/"
 industries: ["tech-saas", "automotive"]
 styles: ["playful-quirky"]
-techniques: ["3d-cgi"]
 soundMusic: ["rock-energetic"]
 ---
 

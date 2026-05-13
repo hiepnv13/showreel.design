@@ -13,7 +13,6 @@ year: 2025
 sourceUrl: "https://x.com/danzeyss/status/1967274583310074029"
 industries: []
 styles: ["bold-vibrant", "geometric-abstract", "playful-quirky"]
-techniques: ["2d-animation", "3d-cgi"]
 soundMusic: []
 ---
 

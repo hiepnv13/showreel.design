@@ -26,9 +26,6 @@ styles:
   - bold-vibrant
   - hand-drawn
   - retro-vintage
-techniques:
-  - 2d-animation
-  - motion-graphics
 soundMusic:
   - voiceover-heavy
 ---

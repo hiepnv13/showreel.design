@@ -13,7 +13,6 @@ year: 2025
 sourceUrl: "https://tempomotions.com/"
 industries: ["entertainment-media"]
 styles: ["bold-vibrant"]
-techniques: ["2d-animation"]
 soundMusic: ["electronic-synth"]
 ---
 

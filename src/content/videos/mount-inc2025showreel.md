@@ -13,7 +13,6 @@ year: 2025
 sourceUrl: "https://note.com/mount_inc/n/nf490f81a2e38"
 industries: ["tech-saas"]
 styles: ["minimal-clean"]
-techniques: ["kinetic-typography"]
 soundMusic: ["electronic-synth"]
 ---
 

@@ -14,6 +14,5 @@ sourceUrl: https://philipvonborries.com/about
 tags: []
 industries: []
 styles: []
-techniques: []
 soundMusic: []
 ---

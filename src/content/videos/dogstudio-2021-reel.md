@@ -13,7 +13,6 @@ year: 2021
 sourceUrl: "https://dogstudio.co/"
 industries: ["tech-saas", "sports-fitness"]
 styles: ["bold-vibrant", "3d-cgi"]
-techniques: []
 soundMusic: ["hip-hop-urban"]
 ---
 

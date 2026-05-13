@@ -25,7 +25,6 @@ const videosCollection = defineCollection({
     quality: z.enum(['4k', '1080p', '720p', 'preview']).default('1080p'),
 
     year: z.number().min(2000).max(2099).optional(),
-    duration: z.number().optional(),
     sourceUrl: z.string().url().optional(),
 
     industries: z.array(z.enum([

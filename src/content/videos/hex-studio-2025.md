@@ -13,7 +13,6 @@ year: 2025
 sourceUrl: "https://www.hex.inc/"
 industries: ["tech-saas", "advertising-commercial"]
 styles: ["bold-vibrant", "geometric-abstract"]
-techniques: ["2d-animation"]
 soundMusic: ["no-sound"]
 ---
 

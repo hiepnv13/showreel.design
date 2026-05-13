@@ -13,7 +13,6 @@ year: 2025
 sourceUrl: "https://x.com/Flamingrph/status/1965309201321783507"
 industries: ["tech-saas"]
 styles: ["minimal-clean"]
-techniques: ["3d-cgi"]
 soundMusic: []
 ---
 

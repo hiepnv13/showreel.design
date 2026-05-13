@@ -13,7 +13,6 @@ year: 2025
 sourceUrl: "https://x.com/DarrkSuun/status/1998437486830506265"
 industries: ["tech-saas"]
 styles: ["3d-cgi"]
-techniques: ["3d-cgi"]
 soundMusic: ["electronic-synth"]
 ---
 
