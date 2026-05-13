@@ -49,6 +49,21 @@ export async function getVideosByTagSlug(tagSlug: string): Promise<CollectionEnt
   );
 }
 
+// Get all unique years (sorted descending)
+export async function getAllYears(): Promise<number[]> {
+  const videos = await getCollection('videos');
+  const years = videos
+    .map((video: CollectionEntry<'videos'>) => video.data.year)
+    .filter((year): year is number => year !== undefined);
+  return [...new Set(years)].sort((a, b) => b - a);
+}
+
+// Get videos by year
+export async function getVideosByYear(year: number): Promise<CollectionEntry<'videos'>[]> {
+  const allVideos = await getAllVideos();
+  return allVideos.filter(video => video.data.year === year);
+}
+
 // Get all unique categories
 export async function getAllCategories(): Promise<string[]> {
   const videos = await getCollection('videos');

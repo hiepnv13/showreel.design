@@ -1,5 +1,8 @@
 ---
+import { getAllYears } from "../utils/videoUtils";
+
 const currentYear = new Date().getFullYear();
+const years = await getAllYears();
 ---
 
 <footer class="w-full bg-white border-t border-gray-100 mt-auto">
@@ -43,13 +46,21 @@ const currentYear = new Date().getFullYear();
           </div>
         </div>
 
+        <!-- Browse by Year -->
+        <div class="flex flex-col gap-3">
+          <p class="text-[10px] tracking-[1.5px] text-gray-400 uppercase font-medium">Archive</p>
+          <div class="flex flex-col gap-2">
+            {years.map((year) => (
+              <a href={`/year/${year}`} class="text-[13px] text-gray-600 hover:text-[#1a1a1a] transition-colors">{year}</a>
+            ))}
+          </div>
+        </div>
+
         <!-- Social -->
         <div class="flex flex-col gap-3">
           <p class="text-[10px] tracking-[1.5px] text-gray-400 uppercase font-medium">Social</p>
           <div class="flex flex-col gap-2">
-            
             <a href="#" class="text-[13px] text-gray-600 hover:text-[#1a1a1a] transition-colors">Twitter (X)</a>
-            
           </div>
         </div>
 

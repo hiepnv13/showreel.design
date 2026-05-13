@@ -1,0 +1,46 @@
+---
+export const prerender = true;
+
+import { getVideosByYear, getAllYears, sortVideosByDate } from "../../utils/videoUtils";
+import Layout from "../../layouts/Layout.astro";
+import Header from "../../components/Header.astro";
+import Footer from "../../components/Footer.astro";
+import VideoGrid from "../../components/VideoGrid.astro";
+import type { GetStaticPaths } from "astro";
+
+export const getStaticPaths: GetStaticPaths = async () => {
+  const years = await getAllYears();
+  return years.map((year: number) => ({
+    params: { year: String(year) },
+    props: { year },
+  }));
+};
+
+interface Props {
+  year: number;
+}
+
+const { year } = Astro.props;
+
+const allVideos = await getVideosByYear(year);
+const videos = sortVideosByDate(allVideos);
+const itemsPerPage = 24;
+const totalCount = videos.length;
+const showingCount = Math.min(itemsPerPage, totalCount);
+
+const breadcrumb = [
+  { label: 'Home', href: '/' },
+  { label: String(year), href: '' },
+];
+---
+
+<Layout title={`${year} Motion Design Showreels — Showreel.design`}>
+  <Header showingCount={showingCount} totalCount={totalCount} breadcrumb={breadcrumb} />
+  <VideoGrid
+    videos={videos}
+    currentPage={1}
+    itemsPerPage={itemsPerPage}
+    baseUrl={`/year/${year}`}
+  />
+  <Footer />
+</Layout>

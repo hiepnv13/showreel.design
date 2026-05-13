@@ -215,7 +215,11 @@ const hasTags = video.data.tags && video.data.tags.length > 0;
         <div class="details-table">
           <div class="detail-row">
             <span class="detail-key">Year</span>
-            <span class="detail-val">{video.data.year || "N/A"}</span>
+            {video.data.year ? (
+              <a href={`/year/${video.data.year}`} class="detail-link">{video.data.year}</a>
+            ) : (
+              <span class="detail-val">N/A</span>
+            )}
           </div>
           <div class="detail-row">
             <span class="detail-key">Category</span>
