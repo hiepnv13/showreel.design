@@ -3,7 +3,7 @@ title: "Showreel 2025 by DarkSun"
 author: "DarkSun"
 thumbnail: "/placeholder.svg"
 videoFileName: "Showreel 2025 by DarkSun.mp4"
-category: "Showreel"
+category: "3D / CGI"
 tags: []
 featured: false
 publishDate: 2025-12-23

@@ -3,7 +3,7 @@ title: "tHeo Le Pen 2025 showreel"
 author: "tHeo Le Pen"
 thumbnail: "/placeholder.svg"
 videoFileName: "tHeo Le Pen 2025 showreel.mp4"
-category: "Showreel"
+category: "3D / CGI"
 tags: []
 featured: false
 publishDate: 2025-12-23

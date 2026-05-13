@@ -1,7 +1,7 @@
 ---
 title: Amélie-Anne Laleque Showreel 2025
 author: Amélie-Anne Laleque
-category: Showreel
+category: "2D Animation"
 publishDate: 2026-04-28
 featured: false
 videoFileName: Amélie-Anne Laleque Showreel 2025.mp4

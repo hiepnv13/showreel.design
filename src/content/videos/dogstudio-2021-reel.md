@@ -3,7 +3,7 @@ title: "Dogstudio 2021 reel"
 author: "Dogstudio"
 thumbnail: "/placeholder.svg"
 videoFileName: "Dogstudio 2021 reel.mp4"
-category: "Showreel"
+category: "Studio / Agency"
 tags: []
 featured: false
 publishDate: 2025-12-25

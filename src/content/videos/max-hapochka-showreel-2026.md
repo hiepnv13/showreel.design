@@ -1,7 +1,7 @@
 ---
 title: Max Hapochka Showreel 2026
 author: Max Hapochka
-category: Showreel
+category: "3D / CGI"
 publishDate: 2026-04-28
 featured: false
 videoFileName: Max Hapochka Showreel 2026.mp4

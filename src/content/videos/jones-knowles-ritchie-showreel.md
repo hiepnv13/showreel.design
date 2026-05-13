@@ -1,7 +1,7 @@
 ---
 title: Jones Knowles Ritchie - Showreel
 author: Jones Knowles Ritchie
-category: Agency
+category: "Branding & Identity"
 publishDate: 2026-04-28
 featured: false
 videoFileName: Jones Knowles Ritchie.mp4

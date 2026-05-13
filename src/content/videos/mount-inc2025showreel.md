@@ -3,7 +3,7 @@ title: "mount inc._2025showreel"
 author: "mount inc"
 thumbnail: "/placeholder.svg"
 videoFileName: "mount inc._2025showreel.mp4"
-category: "Agency"
+category: "Motion Graphics"
 tags: []
 featured: false
 publishDate: 2025-12-22

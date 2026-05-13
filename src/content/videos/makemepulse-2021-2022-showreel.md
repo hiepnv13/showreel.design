@@ -3,7 +3,7 @@ title: "Makemepulse 2021-2022 showreel"
 author: "Makemepulse"
 thumbnail: "/placeholder.svg"
 videoFileName: "Makemepulse 2021-2022 showreel.mp4"
-category: "Showreel"
+category: "Studio / Agency"
 tags: []
 featured: false
 publishDate: 2025-12-25

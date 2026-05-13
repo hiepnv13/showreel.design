@@ -3,7 +3,7 @@ title: "RENN Reel 2024"
 author: "RENN"
 thumbnail: "/placeholder.svg"
 videoFileName: "RENN Reel 2024.mp4"
-category: "Showreel"
+category: "3D / CGI"
 tags: []
 featured: false
 publishDate: 2025-12-25

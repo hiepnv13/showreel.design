@@ -1,7 +1,7 @@
 ---
 title: Victor Vector 3D motion reel
 author: Victor Vector
-category: Showreel
+category: "3D / CGI"
 publishDate: 2026-04-28
 featured: false
 videoFileName: Victor Vector 3D motion reel.mp4

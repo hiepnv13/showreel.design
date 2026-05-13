@@ -1,7 +1,7 @@
 ---
 title: Cavaliers Studio Showreel 2025
 author: Cavaliers Studio
-category: Showreel
+category: "Studio / Agency"
 publishDate: 2026-04-28
 featured: false
 videoFileName: Cavaliers Studio Showreel 2025.mp4

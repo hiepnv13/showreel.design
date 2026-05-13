@@ -3,7 +3,7 @@ title: "basic agency show reel"
 author: "Design Agency"
 thumbnail: "/placeholder.svg"
 videoFileName: "basic agency show reel.mp4"
-category: "Branding"
+category: "Branding & Identity"
 tags: ["branding", "identity", "animation", "logo"]
 featured: false
 publishDate: 2024-01-12

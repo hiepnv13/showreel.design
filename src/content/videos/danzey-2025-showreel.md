@@ -3,7 +3,7 @@ title: "Danzey 2025 Showreel"
 author: "Danzey"
 thumbnail: "/placeholder.svg"
 videoFileName: "Danzey 2025 Showreel.mp4"
-category: "Showreel"
+category: "2D Animation"
 tags: []
 featured: false
 publishDate: 2025-12-25

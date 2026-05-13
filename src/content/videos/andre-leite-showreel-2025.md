@@ -1,7 +1,7 @@
 ---
 title: André Leite Showreel 2025
 author: André Leite
-category: Showreel
+category: "2D Animation"
 publishDate: 2026-04-28
 featured: false
 videoFileName: André Leite Showreel 2025.mp4

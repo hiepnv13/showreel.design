@@ -3,7 +3,7 @@ title: "Figure"
 author: "Design Agency"
 thumbnail: "/placeholder.svg"
 videoFileName: "Figure.mp4"
-category: "Showreel"
+category: "Branding & Identity"
 tags: ["branding", "identity", "animation", "logo"]
 featured: false
 publishDate: 2024-01-12

@@ -3,7 +3,7 @@ title: "Burocratik.com reel 2024"
 author: "Animator Pro"
 thumbnail: "/placeholder.svg"
 videoFileName: "Burocratik.com reel 2024.mp4"
-category: "Character"
+category: "2D Animation"
 tags: ["character", "animation", "2d", "storytelling"]
 featured: true
 publishDate: 2024-01-18

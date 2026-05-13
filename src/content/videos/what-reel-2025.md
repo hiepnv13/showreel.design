@@ -1,7 +1,7 @@
 ---
 title: What?reel 2025
 author: W h ā t ?
-category: Showreel
+category: "3D / CGI"
 publishDate: 2026-04-28
 featured: false
 videoFileName: What?reel 2025.mp4

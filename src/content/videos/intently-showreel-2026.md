@@ -1,7 +1,7 @@
 ---
 title: Intently showreel 2026
 author: Intently
-category: Agency
+category: "Motion Graphics"
 publishDate: 2026-04-28
 featured: false
 videoFileName: Intently showreel 2026.mp4

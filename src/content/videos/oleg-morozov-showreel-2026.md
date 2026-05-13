@@ -1,7 +1,7 @@
 ---
 title: Oleg Morozov Showreel 2026
 author: Oleg Morozov
-category: Motion Graphics
+category: "Motion Graphics"
 publishDate: 2026-04-28
 featured: false
 videoFileName: Oleg Morozov Showreel 2026.mp4

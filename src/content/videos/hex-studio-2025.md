@@ -3,7 +3,7 @@ title: "Hex studio 2025"
 author: "Hex studio"
 thumbnail: "/placeholder.svg"
 videoFileName: "Hex studio 2025.mp4"
-category: "Showreel"
+category: "2D Animation"
 tags: []
 featured: false
 publishDate: 2025-12-25

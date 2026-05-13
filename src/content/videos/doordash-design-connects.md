@@ -3,7 +3,7 @@ title: "DoorDash- Design Connects"
 author: "Design Agency"
 thumbnail: "/placeholder.svg"
 videoFileName: "DoorDash- Design Connects — Motion design.mp4"
-category: "Showreel"
+category: "Branding & Identity"
 tags: ["branding", "identity", "animation", "logo"]
 featured: false
 publishDate: 2024-01-12

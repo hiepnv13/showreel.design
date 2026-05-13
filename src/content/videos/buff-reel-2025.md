@@ -3,7 +3,7 @@ title: "Buff Reel 2025"
 author: "Buff"
 thumbnail: "/placeholder.svg"
 videoFileName: "Buff Reel 2025.mp4"
-category: "Agency"
+category: "Studio / Agency"
 tags: ["Agency", "3D"]
 featured: false
 publishDate: 2025-08-20

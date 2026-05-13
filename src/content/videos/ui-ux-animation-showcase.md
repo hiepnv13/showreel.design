@@ -3,7 +3,7 @@ title: "Dogstudio showreel"
 author: "UX Designer"
 thumbnail: "/placeholder.svg"
 videoFileName: "Dogstudio showreel.mp4"
-category: "UI/UX"
+category: "UI/UX Motion"
 tags: ["ui", "ux", "interface", "interaction", "prototype"]
 featured: false
 publishDate: 2024-01-05

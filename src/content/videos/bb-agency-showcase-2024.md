@@ -3,7 +3,7 @@ title: "BB Agency Showcase 2024"
 author: "Creative Director"
 thumbnail: "/placeholder.svg"
 videoFileName: "BB Agency Showcase 2024.mp4"
-category: "Agency"
+category: "Studio / Agency"
 tags: ["agency", "showcase", "branding", "creative", "2024"]
 featured: true
 publishDate: 2024-01-20

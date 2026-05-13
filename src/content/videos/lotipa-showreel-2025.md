@@ -1,7 +1,7 @@
 ---
 title: Lotipa Showreel 2025
 author: LOTIPA
-category: Showreel
+category: "Branding & Identity"
 publishDate: 2026-04-28
 featured: false
 videoFileName: LOTIPA SHOWREEL 2025.mp4

@@ -1,7 +1,7 @@
 ---
 title: Egor Gordienko Showreel 2026
 author: Egor Gordienko
-category: Showreel
+category: "3D / CGI"
 publishDate: 2026-04-28
 featured: false
 videoFileName: Egor Gordienko Showreel 2026.mp4

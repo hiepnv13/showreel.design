@@ -1,7 +1,7 @@
 ---
 title: Clément Herveau Showreel 2026
 author: Clément Herveau
-category: Showreel
+category: "2D Animation"
 publishDate: 2026-04-28
 featured: false
 videoFileName: Clément Herveau Showreel 2026.mp4

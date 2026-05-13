@@ -3,7 +3,7 @@ title: "Danzey 2025 Video Editing and Motion Graphics Showreel"
 author: "Danzey"
 thumbnail: "/placeholder.svg"
 videoFileName: "Danzey 2025 Video Editing and Motion Graphics Showreel.mp4"
-category: "Showreel"
+category: "Motion Graphics"
 tags: []
 featured: false
 publishDate: 2025-12-23

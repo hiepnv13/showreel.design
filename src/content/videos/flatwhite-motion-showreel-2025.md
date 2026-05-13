@@ -1,7 +1,7 @@
 ---
 title: Flatwhite Motion Showreel 2025
 author: Flatwhite Motion
-category: Motion Graphics
+category: "Motion Graphics"
 publishDate: 2026-04-28
 featured: false
 videoFileName: Flatwhite Motion Showreel 2025.mp4

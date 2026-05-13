@@ -40,13 +40,12 @@ collections:
         name: category
         widget: select
         options:
-          - "3D"
-          - "Agency"
-          - "Branding"
-          - "Character"
+          - "3D / CGI"
+          - "2D Animation"
           - "Motion Graphics"
-          - "Showreel"
-          - "UI/UX"
+          - "Branding & Identity"
+          - "Studio / Agency"
+          - "UI/UX Motion"
 
       - label: "Publish Date"
         name: publishDate

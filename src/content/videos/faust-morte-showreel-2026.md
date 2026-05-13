@@ -1,7 +1,7 @@
 ---
 title: Faust Morte Showreel 2026
 author: Faust Morte
-category: Showreel
+category: "2D Animation"
 publishDate: 2026-04-28
 featured: false
 videoFileName: Faust Morte Showreel 2026.mp4

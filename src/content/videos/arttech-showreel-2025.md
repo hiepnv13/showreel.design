@@ -3,7 +3,7 @@ title: "ARTTECH Showreel 2025"
 author: "ARTTECH"
 thumbnail: "/placeholder.svg"
 videoFileName: "ARTTECH Showreel 2025.mp4"
-category: "Agency"
+category: "Motion Graphics"
 tags: []
 featured: false
 publishDate: 2025-12-23

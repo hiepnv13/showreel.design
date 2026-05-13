@@ -3,7 +3,7 @@ title: "GNN Showreel 2025"
 author: "GNN"
 thumbnail: "/placeholder.svg"
 videoFileName: "GNN Showreel 2025.mp4"
-category: "Showreel"
+category: "2D Animation"
 tags: []
 featured: false
 publishDate: 2025-12-23

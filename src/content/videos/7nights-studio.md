@@ -3,7 +3,7 @@ title: "7NIGHTS Studio"
 author: "7NIGHTS Studio"
 thumbnail: "/placeholder.svg"
 videoFileName: "7NIGHTS Studio.mp4"
-category: "Agency"
+category: "Studio / Agency"
 tags: []
 featured: false
 publishDate: 2025-12-23

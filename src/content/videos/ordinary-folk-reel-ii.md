@@ -3,7 +3,7 @@ title: "Ordinary Folk- Reel II"
 author: "Ordinary Folk"
 thumbnail: "/placeholder.svg"
 videoFileName: "Ordinary Folk- Reel II.mp4"
-category: "Agency"
+category: "Branding & Identity"
 tags: ["branding"]
 featured: false
 publishDate: 2025-12-22

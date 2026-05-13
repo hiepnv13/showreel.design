@@ -3,7 +3,7 @@ title: "Rejouice Studio showreel"
 author: "3D Artist"
 thumbnail: "/placeholder.svg"
 videoFileName: "Rejouice Studio showreel.mp4"
-category: "3D"
+category: "3D / CGI"
 tags: ["3d", "animation", "modeling", "rendering"]
 featured: true
 publishDate: 2024-01-10

@@ -3,7 +3,7 @@ title: "FLOW STUDIO SHOWREEL 2025"
 author: "Flow Studio"
 thumbnail: "/placeholder.svg"
 videoFileName: "FLOW STUDIO SHOWREEL 2025.mp4"
-category: "Showreel"
+category: "Studio / Agency"
 tags: ["Branding & Identity", "UX/UI", "3D", "AI"]
 featured: false
 publishDate: 2025-08-19

@@ -3,7 +3,7 @@ title: "Immersive Studios - Showreel 2022"
 author: "Immersive Studios"
 thumbnail: "/placeholder.svg"
 videoFileName: "Immersive Studios - Showreel 2022.mp4"
-category: "Showreel"
+category: "3D / CGI"
 tags: []
 featured: false
 publishDate: 2025-12-25

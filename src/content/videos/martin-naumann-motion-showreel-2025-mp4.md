@@ -1,7 +1,7 @@
 ---
 title: Martin Naumann Motion Showreel 2025
 author: Martin Naumann
-category: Showreel
+category: "Motion Graphics"
 publishDate: 2026-04-28
 featured: false
 videoFileName: Martin Naumann Motion Showreel 2025.mp4

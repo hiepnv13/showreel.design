@@ -1,7 +1,7 @@
 ---
 title: Danila Kurnosov Showreel 2026
 author: Danila Kurnosov
-category: Showreel
+category: "3D / CGI"
 publishDate: 2026-04-28
 featured: false
 videoFileName: Danila Kurnosov Showreel 2026.mp4

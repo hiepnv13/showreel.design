@@ -3,7 +3,7 @@ title: "Lit Collective Design Showreel"
 author: "Lit Collective"
 thumbnail: "/placeholder.svg"
 videoFileName: "Lit Collective Design Showreel.mp4"
-category: "Showreel"
+category: "2D Animation"
 tags: []
 featured: false
 publishDate: 2025-12-23

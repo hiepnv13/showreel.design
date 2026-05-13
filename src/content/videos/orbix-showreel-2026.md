@@ -1,7 +1,7 @@
 ---
 title: Orbix showreel 2026
 author: Orbix
-category: Agency
+category: "Studio / Agency"
 publishDate: 2026-04-28
 featured: false
 videoFileName: Orbix showreel 2026.mp4
