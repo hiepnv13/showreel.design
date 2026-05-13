@@ -12,16 +12,16 @@ export const getStaticPaths: GetStaticPaths = async () => {
   const years = await getAllYears();
   return years.map((year: number) => ({
     params: { year: String(year) },
-    props: { year, allYears: years },
+    props: { year },
   }));
 };
 
 interface Props {
   year: number;
-  allYears: number[];
 }
 
-const { year, allYears } = Astro.props;
+const { year } = Astro.props;
+const allYears = await getAllYears();
 
 const allVideos = await getVideosByYear(year);
 const videos = sortVideosByDate(allVideos);
