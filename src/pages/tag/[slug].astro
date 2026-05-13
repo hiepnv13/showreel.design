@@ -1,4 +1,6 @@
 ---
+export const prerender = true;
+
 import { getCollection, type CollectionEntry } from 'astro:content';
 import { getVideosByTagSlug, getAllTags, sortVideosByDate, generateSlug } from '../../utils/videoUtils';
 import Layout from '../../layouts/Layout.astro';
