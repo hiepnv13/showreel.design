@@ -135,6 +135,7 @@ const { title, thumbnail, videoUrl, slug } = Astro.props;
         bgVideo.load();
         bgVideo.play().then(() => {
           bgVideo.playbackRate = 0.1;
+          bgVideo.style.opacity = '1';
         }).catch(() => {});
       }
     }
@@ -235,6 +236,7 @@ const { title, thumbnail, videoUrl, slug } = Astro.props;
     align-items: center;
     overflow: hidden;
     padding: 12px;
+    background: #e8e8e8;
   }
 
   .card-bg-video {
@@ -247,6 +249,8 @@ const { title, thumbnail, videoUrl, slug } = Astro.props;
     transform: scale(1.15);
     z-index: 0;
     pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.6s ease;
   }
 
   .card-media {
