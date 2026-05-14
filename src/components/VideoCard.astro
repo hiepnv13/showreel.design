@@ -133,7 +133,9 @@ const { title, thumbnail, videoUrl, slug } = Astro.props;
       if (bgVideo && bgVideo.getAttribute('data-src')) {
         bgVideo.src = bgVideo.getAttribute('data-src')!;
         bgVideo.load();
-        bgVideo.play().catch(() => {});
+        bgVideo.play().then(() => {
+          bgVideo.playbackRate = 0.1;
+        }).catch(() => {});
       }
     }
 
@@ -262,7 +264,7 @@ const { title, thumbnail, videoUrl, slug } = Astro.props;
   }
 
   .card-title {
-    font-size: 13px;
+    font-size: 16px;
     font-weight: 500;
     color: #1a1a1a;
     line-height: 1.4;
