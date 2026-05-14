@@ -1,49 +1,53 @@
 ---
 export interface Props {
   title: string;
-  author: string;
   thumbnail: string;
   videoUrl?: string;
-  fullVideoUrl?: string;
-  category?: string;
   slug?: string;
 }
 
-const { title, author, thumbnail, videoUrl, fullVideoUrl, category, slug } = Astro.props;
+const { title, thumbnail, videoUrl, slug } = Astro.props;
 ---
 
 <a href={slug ? `/videos/${slug}` : '#'} class="video-card group cursor-pointer block" data-video-url={videoUrl}>
-  <!-- Video Container -->
-  <div class="relative overflow-hidden aspect-video bg-black rounded-[4px]">
-    <!-- Video Element -->
-    {videoUrl ? (
+  <div class="card-frame">
+    {videoUrl && (
       <video
-        class="video-element w-full h-full object-cover opacity-0 transition-opacity duration-500"
+        class="card-bg-video"
         muted
         loop
         playsinline
         preload="none"
         data-src={videoUrl}
-      >
-        <source data-src={videoUrl} type="video/mp4" />
-      </video>
-    ) : (
-      <!-- Fallback image if no video URL -->
-      <img
-        src={thumbnail}
-        alt={title}
-        class="w-full h-full object-cover"
-        loading="lazy"
+        aria-hidden="true"
       />
     )}
-
-    <!-- Video Overlay (subtle) -->
-    <div class="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+    <div class="card-media">
+      {videoUrl ? (
+        <video
+          class="video-element w-full h-full object-cover opacity-0 transition-opacity duration-500"
+          muted
+          loop
+          playsinline
+          preload="none"
+          data-src={videoUrl}
+        >
+          <source data-src={videoUrl} type="video/mp4" />
+        </video>
+      ) : (
+        <img
+          src={thumbnail}
+          alt={title}
+          class="w-full h-full object-cover"
+          loading="lazy"
+        />
+      )}
+    </div>
   </div>
-  
-  <!-- Card Content -->
-  <div class="p-1">
-    <p class="text-[14px] text-black">{title}</p>
+
+  <!-- Card info below frame -->
+  <div class="card-info">
+    <p class="card-title">{title}</p>
   </div>
 </a>
 
@@ -123,6 +127,14 @@ const { title, author, thumbnail, videoUrl, fullVideoUrl, category, slug } = Ast
 
       // Load the video
       video.load();
+
+      // Load bg video (same src = served from browser cache, no extra request)
+      const bgVideo = videoCard.querySelector('.card-bg-video') as HTMLVideoElement;
+      if (bgVideo && bgVideo.getAttribute('data-src')) {
+        bgVideo.src = bgVideo.getAttribute('data-src')!;
+        bgVideo.load();
+        bgVideo.play().catch(() => {});
+      }
     }
 
     // Play video with concurrency control
@@ -213,10 +225,55 @@ const { title, author, thumbnail, videoUrl, fullVideoUrl, category, slug } = Ast
 </script>
 
 <style>
-  .line-clamp-2 {
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
+  .card-frame {
+    position: relative;
+    border-radius: 12px;
+    aspect-ratio: 4 / 3;
+    display: flex;
+    align-items: center;
     overflow: hidden;
+    padding: 12px;
+  }
+
+  .card-bg-video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: blur(24px) brightness(0.85) saturate(1.3);
+    transform: scale(1.15);
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  .card-media {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    background: #d0d0d0;
+    border-radius: 8px;
+  }
+
+  .card-info {
+    padding: 10px 2px 20px 2px;
+  }
+
+  .card-title {
+    font-size: 13px;
+    font-weight: 500;
+    color: #1a1a1a;
+    line-height: 1.4;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .card-author {
+    font-size: 12px;
+    color: #999;
+    margin-top: 2px;
   }
 </style>
