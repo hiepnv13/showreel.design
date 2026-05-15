@@ -10,10 +10,10 @@ export interface Props {
 
 const { title, author, authorAvatar, thumbnail, videoUrl, slug } = Astro.props;
 
-const initials = author
+const initials = (author ?? '')
   .split(' ')
   .slice(0, 2)
-  .map(w => w[0]?.toUpperCase() ?? '')
+  .map((w: string) => w[0]?.toUpperCase() ?? '')
   .join('');
 ---
 

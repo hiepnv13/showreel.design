@@ -293,6 +293,8 @@ const hasTags = video.data.tags && video.data.tags.length > 0;
         {relatedVideos.map((relatedVideo) => (
           <VideoCard
             title={relatedVideo.data.title}
+            author={relatedVideo.data.author}
+            authorAvatar={relatedVideo.data.authorAvatar}
             thumbnail={relatedVideo.data.thumbnail}
             videoUrl={(relatedVideo.data as any).thumbnailUrl}
             slug={relatedVideo.id}
