@@ -1,12 +1,20 @@
 ---
 export interface Props {
   title: string;
+  author: string;
+  authorAvatar?: string;
   thumbnail: string;
   videoUrl?: string;
   slug?: string;
 }
 
-const { title, thumbnail, videoUrl, slug } = Astro.props;
+const { title, author, authorAvatar, thumbnail, videoUrl, slug } = Astro.props;
+
+const initials = author
+  .split(' ')
+  .slice(0, 2)
+  .map(w => w[0]?.toUpperCase() ?? '')
+  .join('');
 ---
 
 <a href={slug ? `/videos/${slug}` : '#'} class="video-card group cursor-pointer block" data-video-url={videoUrl}>
@@ -43,11 +51,23 @@ const { title, thumbnail, videoUrl, slug } = Astro.props;
         />
       )}
     </div>
+
+    <!-- Hover title overlay -->
+    <div class="card-title-overlay">
+      <p class="card-title-text">{title}</p>
+    </div>
   </div>
 
   <!-- Card info below frame -->
   <div class="card-info">
-    <p class="card-title">{title}</p>
+    <div class="card-author-row">
+      {authorAvatar ? (
+        <img class="card-avatar" src={authorAvatar} alt={author} loading="lazy" />
+      ) : (
+        <div class="card-avatar card-avatar-initials">{initials}</div>
+      )}
+      <p class="card-author-name">{author}</p>
+    </div>
   </div>
 </a>
 
@@ -286,23 +306,70 @@ const { title, thumbnail, videoUrl, slug } = Astro.props;
     border-radius: 8px;
   }
 
-  .card-info {
-    padding: 10px 2px 20px 2px;
+  /* Hover title overlay */
+  .card-title-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 2;
+    padding: 28px 14px 10px;
+    background: linear-gradient(transparent, rgba(0,0,0,0.55));
+    border-radius: 0 0 8px 8px;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+    pointer-events: none;
   }
 
-  .card-title {
-    font-size: 16px;
-    font-weight: 500;
-    color: #1a1a1a;
+  .group:hover .card-title-overlay {
+    opacity: 1;
+  }
+
+  .card-title-text {
+    font-size: 12px;
+    font-weight: 400;
+    color: rgba(255,255,255,0.9);
     line-height: 1.4;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
 
-  .card-author {
-    font-size: 12px;
-    color: #999;
-    margin-top: 2px;
+  /* Author row below frame */
+  .card-info {
+    padding: 8px 2px 12px 2px;
+  }
+
+  .card-author-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .card-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 30%;
+    object-fit: cover;
+    flex-shrink: 0;
+  }
+
+  .card-avatar-initials {
+    background: #e0e0e0;
+    color: #888;
+    font-size: 10px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    letter-spacing: 0.5px;
+  }
+
+  .card-author-name {
+    font-size: 16px;
+    color: #1b1b1b;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 </style>

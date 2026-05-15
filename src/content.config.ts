@@ -6,6 +6,7 @@ const videosCollection = defineCollection({
   schema: z.object({
     title: z.string(),
     author: z.string(),
+    authorAvatar: z.string().optional(),
     thumbnail: z.string(),
     videoFileName: z.string().refine(
       (fileName) => {

@@ -63,10 +63,9 @@ const totalVideoCount = allVideosForCount.length;
                 <VideoCard
                     title={video.data.title}
                     author={video.data.author}
+                    authorAvatar={video.data.authorAvatar}
                     thumbnail={video.data.thumbnail}
                     videoUrl={video.data.thumbnailUrl}
-                    fullVideoUrl={video.data.videoUrl}
-                    category={video.data.category}
                     slug={video.id}
                 />
             ))

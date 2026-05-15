@@ -36,6 +36,14 @@ collections:
         name: author
         widget: string
 
+      - label: "Author Avatar"
+        name: authorAvatar
+        widget: image
+        required: false
+        media_library:
+          config:
+            multiple: false
+
       - label: "Category"
         name: category
         widget: select
