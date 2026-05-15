@@ -1,6 +1,7 @@
 ---
 title: Alencar Motion Reel - 2026
 author: Giovane Alencar
+authorAvatar: /avatars/www_giovanealencar_com.png
 category: "Motion Graphics"
 publishDate: 2026-04-28
 featured: false

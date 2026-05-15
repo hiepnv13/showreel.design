@@ -1,6 +1,7 @@
 ---
 title: Syncrely Studio Showreel 2026
 author: Syncrely Studio
+authorAvatar: /avatars/www_syncrely_com.png
 category: Studio / Agency
 publishDate: 2026-05-14
 featured: false

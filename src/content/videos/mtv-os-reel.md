@@ -1,6 +1,7 @@
 ---
 title: MTV.OS Reel
 author: Charlx
+authorAvatar: /avatars/Charlx.png
 category: Motion Graphics
 publishDate: 2026-05-14
 featured: false

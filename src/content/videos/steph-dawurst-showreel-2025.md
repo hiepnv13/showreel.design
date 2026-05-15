@@ -1,6 +1,7 @@
 ---
 title: Steph Dawurst Showreel 2025
 author: Steph Dawurst
+authorAvatar: /avatars/www_stephdawurst_com.jpg
 category: Motion Graphics
 publishDate: 2026-05-13
 featured: false

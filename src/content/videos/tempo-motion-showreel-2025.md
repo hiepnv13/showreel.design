@@ -1,6 +1,7 @@
 ---
 title: "Tempo motion - showreel 2025"
 author: "Tempo motion"
+authorAvatar: /avatars/tempomotions_com.png
 thumbnail: "/placeholder.svg"
 videoFileName: "Tempo motion - showreel 2025.mp4"
 category: "2D Animation"

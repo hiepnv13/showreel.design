@@ -1,6 +1,7 @@
 ---
 title: "ARTTECH Showreel 2025"
 author: "ARTTECH"
+authorAvatar: /avatars/ART-TECH .png
 thumbnail: "/placeholder.svg"
 videoFileName: "ARTTECH Showreel 2025.mp4"
 category: "Motion Graphics"

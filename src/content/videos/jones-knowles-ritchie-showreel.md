@@ -1,6 +1,7 @@
 ---
 title: Jones Knowles Ritchie - Showreel
 author: Jones Knowles Ritchie
+authorAvatar: /avatars/www_jkrglobal_com.png
 category: "Branding & Identity"
 publishDate: 2026-04-28
 featured: false

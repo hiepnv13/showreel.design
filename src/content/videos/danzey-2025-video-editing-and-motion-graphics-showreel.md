@@ -1,6 +1,7 @@
 ---
 title: "Danzey 2025 Video Editing and Motion Graphics Showreel"
 author: "Danzey"
+authorAvatar: /avatars/danzey.png
 thumbnail: "/placeholder.svg"
 videoFileName: "Danzey 2025 Video Editing and Motion Graphics Showreel.mp4"
 category: "Motion Graphics"

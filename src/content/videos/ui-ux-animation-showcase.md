@@ -1,7 +1,8 @@
 ---
 title: "Dogstudio showreel"
-author: "UX Designer"
+author: "Dogstudio"
 thumbnail: "/placeholder.svg"
+authorAvatar: /avatars/Studio gusto.png
 videoFileName: "Dogstudio showreel.mp4"
 category: "UI/UX Motion"
 tags: ["ui", "ux", "interface", "interaction", "prototype"]

@@ -1,6 +1,7 @@
 ---
 title: Studio Yatta - Showreel 2026
 author: Studio Yatta
+authorAvatar: /avatars/yatta_studio.png
 category: Studio / Agency
 publishDate: 2026-05-14
 featured: false

@@ -1,6 +1,7 @@
 ---
 title: "Hex studio 2025"
 author: "Hex studio"
+authorAvatar: /avatars/www_hex_inc.png
 thumbnail: "/placeholder.svg"
 videoFileName: "Hex studio 2025.mp4"
 category: "2D Animation"

@@ -1,6 +1,7 @@
 ---
 title: Geometric Studios Showreel 2026
 author: Geometric Studios
+authorAvatar: /avatars/geomatric.jpg
 category: 3D / CGI
 publishDate: 2026-05-14
 featured: false

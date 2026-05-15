@@ -1,6 +1,7 @@
 ---
 title: "FLOW STUDIO SHOWREEL 2025"
 author: "Flow Studio"
+authorAvatar: /avatars/flowstudio.jpeg
 thumbnail: "/placeholder.svg"
 videoFileName: "FLOW STUDIO SHOWREEL 2025.mp4"
 category: "Studio / Agency"

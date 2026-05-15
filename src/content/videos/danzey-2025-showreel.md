@@ -1,6 +1,7 @@
 ---
 title: "Danzey 2025 Showreel"
 author: "Danzey"
+authorAvatar: /avatars/danzey.png
 thumbnail: "/placeholder.svg"
 videoFileName: "Danzey 2025 Showreel.mp4"
 category: "2D Animation"

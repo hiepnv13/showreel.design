@@ -1,6 +1,7 @@
 ---
 title: NUSA Studio Showreel - 2025
 author: NUSA Studio
+authorAvatar: /avatars/www_nusastudios_com.png
 category: Studio / Agency
 publishDate: 2026-05-14
 featured: false

@@ -1,6 +1,7 @@
 ---
 title: "Lit Collective Design Showreel"
 author: "Lit Collective"
+authorAvatar: /avatars/www_litcollective_xyz.png
 thumbnail: "/placeholder.svg"
 videoFileName: "Lit Collective Design Showreel.mp4"
 category: "2D Animation"

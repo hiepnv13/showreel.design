@@ -1,6 +1,7 @@
 ---
 title: .raw showreel
 author: .raw lab
+authorAvatar: /avatars/raw.jpg
 category: UI/UX Motion
 publishDate: 2026-05-14
 featured: false

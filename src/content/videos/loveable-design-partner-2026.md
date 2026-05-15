@@ -1,6 +1,7 @@
 ---
 title: Loveable design partner - 2026
 author: Loveable
+authorAvatar: /avatars/lovable_dev.png
 category: UI/UX Motion
 publishDate: 2026-05-14
 featured: false

@@ -1,6 +1,7 @@
 ---
 title: Dotmot Commercial & Animation Showreel
 author: Dotmot
+authorAvatar: /avatars/www_dotmot_kr.png
 category: Motion Graphics
 publishDate: 2026-05-14
 featured: false

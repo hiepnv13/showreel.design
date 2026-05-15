@@ -1,6 +1,7 @@
 ---
 title: "mount inc._2025showreel"
 author: "mount inc"
+authorAvatar: /avatars/mount_jp.png
 thumbnail: "/placeholder.svg"
 videoFileName: "mount inc._2025showreel.mp4"
 category: "Motion Graphics"

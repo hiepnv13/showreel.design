@@ -1,6 +1,7 @@
 ---
 title: Stepdraw Showreel 2026.mp4
 author: Stepdraw
+authorAvatar: /avatars/stepdraw_eu.png
 category: Motion Graphics
 publishDate: 2026-05-14
 featured: false

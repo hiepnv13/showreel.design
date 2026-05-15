@@ -1,6 +1,7 @@
 ---
 title: "Dogstudio 2021 reel"
 author: "Dogstudio"
+authorAvatar: /avatars/dogstudio_co.png
 thumbnail: "/placeholder.svg"
 videoFileName: "Dogstudio 2021 reel.mp4"
 category: "Studio / Agency"

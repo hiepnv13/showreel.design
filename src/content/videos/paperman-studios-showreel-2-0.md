@@ -1,6 +1,7 @@
 ---
 title: Paperman Studios - Showreel 2.0
 author: Paperman Studios
+authorAvatar: /avatars/papermanstudios_com.png
 category: 3D / CGI
 publishDate: 2026-05-14
 featured: false

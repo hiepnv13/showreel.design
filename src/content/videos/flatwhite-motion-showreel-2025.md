@@ -1,6 +1,7 @@
 ---
 title: Flatwhite Motion Showreel 2025
 author: Flatwhite Motion
+authorAvatar: /avatars/Flatwhite Motion.png
 category: Motion Graphics
 publishDate: 2026-04-28
 featured: false

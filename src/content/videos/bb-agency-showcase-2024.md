@@ -1,6 +1,7 @@
 ---
 title: "BB Agency Showcase 2024"
-author: "Creative Director"
+author: "BB Agency"
+authorAvatar: /avatars/BB Agency.png
 thumbnail: "/placeholder.svg"
 videoFileName: "BB Agency Showcase 2024.mp4"
 category: "Studio / Agency"

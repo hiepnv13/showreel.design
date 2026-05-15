@@ -1,6 +1,7 @@
 ---
 title: Heli Studio - Showreel 2026
 author: Heli Studio
+authorAvatar: /avatars/heli_studio.png
 category: Studio / Agency
 publishDate: 2026-05-14
 featured: false

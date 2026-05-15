@@ -1,6 +1,7 @@
 ---
 title: "7NIGHTS Studio"
 author: "7NIGHTS Studio"
+authorAvatar: /avatars/www_7nights_studio.png
 thumbnail: "/placeholder.svg"
 videoFileName: "7NIGHTS Studio.mp4"
 category: "Studio / Agency"

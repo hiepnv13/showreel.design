@@ -1,6 +1,7 @@
 ---
 title: Alexander Romanov Showreel 2026
 author: Alexander Romanov
+authorAvatar: /avatars/Alexander Romanov.png
 category: 3D / CGI
 publishDate: 2026-05-13
 featured: false

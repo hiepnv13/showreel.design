@@ -1,6 +1,7 @@
 ---
 title: "Buff Reel 2025"
 author: "Buff"
+authorAvatar: /avatars/www_buffmotion_com.png
 thumbnail: "/placeholder.svg"
 videoFileName: "Buff Reel 2025.mp4"
 category: "Studio / Agency"

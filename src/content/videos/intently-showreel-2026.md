@@ -1,6 +1,7 @@
 ---
 title: Intently showreel 2026
 author: Intently
+authorAvatar: /avatars/intently_agency.jpg
 category: Motion Graphics
 publishDate: 2026-04-28
 featured: false

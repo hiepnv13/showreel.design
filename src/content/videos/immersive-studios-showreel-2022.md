@@ -1,6 +1,7 @@
 ---
 title: "Immersive Studios - Showreel 2022"
 author: "Immersive Studios"
+authorAvatar: /avatars/www_immersivestudios_de.png
 thumbnail: "/placeholder.svg"
 videoFileName: "Immersive Studios - Showreel 2022.mp4"
 category: "3D / CGI"

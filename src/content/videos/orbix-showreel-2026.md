@@ -1,6 +1,7 @@
 ---
 title: Orbix showreel 2026
 author: Orbix
+authorAvatar: /avatars/www_orbix_studio.png
 category: "Studio / Agency"
 publishDate: 2026-04-28
 featured: false

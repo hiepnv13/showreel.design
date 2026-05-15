@@ -1,6 +1,7 @@
 ---
 title: "Ordinary Folk- Reel II"
 author: "Ordinary Folk"
+authorAvatar: /avatars/www_ordinaryfolk_co.png
 thumbnail: "/placeholder.svg"
 videoFileName: "Ordinary Folk- Reel II.mp4"
 category: "Branding & Identity"

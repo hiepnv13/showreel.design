@@ -1,6 +1,7 @@
 ---
 title: What?reel 2025
 author: W h ā t ?
+authorAvatar: /avatars/what_cg_com.png
 category: "3D / CGI"
 publishDate: 2026-04-28
 featured: false

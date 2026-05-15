@@ -1,6 +1,7 @@
 ---
 title: "tHeo Le Pen 2025 showreel"
 author: "tHeo Le Pen"
+authorAvatar: /avatars/AtHeo Le Pen.jpg
 thumbnail: "/placeholder.svg"
 videoFileName: "tHeo Le Pen 2025 showreel.mp4"
 category: "3D / CGI"

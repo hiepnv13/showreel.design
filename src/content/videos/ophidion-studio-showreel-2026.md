@@ -1,6 +1,7 @@
 ---
 title: Ophidion Studio Showreel 2026
 author: Ophidion Studio
+authorAvatar: /avatars/ophidion_studio.png
 category: 3D / CGI
 publishDate: 2026-05-14
 featured: false

@@ -1,6 +1,7 @@
 ---
 title: Alright Studio — Showreel 2026
 author: Alright Studio
+authorAvatar: /avatars/alright_studio.png
 category: UI/UX Motion
 publishDate: 2026-05-14
 featured: false

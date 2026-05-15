@@ -1,6 +1,7 @@
 ---
 title: Sébastien Girard Showreel 2024.mp4
 author: Sébastien Girard
+authorAvatar: /avatars/Sabastien Girrard.png
 category: Motion Graphics
 publishDate: 2026-05-14
 featured: false

@@ -1,6 +1,7 @@
 ---
 title: "Makemepulse 2021-2022 showreel"
 author: "Makemepulse"
+authorAvatar: /avatars/www_makemepulse_com.png
 thumbnail: "/placeholder.svg"
 videoFileName: "Makemepulse 2021-2022 showreel.mp4"
 category: "Studio / Agency"

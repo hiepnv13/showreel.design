@@ -1,6 +1,7 @@
 ---
 title: Dylan Moron Showreel 2026
 author: Dylan Moron
+authorAvatar: /avatars/www_daynmoron_com.png
 category: Studio / Agency
 publishDate: 2026-05-14
 featured: false

@@ -1,6 +1,7 @@
 ---
 title: "Showreel 2025 by DarkSun"
 author: "DarkSun"
+authorAvatar: /avatars/DarkSun.jpg
 thumbnail: "/placeholder.svg"
 videoFileName: "Showreel 2025 by DarkSun.mp4"
 category: "3D / CGI"
