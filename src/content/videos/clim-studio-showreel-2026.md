@@ -1,6 +1,7 @@
 ---
 title: Clim Studio - Showreel 2026
 author: Clim Studio
+authorAvatar: /uploads/screenshot.png
 category: Motion Graphics
 publishDate: 2026-05-14
 featured: false
