@@ -1,14 +1,20 @@
 ---
-title: "Rejouice Studio showreel"
-author: "3D Artist"
-thumbnail: "/placeholder.svg"
-videoFileName: "Rejouice Studio showreel.mp4"
-category: "3D / CGI"
-tags: ["3d", "animation", "modeling", "rendering"]
-featured: true
+title: Rejouice Studio showreel
+author: Rejouice Studio
+authorAvatar: /uploads/www_rejouice_com.png
+category: 3D / CGI
 publishDate: 2024-01-10
-description: "Professional 3D animation reel showcasing character modeling, rigging, and cinematic rendering techniques."
-quality: "1080p"
+featured: true
+videoFileName: Rejouice Studio showreel.mp4
+thumbnail: /placeholder.svg
+description: Professional 3D animation reel showcasing character modeling,
+  rigging, and cinematic rendering techniques.
+quality: 1080p
+tags:
+  - 3d
+  - animation
+  - modeling
+  - rendering
 ---
 
 # 3D Animation Demo Reel
