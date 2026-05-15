@@ -1,36 +1,33 @@
 ---
-title: "DoorDash- Design Connects"
-author: "Design Agency"
-thumbnail: "/placeholder.svg"
-videoFileName: "DoorDash- Design Connects — Motion design.mp4"
-category: "Branding & Identity"
-tags: ["branding", "identity", "animation", "logo"]
-featured: false
+title: DoorDash- Design Connects
+author: ILLO
+authorAvatar: /uploads/illo.png
+category: Branding & Identity
 publishDate: 2024-01-12
-description: "Creative brand identity animations for modern businesses."
-quality: "1080p"
+featured: false
+videoFileName: DoorDash- Design Connects — Motion design.mp4
+thumbnail: /placeholder.svg
+description: Illo partnered with DoorDash to create a motion design video that
+  brings the company’s design thinking pillars to life, centered on the core
+  principle that design connects. Inspired by the idea of “connecting dots,” the
+  team developed an abstract, conceptual visual narrative that reflects the
+  collective nature of the design process, using flowing lines and expressive
+  typography to guide the story and link people, places, and ideas. Leveraging
+  DoorDash’s vibrant color palette and brand photography, the piece serves as a
+  design manifesto for the DoorDash Design team, highlighting their commitment
+  to craft, solving real human problems, and supporting the local economy. The
+  video underscores DoorDash’s dedication to design at every level by treating
+  elements such as custom typography, color choices, and even corner radiuses as
+  intentional parts of the story, while a collective voiceover structure
+  emphasizes the collaborative power of design.
+year: 2025
+quality: 1080p
+sourceUrl: https://illo.tv/doordash-motion-design
+tags:
+  - branding
+  - identity
+  - animation
+  - logo
+industries:
+  - tech-saas
 ---
-
-# Brand Identity Animation
-
-This project showcases dynamic brand identity animations designed for modern businesses. The work includes logo reveals, brand guidelines visualization, and corporate presentation elements.
-
-## Project Highlights
-
-- **Logo Animation**: Smooth, professional logo reveals
-- **Brand Guidelines**: Animated presentation of brand elements
-- **Corporate Identity**: Cohesive visual system across all materials
-- **Modern Aesthetics**: Clean, contemporary design approach
-
-## Technical Details
-
-The animations were created using industry-standard tools and techniques, ensuring high-quality output suitable for various media applications.
-
-## Applications
-
-These brand identity animations are perfect for:
-- Corporate presentations
-- Website headers
-- Social media content
-- Marketing materials
-- Brand launch campaigns
