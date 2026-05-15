@@ -7,9 +7,18 @@ publishDate: 2024-01-12
 featured: false
 videoFileName: basic agency show reel.mp4
 thumbnail: /placeholder.svg
-description: Basic Agency specializes in crafting creative brand identity
-  animations for modern businesses, bringing logos and visual identities to life
-  through dynamic motion design that strengthens branding and communication.
+description: BASIC/DEPT® is a digital branding and product design agency
+  recognized as a Design and Branding Agency of the Year, Agency of the Year,
+  and Digital Innovation Agency of the Year Finalist. Under its BASIC/DEPT®
+  brand, the agency curates a collection of internal initiatives, including B/D®
+  JAMS, a weekly-ish employee-curated playlist; Applied®, a thought-leadership
+  panel series focused on strategy, design, and technology; Moves®, an in-depth
+  digital experience documenting the two-year journey of imagining, designing,
+  and developing its new headquarters; Crafted®, a communal initiative
+  celebrating diversity and creativity by bringing together people from
+  different backgrounds and interests; and Brandbeats®, a podcast series with
+  over 45,000 listens per episode that offers candid conversations on a wide
+  range of industry-related topics.
 year: 2025
 quality: 1080p
 sourceUrl: https://www.basicagency.com/
@@ -19,27 +28,3 @@ tags:
   - animation
   - logo
 ---
-
-# Brand Identity Animation
-
-This project showcases dynamic brand identity animations designed for modern businesses. The work includes logo reveals, brand guidelines visualization, and corporate presentation elements.
-
-## Project Highlights
-
-- **Logo Animation**: Smooth, professional logo reveals
-- **Brand Guidelines**: Animated presentation of brand elements
-- **Corporate Identity**: Cohesive visual system across all materials
-- **Modern Aesthetics**: Clean, contemporary design approach
-
-## Technical Details
-
-The animations were created using industry-standard tools and techniques, ensuring high-quality output suitable for various media applications.
-
-## Applications
-
-These brand identity animations are perfect for:
-- Corporate presentations
-- Website headers
-- Social media content
-- Marketing materials
-- Brand launch campaigns
