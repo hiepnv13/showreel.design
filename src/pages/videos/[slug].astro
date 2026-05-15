@@ -1,9 +1,10 @@
 ---
-import { getCollection, render, type CollectionEntry } from "astro:content";
+import { getCollection, type CollectionEntry } from "astro:content";
 import { getAllVideos, getRelatedVideos, generateSlug, getIndustryLabel } from "../../utils/videoUtils";
 import Layout from "../../layouts/Layout.astro";
 import Header from "../../components/Header.astro";
 import Footer from "../../components/Footer.astro";
+import VideoCard from "../../components/VideoCard.astro";
 import type { GetStaticPaths } from "astro";
 
 export const prerender = true;
@@ -29,9 +30,8 @@ interface Props {
 }
 
 const { video }: Props = Astro.props;
-const { Content } = await render(video);
 
-const relatedVideos = await getRelatedVideos(video.id, video.data.category, 3);
+const relatedVideos = await getRelatedVideos(video.id, video.data.category, 6);
 
 const breadcrumb = [
   { label: 'Home', href: '/' },
@@ -283,12 +283,6 @@ const hasTags = video.data.tags && video.data.tags.length > 0;
       </div>
     )}
 
-    <!-- Markdown Description -->
-    <div class="info-markdown">
-      <div class="prose-content">
-        <Content />
-      </div>
-    </div>
   </div>
 
   <!-- Related Videos -->
@@ -297,21 +291,12 @@ const hasTags = video.data.tags && video.data.tags.length > 0;
       <p class="related-label">Explore more</p>
       <div class="related-grid">
         {relatedVideos.map((relatedVideo) => (
-          <a href={`/videos/${relatedVideo.id}`} class="related-item group">
-            <div class="related-thumb">
-              <video
-                class="related-video"
-                muted
-                loop
-                playsinline
-                preload="none"
-                data-src={(relatedVideo.data as any).thumbnailUrl}
-              >
-                <source data-src={(relatedVideo.data as any).thumbnailUrl} type="video/mp4" />
-              </video>
-            </div>
-            <p class="related-title">{relatedVideo.data.title}</p>
-          </a>
+          <VideoCard
+            title={relatedVideo.data.title}
+            thumbnail={relatedVideo.data.thumbnail}
+            videoUrl={(relatedVideo.data as any).thumbnailUrl}
+            slug={relatedVideo.id}
+          />
         ))}
       </div>
     </section>
@@ -771,7 +756,7 @@ const hasTags = video.data.tags && video.data.tags.length > 0;
     grid-template-columns: 1fr 360px;
     gap: 80px;
     padding-bottom: 48px;
-    border-bottom: 1px solid #f0f0f0;
+  
   }
 
   .info-title {
@@ -940,9 +925,8 @@ const hasTags = video.data.tags && video.data.tags.length > 0;
 
   /* ─── Related Videos ───────────────────────────────────── */
   .related-section {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 40px 80px 60px;
+    width: 100%;
+    padding: 32px 32px 60px;
     border-top: 1px solid #f0f0f0;
   }
 
@@ -951,49 +935,14 @@ const hasTags = video.data.tags && video.data.tags.length > 0;
     letter-spacing: 2px;
     text-transform: uppercase;
     color: #bbb;
-    text-align: center;
-    margin-bottom: 24px;
+    margin-bottom: 20px;
   }
 
   .related-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
   }
-
-  .related-item {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    text-decoration: none;
-  }
-
-  .related-thumb {
-    aspect-ratio: 16/9;
-    overflow: hidden;
-    background: #f3f3f3;
-  }
-
-  .related-video {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    opacity: 0;
-    transition: opacity 0.5s ease, transform 0.7s ease;
-  }
-
-  .related-video.loaded { opacity: 1; }
-
-  .related-item:hover .related-video { transform: scale(1.04); }
-
-  .related-title {
-    font-size: 12px;
-    color: #555;
-    padding: 0 2px;
-    transition: color 0.15s;
-  }
-
-  .related-item:hover .related-title { color: #111; }
 
   /* ─── Responsive ───────────────────────────────────────── */
   @media (max-width: 1023px) {
@@ -1013,10 +962,6 @@ const hasTags = video.data.tags && video.data.tags.length > 0;
 
     .related-section {
       padding: 32px 24px 48px;
-    }
-
-    .related-grid {
-      grid-template-columns: repeat(2, 1fr);
     }
   }
 
@@ -1040,10 +985,6 @@ const hasTags = video.data.tags && video.data.tags.length > 0;
     .c-role { width: 110px; font-size: 8px; }
     .c-val  { width: 140px; font-size: 11px; }
     .c-tags-row .c-val { width: 160px; }
-
-    .related-grid {
-      grid-template-columns: 1fr;
-    }
 
     .volume-container { display: none; }
 

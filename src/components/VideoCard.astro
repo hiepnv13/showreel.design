@@ -136,6 +136,7 @@ const { title, thumbnail, videoUrl, slug } = Astro.props;
         bgVideo.play().then(() => {
           bgVideo.playbackRate = 0.1;
           bgVideo.style.opacity = '1';
+          (videoCard as HTMLElement).querySelector('.card-frame')?.classList.add('card-loaded');
         }).catch(() => {});
       }
     }
@@ -237,6 +238,28 @@ const { title, thumbnail, videoUrl, slug } = Astro.props;
     overflow: hidden;
     padding: 12px;
     background: #e8e8e8;
+  }
+
+  .card-frame::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.45) 50%, transparent 100%);
+    background-size: 200% 100%;
+    animation: card-shimmer 1.4s infinite;
+    pointer-events: none;
+    transition: opacity 0.4s ease;
+  }
+
+  .card-frame.card-loaded::after {
+    opacity: 0;
+    animation: none;
+  }
+
+  @keyframes card-shimmer {
+    0%   { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
   }
 
   .card-bg-video {
