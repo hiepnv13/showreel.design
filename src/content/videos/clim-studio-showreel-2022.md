@@ -1,6 +1,7 @@
 ---
 title: Clim Studio Showreel 2022
 author: Clim Studio
+authorAvatar: /uploads/screenshot.png
 category: 3D / CGI
 publishDate: 2026-05-14
 featured: false
