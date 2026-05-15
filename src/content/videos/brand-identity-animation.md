@@ -1,14 +1,23 @@
 ---
-title: "basic agency show reel"
-author: "Design Agency"
-thumbnail: "/placeholder.svg"
-videoFileName: "basic agency show reel.mp4"
-category: "Branding & Identity"
-tags: ["branding", "identity", "animation", "logo"]
-featured: false
+title: Basic agency Showreel
+author: Basic agency
+authorAvatar: /uploads/www_basicagency_com.png
+category: Branding & Identity
 publishDate: 2024-01-12
-description: "Creative brand identity animations for modern businesses."
-quality: "1080p"
+featured: false
+videoFileName: basic agency show reel.mp4
+thumbnail: /placeholder.svg
+description: Basic Agency specializes in crafting creative brand identity
+  animations for modern businesses, bringing logos and visual identities to life
+  through dynamic motion design that strengthens branding and communication.
+year: 2025
+quality: 1080p
+sourceUrl: https://www.basicagency.com/
+tags:
+  - branding
+  - identity
+  - animation
+  - logo
 ---
 
 # Brand Identity Animation
