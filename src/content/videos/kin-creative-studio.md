@@ -1,7 +1,7 @@
 ---
 title: "'Kin Creative Studio"
 author: "'Kin"
-authorAvatar: /uploads/favicon_by_kin_com_256x256.png
+authorAvatar: /uploads/by_kin.png
 category: Studio / Agency
 publishDate: 2026-05-17
 featured: false
