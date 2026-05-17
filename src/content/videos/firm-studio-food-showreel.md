@@ -3,7 +3,7 @@ title: Firm - Studio Food Showreel
 author: Firm - Studio
 authorAvatar: /uploads/favicon_firm_studio_fr_64x64.png
 category: 3D / CGI
-publishDate: 2026-05-17
+publishDate: 2026-05-15
 featured: false
 videoFileName: Firm - studio-Food Showreel.mp4
 thumbnail: /placeholder.svg
