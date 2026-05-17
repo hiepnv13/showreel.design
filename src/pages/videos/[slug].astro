@@ -34,7 +34,6 @@ const { video }: Props = Astro.props;
 const relatedVideos = await getRelatedVideos(video.id, video.data.category, 6);
 
 const breadcrumb = [
-  { label: 'Home', href: '/' },
   { label: video.data.category, href: `/category/${generateSlug(video.data.category)}` },
   { label: video.data.title, href: '' }
 ];
@@ -44,6 +43,16 @@ function formatTaxonomyValue(values: string[] | undefined): string {
   return values
     .map(v => v.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' '))
     .join(', ');
+}
+
+function withRef(url: string): string {
+  try {
+    const u = new URL(url);
+    u.searchParams.set('ref', 'showreel.design');
+    return u.toString();
+  } catch {
+    return url;
+  }
 }
 
 const hasStyles = video.data.styles && video.data.styles.length > 0;
@@ -208,7 +217,7 @@ const hasTags = video.data.tags && video.data.tags.length > 0;
         <h1 class="info-title">{video.data.title}</h1>
         <p class="info-by">
           {video.data.sourceUrl ? (
-            <a href={video.data.sourceUrl} target="_blank" rel="noopener noreferrer" class="info-author-link">{video.data.author}</a>
+            <a href={withRef(video.data.sourceUrl!)} target="_blank" rel="noopener noreferrer" class="info-author-link">{video.data.author}</a>
           ) : (
             <span class="info-author-link" style="border-color:transparent;cursor:default;">{video.data.author}</span>
           )}
@@ -258,7 +267,7 @@ const hasTags = video.data.tags && video.data.tags.length > 0;
             <div class="detail-row">
               <span class="detail-key">Link</span>
               <a
-                href={video.data.sourceUrl}
+                href={withRef(video.data.sourceUrl!)}
                 target="_blank"
                 rel="noopener noreferrer"
                 class="detail-link detail-link-truncate"
@@ -965,6 +974,10 @@ const hasTags = video.data.tags && video.data.tags.length > 0;
     .related-section {
       padding: 32px 24px 48px;
     }
+
+    .related-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
   }
 
   @media (max-width: 640px) {
@@ -1006,6 +1019,11 @@ const hasTags = video.data.tags && video.data.tags.length > 0;
 
     .related-section {
       padding: 24px 16px 40px;
+    }
+
+    .related-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
     }
 
     .vp-title-text {
