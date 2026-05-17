@@ -1,0 +1,286 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+---
+
+<Layout title="About — Showreel.design">
+  <Header />
+
+  <main class="about-page">
+
+    <!-- Hero -->
+    <section class="about-hero">
+      <p class="about-eyebrow">About</p>
+      <h1 class="about-title">A curated archive of<br />motion design work.</h1>
+      <p class="about-subtitle">
+        Showreel.design collects outstanding motion design reels from studios and creators
+        around the world — updated every week, free to explore.
+      </p>
+    </section>
+
+    <div class="about-divider"></div>
+
+    <!-- Mission -->
+    <section class="about-section">
+      <div class="section-label">What we do</div>
+      <div class="section-content">
+        <p>
+          We curate showreels from motion designers, studios, and animation teams worldwide.
+          The goal is simple: make it easier to find inspiration, discover new talent,
+          and stay connected to the best work being made in the industry.
+        </p>
+        <p>
+          Every reel in the collection is handpicked. No algorithms, no submissions queue
+          — just a continuous effort to surface work worth watching.
+        </p>
+      </div>
+    </section>
+
+    <div class="about-divider"></div>
+
+    <!-- Stats -->
+    <section class="about-stats">
+      <div class="stat-item">
+        <span class="stat-number">Weekly</span>
+        <span class="stat-label">New reels added</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-number">Free</span>
+        <span class="stat-label">Always, no account needed</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-number">Global</span>
+        <span class="stat-label">Studios & independents</span>
+      </div>
+    </section>
+
+    <div class="about-divider"></div>
+
+    <!-- Rights -->
+    <section class="about-section">
+      <div class="section-label">Copyright</div>
+      <div class="section-content">
+        <p>
+          All videos featured on Showreel.design remain the intellectual property of their
+          respective creators and studios. We do not claim ownership over any content displayed.
+        </p>
+        <p>
+          If you are the owner of a video and would like it removed, please reach out and
+          we will take it down within <strong>24 hours</strong>.
+        </p>
+        <a href="mailto:hello@showreel.design" class="about-link">
+          hello@showreel.design
+          <svg class="link-arrow" viewBox="0 0 16 16" fill="none">
+            <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </a>
+      </div>
+    </section>
+
+    <div class="about-divider"></div>
+
+    <!-- Submit -->
+    <section class="about-section">
+      <div class="section-label">Submit a reel</div>
+      <div class="section-content">
+        <p>
+          Know a showreel that deserves to be here? We're always looking for great work
+          to add to the collection. Send us a link and we'll take a look.
+        </p>
+        <a href="mailto:submit@showreel.design" class="about-link">
+          submit@showreel.design
+          <svg class="link-arrow" viewBox="0 0 16 16" fill="none">
+            <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </a>
+      </div>
+    </section>
+
+  </main>
+
+  <Footer />
+</Layout>
+
+<style>
+  .about-page {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 80px 32px 100px;
+  }
+
+  /* Hero */
+  .about-hero {
+    padding-bottom: 64px;
+  }
+
+  .about-eyebrow {
+    font-size: 9px;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: #bbb;
+    margin-bottom: 28px;
+  }
+
+  .about-title {
+    font-size: clamp(32px, 5vw, 52px);
+    font-weight: 400;
+    letter-spacing: -1px;
+    line-height: 1.15;
+    color: #111;
+    margin-bottom: 28px;
+  }
+
+  .about-subtitle {
+    font-size: 16px;
+    line-height: 1.75;
+    color: #888;
+    max-width: 520px;
+  }
+
+  /* Divider */
+  .about-divider {
+    width: 100%;
+    height: 1px;
+    background: #f0f0f0;
+    margin: 0;
+  }
+
+  /* Section */
+  .about-section {
+    display: grid;
+    grid-template-columns: 160px 1fr;
+    gap: 40px;
+    padding: 56px 0;
+  }
+
+  .section-label {
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #bbb;
+    padding-top: 4px;
+    flex-shrink: 0;
+  }
+
+  .section-content {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .section-content p {
+    font-size: 15px;
+    line-height: 1.8;
+    color: #555;
+  }
+
+  .section-content strong {
+    color: #222;
+    font-weight: 500;
+  }
+
+  /* Link */
+  .about-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: #111;
+    text-decoration: none;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 2px;
+    margin-top: 4px;
+    transition: border-color 0.2s, gap 0.2s;
+    width: fit-content;
+  }
+
+  .about-link:hover {
+    border-color: #111;
+    gap: 12px;
+  }
+
+  .link-arrow {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+  }
+
+  /* Stats */
+  .about-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0;
+    padding: 56px 0;
+  }
+
+  .stat-item {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding-right: 32px;
+    border-right: 1px solid #f0f0f0;
+    padding-left: 0;
+  }
+
+  .stat-item:first-child {
+    padding-left: 0;
+  }
+
+  .stat-item:last-child {
+    border-right: none;
+    padding-left: 32px;
+  }
+
+  .stat-item:not(:first-child):not(:last-child) {
+    padding-left: 32px;
+  }
+
+  .stat-number {
+    font-size: 28px;
+    font-weight: 400;
+    letter-spacing: -0.5px;
+    color: #111;
+  }
+
+  .stat-label {
+    font-size: 11px;
+    color: #aaa;
+    letter-spacing: 0.2px;
+    line-height: 1.4;
+  }
+
+  /* Responsive */
+  @media (max-width: 640px) {
+    .about-page {
+      padding: 48px 20px 72px;
+    }
+
+    .about-section {
+      grid-template-columns: 1fr;
+      gap: 16px;
+      padding: 40px 0;
+    }
+
+    .about-stats {
+      grid-template-columns: 1fr;
+      gap: 0;
+      padding: 40px 0;
+    }
+
+    .stat-item {
+      border-right: none;
+      border-bottom: 1px solid #f0f0f0;
+      padding: 24px 0;
+    }
+
+    .stat-item:last-child {
+      border-bottom: none;
+      padding-left: 0;
+    }
+
+    .stat-item:not(:first-child):not(:last-child) {
+      padding-left: 0;
+    }
+  }
+</style>
