@@ -15,7 +15,7 @@ import Footer from "../components/Footer.astro";
       <h1 class="about-title">A curated archive of<br />motion design work.</h1>
       <p class="about-subtitle">
         Showreel.design collects outstanding motion design reels from studios and creators
-        around the world — updated every week, free to explore.
+        around the world — updated every week.
       </p>
     </section>
 
@@ -39,24 +39,7 @@ import Footer from "../components/Footer.astro";
 
     <div class="about-divider"></div>
 
-    <!-- Stats -->
-    <section class="about-stats">
-      <div class="stat-item">
-        <span class="stat-number">Weekly</span>
-        <span class="stat-label">New reels added</span>
-      </div>
-      <div class="stat-item">
-        <span class="stat-number">Free</span>
-        <span class="stat-label">Always, no account needed</span>
-      </div>
-      <div class="stat-item">
-        <span class="stat-number">Global</span>
-        <span class="stat-label">Studios & independents</span>
-      </div>
-    </section>
-
-    <div class="about-divider"></div>
-
+    
     <!-- Rights -->
     <section class="about-section">
       <div class="section-label">Copyright</div>
@@ -69,8 +52,8 @@ import Footer from "../components/Footer.astro";
           If you are the owner of a video and would like it removed, please reach out and
           we will take it down within <strong>24 hours</strong>.
         </p>
-        <a href="mailto:hello@showreel.design" class="about-link">
-          hello@showreel.design
+        <a href="mailto:hi.showreel.design@gmail.com" class="about-link">
+          hi.showreel.design@gmail.com
           <svg class="link-arrow" viewBox="0 0 16 16" fill="none">
             <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
@@ -88,12 +71,86 @@ import Footer from "../components/Footer.astro";
           Know a showreel that deserves to be here? We're always looking for great work
           to add to the collection. Send us a link and we'll take a look.
         </p>
-        <a href="mailto:submit@showreel.design" class="about-link">
-          submit@showreel.design
-          <svg class="link-arrow" viewBox="0 0 16 16" fill="none">
-            <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </a>
+
+        <form
+          name="submit-reel"
+          method="POST"
+          data-netlify="true"
+          class="submit-form"
+          id="submit-form"
+        >
+          <input type="hidden" name="form-name" value="submit-reel" />
+          
+          <div class="form-row">
+            <label class="form-label" for="reel-url">Video URL <span class="form-required">*</span></label>
+            <input
+              type="url"
+              id="reel-url"
+              name="reel-url"
+              class="form-input"
+              placeholder="https://vimeo.com/..."
+              required
+            />
+          </div>
+          <div class="form-row">
+            <label class="form-label" for="reel-url">Video Title <span class="form-required">*</span></label>
+            <input
+              type="url"
+              id="reel-url"
+              name="reel-url"
+              class="form-input"
+              placeholder="Studio Showreel"
+              required
+            />
+          </div>
+
+          <div class="form-row">
+            <label class="form-label" for="author-name">Author / Studio</label>
+            <input
+              type="text"
+              id="author-name"
+              name="author-name"
+              class="form-input"
+              placeholder="Studio or creator name"
+            />
+          </div>
+          <div class="form-row">
+            <label class="form-label" for="author-name">Portfolio/Website URL</label>
+            <input
+              type="text"
+              id="author-name"
+              name="author-name"
+              class="form-input"
+              placeholder="https://your-portfolio.com"
+            />
+          </div>
+          
+          
+
+          <div class="form-row">
+            <label class="form-label" for="notes">Note about your style, industry, or other relevant information</label>
+            <textarea
+              id="notes"
+              name="notes"
+              class="form-input form-textarea"
+              placeholder="Any context you'd like to share..."
+              rows="3"
+            ></textarea>
+          </div>
+
+          <button type="submit" class="form-submit" id="form-submit-btn">
+            <span class="submit-text">Submit reel</span>
+            <svg class="submit-arrow" viewBox="0 0 16 16" fill="none">
+              <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        </form>
+
+        <!-- Success state -->
+        <div class="form-success" id="form-success">
+          <p class="success-text">Thanks — we'll take a look.</p>
+        </div>
+
       </div>
     </section>
 
@@ -155,12 +212,13 @@ import Footer from "../components/Footer.astro";
   }
 
   .section-label {
-    font-size: 9px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: #bbb;
+    font-size: 24px;
+    
+    text-transform: titlecase;
+    color: #090909;
     padding-top: 4px;
     flex-shrink: 0;
+    font-weight: 400;
   }
 
   .section-content {
@@ -250,6 +308,96 @@ import Footer from "../components/Footer.astro";
     line-height: 1.4;
   }
 
+  /* Submit Form */
+  .submit-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin-top: 8px;
+  }
+
+  .form-row {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 20px 0;
+    border-bottom: 1px solid #f0f0f0;
+  }
+
+  .form-label {
+    font-size: 16px;
+   
+    text-transform: normal;
+    color: #252525;
+  }
+
+  .form-required {
+    color: #ccc;
+  }
+
+  .form-input {
+    font-family: 'Aileron', sans-serif;
+    font-size: 16px;
+    color: #111;
+    background: transparent;
+    border: none;
+    outline: none;
+    padding: 0;
+    width: 100%;
+    resize: none;
+  }
+
+  .form-input::placeholder {
+    color: #ccc;
+  }
+
+  .form-textarea {
+    line-height: 1.7;
+  }
+
+  .form-submit {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 28px;
+    font-family: 'Aileron', sans-serif;
+    font-size: 13px;
+    color: #111;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid #ddd;
+    padding: 0 0 2px;
+    cursor: pointer;
+    transition: border-color 0.2s, gap 0.2s;
+    width: fit-content;
+  }
+
+  .form-submit:hover {
+    border-color: #111;
+    gap: 12px;
+  }
+
+  .submit-arrow {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+  }
+
+  /* Success state */
+  .form-success {
+    display: none;
+    padding: 20px 0;
+  }
+
+  .form-success.visible {
+    display: block;
+  }
+
+  .success-text {
+    font-size: 14px;
+    color: #888;
+  }
+
   /* Responsive */
   @media (max-width: 640px) {
     .about-page {
@@ -284,3 +432,22 @@ import Footer from "../components/Footer.astro";
     }
   }
 </style>
+
+<script>
+  const form = document.getElementById('submit-form') as HTMLFormElement;
+  const successEl = document.getElementById('form-success');
+
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const data = new FormData(form);
+
+    await fetch('/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams(data as any).toString(),
+    });
+
+    form.style.display = 'none';
+    successEl?.classList.add('visible');
+  });
+</script>
