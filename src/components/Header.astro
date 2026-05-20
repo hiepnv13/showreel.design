@@ -4,12 +4,13 @@ import { getAllCategories, generateSlug } from "../utils/videoUtils";
 
 // Props for showing video counts or breadcrumb
 interface Props {
-  showingCount?: number;  // Number of videos showing on current page
-  totalCount?: number;    // Total number of videos in collection/category
-  breadcrumb?: Array<{ label: string; href: string }>;  // Breadcrumb navigation for detail pages
+  showingCount?: number;
+  totalCount?: number;
+  breadcrumb?: Array<{ label: string; href: string }>;
+  searchQuery?: string;
 }
 
-const { showingCount, totalCount, breadcrumb } = Astro.props;
+const { showingCount, totalCount, breadcrumb, searchQuery } = Astro.props;
 
 // Get current path to highlight active category
 const currentPath = Astro.url.pathname;
@@ -59,7 +60,7 @@ for (const category of allCategories) {
     <!-- Right controls: Search -->
     <div class="flex items-center gap-2 sm:gap-0 flex-shrink-0">
       <!-- Search Bar -->
-      <div class="pl-2 sm:pl-4 flex-shrink-0" id="search-container">
+      <div class="pl-2 sm:pl-4 flex-shrink-0">
         <form action="/search" method="get" class="border-b border-gray-200 pb-2 flex items-center gap-2 sm:gap-4">
           <input
             type="text"
@@ -69,17 +70,12 @@ for (const category of allCategories) {
             class="w-[100px] sm:w-[180px] bg-transparent border-none outline-none text-[13px] sm:text-[14px] placeholder-gray-500"
             autocomplete="off"
           />
-          <div class="hidden sm:block bg-[#f0f0f0] px-2 py-1 rounded text-[12px] text-gray-500 border border-transparent">
-            ENTER
-          </div>
+          <button type="submit" class="text-gray-400 hover:text-gray-600 transition-colors flex-shrink-0">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+            </svg>
+          </button>
         </form>
-
-        <!-- Search Suggestions Dropdown -->
-        <div id="search-suggestions" class="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-lg shadow-lg mt-1 max-h-96 overflow-y-auto z-50 hidden">
-          <div id="suggestions-content" class="py-2">
-            <!-- Suggestions will be populated by JavaScript -->
-          </div>
-        </div>
       </div>
     </div>
   </div>
@@ -117,33 +113,18 @@ for (const category of allCategories) {
     ) : (
       <!-- Results Counter -->
       <span class="text-[10px] tracking-[1.5px] text-gray-500 font-medium flex items-center gap-1 uppercase" id="results-counter">
-        Showing <span id="showing-count">{showingCount || 0}</span> <i class="fa-solid fa-caret-right text-[8px] mx-0.5 text-gray-400"></i> of <span id="total-count">{totalCount?.toLocaleString() || 0}</span>
+        Showing <span id="showing-count">{showingCount || 0}</span> <i class="fa-solid fa-caret-right text-[8px] mx-0.5 text-gray-400"></i> of <span id="total-count">{totalCount?.toLocaleString() || 0}</span>{searchQuery && <span class="normal-case text-gray-400 tracking-normal"> for "{searchQuery}"</span>}
       </span>
     )}
   </div>
 </header>
 
-<style>
-  /* Search suggestions styling */
-  #search-suggestions {
-    z-index: 9999;
-  }
-
-  .suggestion-item:hover {
-    background-color: #f9fafb;
-  }
-
-  .suggestion-item.bg-gray-100 {
-    background-color: #f3f4f6;
-  }
-
-  /* Ensure search container has proper stacking context */
-  #search-container {
-    position: relative;
-    z-index: 100;
-  }
-</style>
-
 <script>
-  import '../scripts/searchHandler.js';
+  // Focus search input on Cmd+K / Ctrl+K
+  document.addEventListener('keydown', (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+      e.preventDefault();
+      document.getElementById('search-input')?.focus();
+    }
+  });
 </script>

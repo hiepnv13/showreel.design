@@ -6,129 +6,91 @@ import VideoGrid from "../components/VideoGrid.astro";
 import { searchVideos, sortVideosByDate } from "../utils/videoUtils";
 import type { CollectionEntry } from 'astro:content';
 
-// Get search query and page from URL params
 const url = Astro.url;
 const query = url.searchParams.get('q') || '';
 const pageParam = url.searchParams.get('page') || '1';
 const currentPage = parseInt(pageParam);
 const itemsPerPage = 24;
 
-// Search videos if query exists
 let videos: CollectionEntry<'videos'>[] = [];
 let searchPerformed = false;
+let totalCount = 0;
 let totalPages = 1;
 
 if (query.trim()) {
   const searchResults = await searchVideos(query.trim());
   const allResults = sortVideosByDate(searchResults);
-  totalPages = Math.ceil(allResults.length / itemsPerPage);
-  
-  // Paginate results
+  totalCount = allResults.length;
+  totalPages = Math.ceil(totalCount / itemsPerPage);
+
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  videos = allResults.slice(startIndex, endIndex);
-  
+  videos = allResults.slice(startIndex, startIndex + itemsPerPage);
   searchPerformed = true;
 }
 ---
 
-<Layout title={query ? `Search: ${query} - Showreel.design` : "Search - Showreel.design"}>
-  <Header />
-  <main>
-    <!-- Hero Section -->
-    <section class="py-20 bg-gray-900 text-white">
-      <div class="section-container text-center">
-        <!-- Breadcrumb -->
-        <nav class="mb-8">
-          <ol class="flex justify-center items-center space-x-2 text-sm text-gray-300">
-            <li>
-              <a href="/" class="hover:text-white transition-colors">Home</a>
-            </li>
-            <li class="text-gray-500">/</li>
-            <li class="text-white font-medium">Search</li>
-          </ol>
-        </nav>
+<Layout title={query ? `"${query}" — Showreel.design` : "Search — Showreel.design"}>
+  <Header showingCount={videos.length} totalCount={totalCount} searchQuery={searchPerformed ? query : undefined} />
 
-        <h1 class="text-4xl md:text-6xl font-bold mb-6 leading-tight">
-          {query ? `Search Results` : 'Search Videos'}
-        </h1>
-        
-        {query && (
-          <p class="text-xl md:text-2xl text-gray-300 mb-8">
-            Results for: <span class="text-blue-400 font-semibold">"{query}"</span>
-          </p>
-        )}
-        
-        <div class="text-lg text-gray-400">
-          {searchPerformed ? (
-            <span>
-              {videos.length} {videos.length === 1 ? 'result' : 'results'} found
-              {totalPages > 1 && ` - Page ${currentPage} of ${totalPages}`}
-            </span>
-          ) : (
-            <span>Enter a search term to find videos</span>
-          )}
-        </div>
-      </div>
-    </section>
+  <div class="search-body">
+  {!searchPerformed && (
+    <div class="empty-state">
+      <p class="empty-hint">Type something in the search bar above.</p>
+    </div>
+  )}
 
-    <!-- Search Results -->
-    {searchPerformed && videos.length > 0 && (
-      <VideoGrid 
-        videos={videos} 
-        currentCategory="Search Results" 
-        showAllTab={false}
-        currentPage={currentPage}
-        itemsPerPage={itemsPerPage}
-        baseUrl={`/search?q=${encodeURIComponent(query)}`}
-      />
-    )}
+  {searchPerformed && videos.length === 0 && (
+    <div class="empty-state">
+      <p class="empty-query">"{query}"</p>
+      <p class="empty-hint">No results found. Try a different keyword.</p>
+    </div>
+  )}
 
-    <!-- Empty State -->
-    {searchPerformed && videos.length === 0 && (
-      <section class="py-20 bg-gray-50">
-        <div class="section-container">
-          <div class="text-center py-16">
-            <div class="text-gray-400 text-6xl mb-4">🔍</div>
-            <h3 class="text-2xl font-bold text-gray-900 mb-2">
-              No videos found
-            </h3>
-            <p class="text-gray-600 mb-8">
-              No videos match your search for <strong>"{query}"</strong>.
-              <br />Try different keywords or browse all videos.
-            </p>
-            <a href="/" class="btn-primary">
-              Browse All Videos
-            </a>
-          </div>
-        </div>
-      </section>
-    )}
+  {searchPerformed && videos.length > 0 && (
+    <VideoGrid
+      videos={videos}
+      showAllTab={false}
+      currentPage={currentPage}
+      itemsPerPage={itemsPerPage}
+      baseUrl={`/search?q=${encodeURIComponent(query)}`}
+    />
+  )}
+  </div>
 
-    <!-- No Search Performed -->
-    {!searchPerformed && (
-      <section class="py-20 bg-gray-50">
-        <div class="section-container">
-          <div class="text-center py-16">
-            <div class="text-gray-400 text-6xl mb-4">🎬</div>
-            <h3 class="text-2xl font-bold text-gray-900 mb-2">
-              Start Your Search
-            </h3>
-            <p class="text-gray-600 mb-8">
-              Use the search bar above to find videos by title, author, description, or tags.
-            </p>
-            <a href="/" class="btn-primary">
-              Browse All Videos
-            </a>
-          </div>
-        </div>
-      </section>
-    )}
-  </main>
   <Footer />
 </Layout>
 
+<style>
+  .search-body {
+    min-height: calc(100vh - 140px);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 120px 24px;
+    text-align: center;
+  }
+
+  .empty-query {
+    font-size: 24px;
+    font-weight: 400;
+    letter-spacing: -0.3px;
+    color: #111;
+  }
+
+  .empty-hint {
+    font-size: 13px;
+    color: #bbb;
+    letter-spacing: 0.2px;
+  }
+</style>
+
 <script>
-  // Import grid actions for interactive animations
   import '../scripts/gridActions.js';
 </script>
