@@ -12,7 +12,7 @@ description: Bartek is a product and web designer focused on crafting
   page, his work blends refined interaction details—such as dynamic wallet
   animations—with strong visual storytelling that elevates modern digital
   experiences.
-year: 2023
+year: 2026
 quality: 1080p
 sourceUrl: https://www.shapeshyft.co.uk/
 tags: []
