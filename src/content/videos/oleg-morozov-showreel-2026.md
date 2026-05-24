@@ -1,7 +1,7 @@
 ---
 title: Oleg Morozov Showreel 2026
 author: Oleg Morozov
-authorAvatar: /avatars/AOleg Morozov.png
+authorAvatar: /avatars/aoleg-morozov.png
 category: "Motion Graphics"
 publishDate: 2026-04-28
 featured: false

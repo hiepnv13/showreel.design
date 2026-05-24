@@ -1,7 +1,7 @@
 ---
 title: Victor Vector 3D motion reel
 author: Victor Vector
-authorAvatar: /avatars/Victor Vector.png
+authorAvatar: /avatars/victor-vector.png
 category: "3D / CGI"
 publishDate: 2026-04-28
 featured: false
