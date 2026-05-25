@@ -1,7 +1,7 @@
 ---
 title: Alpha Ledger Showreel
 author: DimentionTV
-authorAvatar: /uploads/favicon_www_dimention_tv_64x64.png
+authorAvatar: /uploads/dimention_tv.png
 category: Motion Graphics
 publishDate: 2026-05-24
 featured: false
