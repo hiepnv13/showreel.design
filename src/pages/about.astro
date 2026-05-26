@@ -2,6 +2,9 @@
 import Layout from "../layouts/Layout.astro";
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
+
+// Pre-render as static HTML so Netlify can detect the form at build time
+export const prerender = true;
 ---
 
 <Layout title="About — Showreel.design">
@@ -441,7 +444,7 @@ import Footer from "../components/Footer.astro";
     e.preventDefault();
     const data = new FormData(form);
 
-    await fetch('/', {
+    await fetch('/about', {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: new URLSearchParams(data as any).toString(),
