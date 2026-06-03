@@ -3,7 +3,7 @@ title: Microsoft Surface
 author: Microsoft
 authorAvatar: /uploads/7j6bstid_400x400.png
 category: 3D / CGI
-publishDate: 2026-06-02
+publishDate: 2026-06-03
 featured: false
 videoFileName: Microsoft Surface.mp4
 thumbnail: /placeholder.svg
