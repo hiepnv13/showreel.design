@@ -16,7 +16,7 @@ description: Introducing Microsoft's Surface Laptop Ultra, a premium hardware
   security alongside groundbreaking on-device performance.
 year: 2026
 quality: 1080p
-sourceUrl: ""
+sourceUrl: https://x.com/surface
 tags: []
 industries:
   - advertising-commercial
