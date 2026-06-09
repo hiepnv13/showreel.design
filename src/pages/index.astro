@@ -5,6 +5,8 @@ import Footer from "../components/Footer.astro";
 import VideoGrid from "../components/VideoGrid.astro";
 import { getAllVideos, sortVideosByDate } from "../utils/videoUtils";
 
+export const prerender = true;
+
 // Get all videos sorted by date
 const allVideos = await getAllVideos();
 const videos = sortVideosByDate(allVideos);
