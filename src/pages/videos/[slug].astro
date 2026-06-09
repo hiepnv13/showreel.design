@@ -66,9 +66,33 @@ const metaDescription = video.data.description
   : `${video.data.author} — ${video.data.category} showreel. Curated on Showreel.design.`;
 const metaImage = video.data.thumbnailUrl || undefined;
 const canonicalUrl = `https://showreel.design/videos/${video.id}`;
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "VideoObject",
+  "name": video.data.title,
+  "description": video.data.description || metaDescription,
+  "thumbnailUrl": metaImage,
+  "uploadDate": video.data.publishDate?.toISOString?.() ?? `${video.data.year}-01-01`,
+  "author": {
+    "@type": "Person",
+    "name": video.data.author,
+    ...(video.data.sourceUrl ? { "url": video.data.sourceUrl } : {})
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Showreel.design",
+    "url": "https://showreel.design"
+  },
+  "url": canonicalUrl,
+  ...(video.data.videoUrl ? { "contentUrl": video.data.videoUrl } : {})
+};
 ---
 
 <Layout title={metaTitle} description={metaDescription} ogImage={metaImage} ogType="article" canonicalUrl={canonicalUrl}>
+  <Fragment slot="head">
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+  </Fragment>
   <Header breadcrumb={breadcrumb} />
 
   <!-- Video Player — Full Width -->
