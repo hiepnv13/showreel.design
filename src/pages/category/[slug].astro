@@ -43,7 +43,11 @@ const showingCount = Math.min(itemsPerPage, totalCount);
 const allCategories = await getAllCategories();
 ---
 
-<Layout title={`${category} Videos - Showreel.design`}>
+<Layout
+  title={`${category} — Showreel.design`}
+  description={`Curated ${category} motion design reels from studios and creators worldwide. Discover the best ${category} showreels on Showreel.design.`}
+  canonicalUrl={`https://showreel.design/category/${categorySlug}`}
+>
     <Header showingCount={showingCount} totalCount={totalCount} />
     <main>
         

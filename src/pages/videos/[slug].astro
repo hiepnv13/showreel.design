@@ -59,9 +59,16 @@ const hasStyles = video.data.styles && video.data.styles.length > 0;
 const hasIndustries = video.data.industries && video.data.industries.length > 0;
 const hasSoundMusic = video.data.soundMusic && video.data.soundMusic.length > 0;
 const hasTags = video.data.tags && video.data.tags.length > 0;
+
+const metaTitle = `${video.data.title} — ${video.data.author} | Showreel.design`;
+const metaDescription = video.data.description
+  ? video.data.description.slice(0, 160)
+  : `${video.data.author} — ${video.data.category} showreel. Curated on Showreel.design.`;
+const metaImage = video.data.thumbnailUrl || undefined;
+const canonicalUrl = `https://showreel.design/videos/${video.id}`;
 ---
 
-<Layout title={video.data.title}>
+<Layout title={metaTitle} description={metaDescription} ogImage={metaImage} ogType="article" canonicalUrl={canonicalUrl}>
   <Header breadcrumb={breadcrumb} />
 
   <!-- Video Player — Full Width -->
