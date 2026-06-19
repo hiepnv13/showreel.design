@@ -88,6 +88,25 @@ const videosCollection = defineCollection({
   }),
 });
 
+const toolsCollection = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/tools' }),
+  schema: z.object({
+    name: z.string(),
+    category: z.enum(['Animation Software', 'Web & UI Animation', 'AI Motion Tools', 'Assets & Resources']),
+    description: z.string(),
+    pricing: z.string(),
+    href: z.string().url(),
+    thumbnail: z.string().optional(),
+    tags: z.array(z.object({
+      label: z.string(),
+      color: z.enum(['blue', 'green', 'orange', 'purple', 'gray']).default('gray'),
+    })).optional().default([]),
+    featured: z.boolean().default(false),
+    order: z.number().optional().default(0),
+  }),
+});
+
 export const collections = {
   videos: videosCollection,
+  tools: toolsCollection,
 };

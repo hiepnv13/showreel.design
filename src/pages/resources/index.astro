@@ -1,0 +1,228 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import Header from "../../components/Header.astro";
+import Footer from "../../components/Footer.astro";
+
+export const prerender = true;
+
+const categories = [
+  {
+    label: "Tools",
+    href: "/resources/tools",
+    description: "Software, apps, and tools used by professional motion designers — from industry standards to emerging AI tools.",
+    count: "20+ tools",
+    available: true,
+  },
+  {
+    label: "Courses",
+    href: "/resources/courses",
+    description: "Curated learning resources for motion designers at every level — from beginner fundamentals to advanced techniques.",
+    count: "Coming soon",
+    available: false,
+  },
+  {
+    label: "Templates",
+    href: "/resources/templates",
+    description: "After Effects templates, Lottie animations, and motion presets to accelerate your workflow.",
+    count: "Coming soon",
+    available: false,
+  },
+  {
+    label: "Plugins",
+    href: "/resources/plugins",
+    description: "Essential After Effects and Cinema 4D plugins used by top motion studios worldwide.",
+    count: "Coming soon",
+    available: false,
+  },
+];
+---
+
+<Layout
+  title="Motion Design Resources — Showreel.design"
+  description="Curated tools, courses, templates, and plugins for motion designers. Everything you need to learn, create, and grow as a motion designer."
+  canonicalUrl="https://showreel.design/resources"
+>
+  <Header />
+
+  <main class="resources-page">
+
+    <section class="resources-hero">
+      <p class="resources-eyebrow">Resources</p>
+      <h1 class="resources-title">Everything a motion<br />designer needs.</h1>
+      <p class="resources-subtitle">
+        Curated tools, courses, templates, and more — handpicked for studios and
+        independent creators working in motion design.
+      </p>
+    </section>
+
+    <div class="resources-divider"></div>
+
+    <section class="resources-grid-section">
+      <div class="resources-grid">
+        {categories.map((cat) => (
+          <a
+            href={cat.available ? cat.href : '#'}
+            class={`resource-card ${!cat.available ? 'resource-card--disabled' : ''}`}
+          >
+            <div class="resource-card-top">
+              <span class="resource-card-count">{cat.count}</span>
+              {!cat.available && <span class="resource-card-badge">Soon</span>}
+            </div>
+            <h2 class="resource-card-label">{cat.label}</h2>
+            <p class="resource-card-description">{cat.description}</p>
+            {cat.available && (
+              <span class="resource-card-cta">
+                Explore {cat.label}
+                <svg viewBox="0 0 16 16" fill="none">
+                  <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </span>
+            )}
+          </a>
+        ))}
+      </div>
+    </section>
+
+  </main>
+
+  <Footer />
+</Layout>
+
+<style>
+  .resources-page {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 80px 32px 100px;
+  }
+
+  .resources-hero {
+    padding-bottom: 64px;
+  }
+
+  .resources-eyebrow {
+    font-size: 9px;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: #bbb;
+    margin-bottom: 28px;
+  }
+
+  .resources-title {
+    font-size: clamp(32px, 5vw, 52px);
+    font-weight: 400;
+    letter-spacing: -1px;
+    line-height: 1.15;
+    color: #111;
+    margin-bottom: 28px;
+  }
+
+  .resources-subtitle {
+    font-size: 16px;
+    line-height: 1.75;
+    color: #888;
+    max-width: 520px;
+  }
+
+  .resources-divider {
+    width: 100%;
+    height: 1px;
+    background: #f0f0f0;
+    margin-bottom: 56px;
+  }
+
+  .resources-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2px;
+    background: #f0f0f0;
+    border: 1px solid #f0f0f0;
+    border-radius: 16px;
+    overflow: hidden;
+  }
+
+  .resource-card {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 36px;
+    background: #fff;
+    text-decoration: none;
+    transition: background 0.2s;
+  }
+
+  .resource-card:not(.resource-card--disabled):hover {
+    background: #fafafa;
+  }
+
+  .resource-card--disabled {
+    cursor: default;
+    opacity: 0.6;
+  }
+
+  .resource-card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .resource-card-count {
+    font-size: 11px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #bbb;
+  }
+
+  .resource-card-badge {
+    font-size: 10px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: #bbb;
+    background: #f5f5f5;
+    padding: 2px 8px;
+    border-radius: 20px;
+  }
+
+  .resource-card-label {
+    font-size: 28px;
+    font-weight: 400;
+    letter-spacing: -0.5px;
+    color: #111;
+    margin: 0;
+  }
+
+  .resource-card-description {
+    font-size: 14px;
+    line-height: 1.7;
+    color: #888;
+    flex: 1;
+  }
+
+  .resource-card-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: #111;
+    margin-top: 8px;
+    transition: gap 0.2s;
+  }
+
+  .resource-card:hover .resource-card-cta {
+    gap: 10px;
+  }
+
+  .resource-card-cta svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  @media (max-width: 640px) {
+    .resources-page {
+      padding: 48px 20px 72px;
+    }
+
+    .resources-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
