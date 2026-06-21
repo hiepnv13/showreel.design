@@ -9,9 +9,8 @@ import {
     generateSlug,
 } from "../../utils/videoUtils";
 import Layout from "../../layouts/Layout.astro";
-import Header from "../../components/Header.astro";
-import Footer from "../../components/Footer.astro";
 import VideoGrid from "../../components/VideoGrid.astro";
+import FilterBar from "../../components/FilterBar.astro";
 import type { GetStaticPaths } from "astro";
 
 export const getStaticPaths: GetStaticPaths = async () => {
@@ -48,9 +47,8 @@ const allCategories = await getAllCategories();
   description={`Curated ${category} motion design reels from studios and creators worldwide. Discover the best ${category} showreels on Showreel.design.`}
   canonicalUrl={`https://showreel.design/category/${categorySlug}`}
 >
-    <Header showingCount={showingCount} totalCount={totalCount} />
     <main>
-        
+        <FilterBar videos={videos} />
 
         <!-- Use VideoGrid Component -->
         <VideoGrid
@@ -85,5 +83,4 @@ const allCategories = await getAllCategories();
             )
         }
     </main>
-  <Footer />
 </Layout>

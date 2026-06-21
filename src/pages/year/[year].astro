@@ -3,8 +3,6 @@ export const prerender = true;
 
 import { getVideosByYear, getAllYears, sortVideosByDate } from "../../utils/videoUtils";
 import Layout from "../../layouts/Layout.astro";
-import Header from "../../components/Header.astro";
-import Footer from "../../components/Footer.astro";
 import VideoGrid from "../../components/VideoGrid.astro";
 import type { GetStaticPaths } from "astro";
 
@@ -36,7 +34,6 @@ const breadcrumb = [
 ---
 
 <Layout title={`${year} Motion Design Showreels — Showreel.design`}>
-  <Header showingCount={showingCount} totalCount={totalCount} breadcrumb={breadcrumb} />
 
   <!-- Year filter chips -->
   <div class="year-chips">
@@ -51,7 +48,6 @@ const breadcrumb = [
     itemsPerPage={itemsPerPage}
     baseUrl={`/year/${year}`}
   />
-  <Footer />
 </Layout>
 
 <style>

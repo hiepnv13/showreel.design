@@ -6,9 +6,14 @@ export interface Props {
   thumbnail: string;
   videoUrl?: string;
   slug?: string;
+  industries?: string[];
+  styles?: string[];
+  soundMusic?: string[];
 }
 
-const { title, author, authorAvatar, thumbnail, videoUrl, slug } = Astro.props;
+const { title, author, authorAvatar, thumbnail, videoUrl, slug, industries = [], styles = [], soundMusic = [] } = Astro.props;
+
+const taxonomyTags = [...industries, ...styles, ...soundMusic].join(' ');
 
 const initials = (author ?? '')
   .split(' ')
@@ -17,7 +22,7 @@ const initials = (author ?? '')
   .join('');
 ---
 
-<a href={slug ? `/videos/${slug}` : '#'} class="video-card group cursor-pointer block" data-video-url={videoUrl}>
+<a href={slug ? `/videos/${slug}` : '#'} class="video-card group cursor-pointer block" data-video-url={videoUrl} data-video-taxonomies={taxonomyTags}>
   <div class="card-frame">
     {videoUrl && (
       <video

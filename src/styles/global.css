@@ -2,6 +2,24 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ── Sidebar layout ── */
+.app-layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+.app-content {
+  margin-left: 209px;
+  flex: 1;
+  min-width: 0;
+}
+
+@media (max-width: 768px) {
+  .app-content {
+    margin-left: 0;
+  }
+}
+
 @font-face {
   font-family: 'Aileron';
   src: url('/fonts/Aileron-Thin.otf') format('opentype');

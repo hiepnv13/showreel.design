@@ -106,7 +106,27 @@ const toolsCollection = defineCollection({
   }),
 });
 
+const coursesCollection = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/courses' }),
+  schema: z.object({
+    name: z.string(),
+    platform: z.string(),
+    category: z.enum(['After Effects', 'Cinema 4D', '3D & Blender', 'Character Animation', 'Motion Principles', 'Web Animation']),
+    description: z.string(),
+    pricing: z.string(),
+    href: z.string().url(),
+    thumbnail: z.string().optional(),
+    tags: z.array(z.object({
+      label: z.string(),
+      color: z.enum(['blue', 'green', 'orange', 'purple', 'gray']).default('gray'),
+    })).optional().default([]),
+    featured: z.boolean().default(false),
+    order: z.number().optional().default(0),
+  }),
+});
+
 export const collections = {
   videos: videosCollection,
   tools: toolsCollection,
+  courses: coursesCollection,
 };

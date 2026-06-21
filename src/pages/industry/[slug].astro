@@ -8,8 +8,6 @@ import {
   sortVideosByDate,
 } from "../../utils/videoUtils";
 import Layout from "../../layouts/Layout.astro";
-import Header from "../../components/Header.astro";
-import Footer from "../../components/Footer.astro";
 import VideoGrid from "../../components/VideoGrid.astro";
 import type { GetStaticPaths } from "astro";
 
@@ -38,7 +36,6 @@ const showingCount = Math.min(itemsPerPage, totalCount);
 ---
 
 <Layout title={`${label} Motion Design — Showreel.design`}>
-  <Header showingCount={showingCount} totalCount={totalCount} />
 
   <!-- Industry filter chips -->
   <div class="industry-chips">
@@ -58,7 +55,6 @@ const showingCount = Math.min(itemsPerPage, totalCount);
     itemsPerPage={itemsPerPage}
     baseUrl={`/industry/${slug}`}
   />
-  <Footer />
 </Layout>
 
 <style>

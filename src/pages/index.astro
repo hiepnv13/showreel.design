@@ -1,8 +1,7 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import Header from "../components/Header.astro";
-import Footer from "../components/Footer.astro";
 import VideoGrid from "../components/VideoGrid.astro";
+import FilterBar from "../components/FilterBar.astro";
 import { getAllVideos, sortVideosByDate } from "../utils/videoUtils";
 
 export const prerender = true;
@@ -18,12 +17,11 @@ const showingCount = Math.min(itemsPerPage, totalCount);
 ---
 
 <Layout title="Showreel.design - Discover amazing showreels">
-    <Header showingCount={showingCount} totalCount={totalCount} />
+    <FilterBar videos={videos} />
     <VideoGrid
         videos={videos}
         currentPage={1}
         itemsPerPage={itemsPerPage}
         baseUrl="/"
     />
-  <Footer />
 </Layout>

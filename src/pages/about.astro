@@ -1,7 +1,5 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import Header from "../components/Header.astro";
-import Footer from "../components/Footer.astro";
 
 // Pre-render as static HTML so Netlify can detect the form at build time
 export const prerender = true;
@@ -12,7 +10,6 @@ export const prerender = true;
   description="Showreel.design is a curated archive of outstanding motion design work from studios and creators worldwide — updated every week."
   canonicalUrl="https://showreel.design/about"
 >
-  <Header />
 
   <main class="about-page">
 
@@ -163,7 +160,6 @@ export const prerender = true;
 
   </main>
 
-  <Footer />
 </Layout>
 
 <style>

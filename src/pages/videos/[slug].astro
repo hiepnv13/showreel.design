@@ -2,9 +2,8 @@
 import { getCollection, type CollectionEntry } from "astro:content";
 import { getAllVideos, getRelatedVideos, generateSlug, getIndustryLabel } from "../../utils/videoUtils";
 import Layout from "../../layouts/Layout.astro";
-import Header from "../../components/Header.astro";
-import Footer from "../../components/Footer.astro";
 import VideoCard from "../../components/VideoCard.astro";
+import FilterBar from "../../components/FilterBar.astro";
 import type { GetStaticPaths } from "astro";
 
 export const prerender = true;
@@ -93,7 +92,8 @@ const jsonLd = {
   <Fragment slot="head">
     <script is:inline type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
   </Fragment>
-  <Header breadcrumb={breadcrumb} />
+
+  <FilterBar breadcrumb={breadcrumb} />
 
   <!-- Video Player — Full Width -->
   <div class="video-wrapper">
@@ -344,7 +344,6 @@ const jsonLd = {
     </section>
   )}
 
-  <Footer />
 </Layout>
 
 <style>

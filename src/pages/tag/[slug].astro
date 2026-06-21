@@ -4,8 +4,6 @@ export const prerender = true;
 import { getCollection, type CollectionEntry } from 'astro:content';
 import { getVideosByTagSlug, getAllTags, sortVideosByDate, generateSlug } from '../../utils/videoUtils';
 import Layout from '../../layouts/Layout.astro';
-import Header from '../../components/Header.astro';
-import Footer from '../../components/Footer.astro';
 import VideoCard from '../../components/VideoCard.astro';
 import type { GetStaticPaths } from 'astro';
 
@@ -33,7 +31,6 @@ const allTags = await getAllTags();
 ---
 
 <Layout title={`#${tag} Videos - Showreel.design`}>
-  <Header />
   <main>
     <!-- Hero Section -->
     <section class="py-20 bg-gray-900 text-white">
@@ -131,7 +128,6 @@ const allTags = await getAllTags();
       </div>
     </section>
   </main>
-  <Footer />
 </Layout>
 
 <script>

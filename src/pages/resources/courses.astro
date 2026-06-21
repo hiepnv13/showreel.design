@@ -1,0 +1,97 @@
+---
+import { getCollection } from "astro:content";
+import Layout from "../../layouts/Layout.astro";
+import ToolCard from "../../components/ToolCard.astro";
+
+export const prerender = true;
+
+const allCourses = await getCollection('courses');
+const courses = allCourses.sort((a, b) => (a.data.order ?? 0) - (b.data.order ?? 0));
+
+const categories = [
+  'After Effects',
+  'Cinema 4D',
+  '3D & Blender',
+  'Character Animation',
+  'Motion Principles',
+  'Web Animation',
+] as const;
+---
+
+<Layout
+  title="Motion Design Courses — Showreel.design"
+  description="The best courses for motion designers — from After Effects fundamentals to advanced 3D, character animation, and web animation."
+  canonicalUrl="https://showreel.design/resources/courses"
+>
+
+  <main class="w-full bg-white px-4 sm:px-8 pb-16">
+
+    {categories.map((category) => {
+      const categoryCourses = courses.filter(c => c.data.category === category);
+      if (categoryCourses.length === 0) return null;
+      return (
+        <section class="courses-section">
+          <div class="section-header">
+            <p class="section-label">{category}</p>
+            <span class="section-count">{categoryCourses.length} course{categoryCourses.length > 1 ? 's' : ''}</span>
+          </div>
+          <div class="courses-grid">
+            {categoryCourses.map((course) => (
+              <ToolCard
+                name={course.data.name}
+                pricing={course.data.pricing}
+                href={course.data.href}
+                thumbnail={course.data.thumbnail}
+                tags={course.data.tags}
+              />
+            ))}
+          </div>
+        </section>
+      );
+    })}
+
+  </main>
+
+</Layout>
+
+<style>
+  .courses-section {
+    margin-bottom: 48px;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    padding: 20px 0 16px;
+    border-bottom: 1px solid #f0f0f0;
+    margin-bottom: 20px;
+  }
+
+  .section-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: #111;
+  }
+
+  .section-count {
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #ccc;
+  }
+
+  .courses-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px 12px;
+  }
+
+  @media (max-width: 1024px) {
+    .courses-grid { grid-template-columns: repeat(3, 1fr); }
+  }
+
+  @media (max-width: 640px) {
+    .courses-grid { grid-template-columns: repeat(2, 1fr); gap: 12px 8px; }
+  }
+</style>

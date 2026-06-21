@@ -1,0 +1,187 @@
+---
+---
+
+<div class="mobile-header" id="mobile-header">
+
+  <!-- Default state -->
+  <div class="mh-default" id="mh-default">
+    <button class="mh-btn" id="mobile-hamburger" aria-label="Open menu">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+
+    <a href="/" class="mobile-logo">SR.D</a>
+
+    <button class="mh-btn mh-search-open" id="mh-search-open" aria-label="Search">
+      <svg width="18" height="18" viewBox="0 0 256 256" fill="currentColor">
+        <path d="M229.66 218.34l-50.06-50.07a88.11 88.11 0 1 0-11.31 11.31l50.06 50.07a8 8 0 0 0 11.31-11.31zM40 112a72 72 0 1 1 72 72 72.08 72.08 0 0 1-72-72z"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Search state -->
+  <form class="mh-search" id="mh-search" action="/search" method="get">
+    <button type="button" class="mh-btn mh-search-close" id="mh-search-close" aria-label="Close search">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+        <path d="M19 12H5M5 12l7-7M5 12l7 7"/>
+      </svg>
+    </button>
+
+    <input
+      type="text"
+      name="q"
+      class="mh-search-input"
+      id="mh-search-input"
+      placeholder="Search..."
+      autocomplete="off"
+    />
+
+    <button type="submit" class="mh-btn" aria-label="Submit search">
+      <svg width="18" height="18" viewBox="0 0 256 256" fill="currentColor">
+        <path d="M229.66 218.34l-50.06-50.07a88.11 88.11 0 1 0-11.31 11.31l50.06 50.07a8 8 0 0 0 11.31-11.31zM40 112a72 72 0 1 1 72 72 72.08 72.08 0 0 1-72-72z"/>
+      </svg>
+    </button>
+  </form>
+
+</div>
+
+<script>
+  const hamburger  = document.getElementById('mobile-hamburger')!;
+  const sidebar    = document.getElementById('sidebar')!;
+  const overlay    = document.getElementById('sidebar-overlay')!;
+  const searchOpen = document.getElementById('mh-search-open')!;
+  const searchClose= document.getElementById('mh-search-close')!;
+  const mhDefault  = document.getElementById('mh-default')!;
+  const mhSearch   = document.getElementById('mh-search')!;
+  const searchInput= document.getElementById('mh-search-input') as HTMLInputElement;
+
+  // Sidebar open/close
+  function openMenu() {
+    sidebar.classList.add('open');
+    overlay.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeMenu() {
+    sidebar.classList.remove('open');
+    overlay.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  hamburger?.addEventListener('click', openMenu);
+  overlay?.addEventListener('click', closeMenu);
+  document.getElementById('sidebar-close')?.addEventListener('click', closeMenu);
+
+  // Search mode toggle
+  function openSearch() {
+    mhDefault.style.display = 'none';
+    mhSearch.style.display  = 'flex';
+    searchInput.focus();
+  }
+
+  function closeSearch() {
+    mhSearch.style.display  = 'none';
+    mhDefault.style.display = 'flex';
+    searchInput.value = '';
+  }
+
+  searchOpen?.addEventListener('click', openSearch);
+  searchClose?.addEventListener('click', closeSearch);
+
+  // Close search on Escape
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && mhSearch.style.display === 'flex') closeSearch();
+  });
+</script>
+
+<style>
+  .mobile-header {
+    display: none;
+  }
+
+  @media (max-width: 768px) {
+    .mobile-header {
+      display: flex;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: #fff;
+      border-bottom: 1px solid #f0f0f0;
+      height: 52px;
+      flex-shrink: 0;
+    }
+
+    /* Default row */
+    .mh-default {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      padding: 0 16px;
+    }
+
+    /* Search row */
+    .mh-search {
+      display: none;
+      align-items: center;
+      gap: 8px;
+      width: 100%;
+      padding: 0 12px;
+    }
+
+    /* Shared button style */
+    .mh-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #111;
+      padding: 6px;
+      flex-shrink: 0;
+    }
+
+    /* Hamburger */
+    #mobile-hamburger {
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    #mobile-hamburger span {
+      display: block;
+      width: 22px;
+      height: 1.5px;
+      background: #111;
+    }
+
+    .mobile-logo {
+      font-size: 18px;
+      font-weight: 700;
+      color: #111;
+      text-decoration: none;
+      letter-spacing: -0.3px;
+    }
+
+    /* Search input */
+    .mh-search-input {
+      flex: 1;
+      height: 36px;
+      background: #f5f5f5;
+      border: none;
+      border-radius: 8px;
+      padding: 0 12px;
+      font-size: 15px;
+      font-family: 'Aileron', sans-serif;
+      color: #111;
+      outline: none;
+      min-width: 0;
+    }
+
+    .mh-search-input::placeholder {
+      color: #aaa;
+    }
+  }
+</style>
