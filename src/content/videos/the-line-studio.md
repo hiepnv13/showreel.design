@@ -2,7 +2,7 @@
 title: THE LINE Studio
 author: THE LINE
 authorAvatar: /uploads/favicon_thelinestudio_com_64x64.png
-category: 2D Animation
+category: Motion Graphics
 publishDate: 2026-05-17
 featured: false
 videoFileName: Thelinestudio.mp4

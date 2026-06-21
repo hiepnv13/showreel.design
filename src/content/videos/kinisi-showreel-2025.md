@@ -2,7 +2,7 @@
 title: Kinisi Showreel 2025
 author: Kinisi
 authorAvatar: /avatars/www_kinisi_tv.png
-category: 2D Animation
+category: Motion Graphics
 publishDate: 2026-05-14
 featured: false
 videoFileName: Kinisi Showreel 2025.mp4

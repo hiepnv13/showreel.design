@@ -49,7 +49,6 @@ collections:
         widget: select
         options:
           - "3D / CGI"
-          - "2D Animation"
           - "Motion Graphics"
           - "Branding & Identity"
           - "Studio / Agency"

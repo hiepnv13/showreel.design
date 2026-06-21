@@ -1,7 +1,7 @@
 ---
 title: Amberluvsbugs Showreel 2026
 author: Amberluvsbugs
-category: 2D Animation
+category: Motion Graphics
 publishDate: 2026-06-02
 featured: false
 videoFileName: Amberluvsbugs Showreel 2023-2026.mp4

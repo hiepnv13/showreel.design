@@ -2,7 +2,7 @@
 title: Burocratik.com reel 2024
 author: Burocratik
 authorAvatar: /uploads/www_burocratik_com.png
-category: 2D Animation
+category: Motion Graphics
 publishDate: 2024-01-18
 featured: true
 videoFileName: Burocratik.com reel 2024.mp4
