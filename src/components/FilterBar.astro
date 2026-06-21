@@ -4,11 +4,12 @@ import { getTaxonomyLabel } from '../config/taxonomies';
 interface Props {
   videos?: any[];
   breadcrumb?: Array<{ label: string; href: string }>;
-  activeFilter?: string;  // currently active filter value from URL
-  filterBaseUrl?: string; // base URL for filter links (e.g. "/category/motion-graphics")
+  activeFilter?: string;
+  filterBaseUrl?: string;
+  label?: string; // freeform left-side text (e.g. search results count)
 }
 
-const { videos = [], breadcrumb, activeFilter = '', filterBaseUrl = '' } = Astro.props;
+const { videos = [], breadcrumb, activeFilter = '', filterBaseUrl = '', label } = Astro.props;
 
 // Count frequency of each taxonomy value across current videos
 function topByFrequency(field: string, n: number, exclude: string[] = []) {
@@ -52,15 +53,17 @@ const panelGroups = [
 ].filter(g => g.chips.length > 0);
 ---
 
-{(hasChips || breadcrumb) && (
+{(hasChips || breadcrumb || label) && (
   <div class="filter-bar-wrap" id="filter-bar">
 
     <!-- Main bar -->
     <div class="filter-bar">
 
-      <!-- Left: breadcrumb OR filter chips -->
+      <!-- Left: label OR breadcrumb OR filter chips -->
       <div class="filter-bar-left">
-        {breadcrumb ? (
+        {label ? (
+          <span class="filter-label">{label}</span>
+        ) : breadcrumb ? (
           <!-- Breadcrumb mode -->
           <nav class="filter-breadcrumb">
             {breadcrumb.map((item, i) => (
@@ -241,6 +244,15 @@ const panelGroups = [
   .filter-chip.active {
     background: #333;
     color: #fff;
+  }
+
+  /* Label mode (search results) */
+  .filter-label {
+    font-size: 13px;
+    color: #111;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   /* Breadcrumb mode */
