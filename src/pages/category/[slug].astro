@@ -1,7 +1,4 @@
 ---
-export const prerender = true;
-
-import { getCollection, type CollectionEntry } from "astro:content";
 import {
     getVideosByCategorySlug,
     getAllCategories,
@@ -11,58 +8,52 @@ import {
 import Layout from "../../layouts/Layout.astro";
 import VideoGrid from "../../components/VideoGrid.astro";
 import FilterBar from "../../components/FilterBar.astro";
-import type { GetStaticPaths } from "astro";
 
-export const getStaticPaths: GetStaticPaths = async () => {
-    const categories = await getAllCategories();
-    return categories.map((category: string) => ({
-        params: { slug: generateSlug(category) },
-        props: { category, categorySlug: generateSlug(category) },
-    }));
-};
+const { slug } = Astro.params;
+const filter  = Astro.url.searchParams.get('filter') ?? '';
+const pageNum = Math.max(1, parseInt(Astro.url.searchParams.get('page') ?? '1'));
 
-interface Props {
-    category: string;
-    categorySlug: string;
-}
-
-const { category, categorySlug }: Props = Astro.props;
-
-// Get videos for this category
-const allVideos = await getVideosByCategorySlug(categorySlug);
-const videos = sortVideosByDate(allVideos);
-const itemsPerPage = 24;
-const totalPages = Math.ceil(videos.length / itemsPerPage);
-
-// Calculate counts for header
-const totalCount = videos.length;
-const showingCount = Math.min(itemsPerPage, totalCount);
-
-// Get all categories for breadcrumb/navigation
+// Resolve category label from slug
 const allCategories = await getAllCategories();
+const category = allCategories.find(c => generateSlug(c) === slug) ?? slug!;
+
+// Get + filter videos
+const allVideos = await getVideosByCategorySlug(slug!);
+const sorted = sortVideosByDate(allVideos);
+
+const filtered = filter
+  ? sorted.filter((v: any) => [
+      ...(v.data.industries ?? []),
+      ...(v.data.styles ?? []),
+      ...(v.data.soundMusic ?? []),
+    ].includes(filter))
+  : sorted;
+
+const itemsPerPage = 24;
+const filterBaseUrl = `/category/${slug}`;
 ---
 
 <Layout
   title={`${category} — Showreel.design`}
-  description={`Curated ${category} motion design reels from studios and creators worldwide. Discover the best ${category} showreels on Showreel.design.`}
-  canonicalUrl={`https://showreel.design/category/${categorySlug}`}
+  description={`Curated ${category} motion design reels from studios and creators worldwide.`}
+  canonicalUrl={`https://showreel.design/category/${slug}`}
 >
     <main>
-        <FilterBar videos={videos} />
+        <FilterBar videos={sorted} activeFilter={filter} filterBaseUrl={filterBaseUrl} />
 
-        <!-- Use VideoGrid Component -->
         <VideoGrid
-            videos={videos}
+            videos={filtered}
             currentCategory={category}
             showAllTab={true}
-            currentPage={1}
+            currentPage={pageNum}
             itemsPerPage={itemsPerPage}
-            baseUrl={`/category/${categorySlug}`}
+            baseUrl={filterBaseUrl}
+            filter={filter}
         />
 
         <!-- Empty State (only show if no videos in this category) -->
         {
-            videos.length === 0 && (
+            filtered.length === 0 && (
                 <section class="py-20 bg-gray-50">
                     <div class="section-container">
                         <div class="text-center py-16">

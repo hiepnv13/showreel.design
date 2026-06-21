@@ -4,24 +4,30 @@ import VideoGrid from "../components/VideoGrid.astro";
 import FilterBar from "../components/FilterBar.astro";
 import { getAllVideos, sortVideosByDate } from "../utils/videoUtils";
 
-export const prerender = true;
+const filter  = Astro.url.searchParams.get('filter') ?? '';
+const pageNum = Math.max(1, parseInt(Astro.url.searchParams.get('page') ?? '1'));
 
-// Get all videos sorted by date
 const allVideos = await getAllVideos();
-const videos = sortVideosByDate(allVideos);
+const sorted = sortVideosByDate(allVideos);
 
-// Calculate counts for header
+const filtered = filter
+  ? sorted.filter((v: any) => [
+      ...(v.data.industries ?? []),
+      ...(v.data.styles ?? []),
+      ...(v.data.soundMusic ?? []),
+    ].includes(filter))
+  : sorted;
+
 const itemsPerPage = 24;
-const totalCount = videos.length;
-const showingCount = Math.min(itemsPerPage, totalCount);
 ---
 
 <Layout title="Showreel.design - Discover amazing showreels">
-    <FilterBar videos={videos} />
+    <FilterBar videos={sorted} activeFilter={filter} filterBaseUrl="/" />
     <VideoGrid
-        videos={videos}
-        currentPage={1}
+        videos={filtered}
+        currentPage={pageNum}
         itemsPerPage={itemsPerPage}
         baseUrl="/"
+        filter={filter}
     />
 </Layout>

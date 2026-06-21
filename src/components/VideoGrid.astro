@@ -10,12 +10,13 @@ import {
 
 // Props interface for reusability
 interface Props {
-    videos?: any[]; // Pre-filtered videos from parent page
-    currentCategory?: string; // Current active category for highlighting tabs
-    showAllTab?: boolean; // Whether to show "All Work" tab
-    currentPage?: number; // Current page number
-    itemsPerPage?: number; // Items per page
-    baseUrl?: string; // Base URL for pagination
+    videos?: any[];
+    currentCategory?: string;
+    showAllTab?: boolean;
+    currentPage?: number;
+    itemsPerPage?: number;
+    baseUrl?: string;
+    filter?: string;
 }
 
 const {
@@ -25,6 +26,7 @@ const {
     currentPage = 1,
     itemsPerPage = 24,
     baseUrl = "/",
+    filter = "",
 } = Astro.props;
 
 // If videos are passed as props, use them. Otherwise get all videos
@@ -80,6 +82,7 @@ const totalVideoCount = allVideosForCount.length;
         currentPage={currentPage}
         totalPages={totalPages}
         baseUrl={baseUrl}
+        filter={filter}
     />
 </main>
 
