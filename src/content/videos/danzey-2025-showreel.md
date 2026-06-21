@@ -4,7 +4,7 @@ author: "Danzey"
 authorAvatar: /avatars/danzey.png
 thumbnail: "/placeholder.svg"
 videoFileName: "Danzey 2025 Showreel.mp4"
-category: "2D Animation"
+category: Motion Graphics
 tags: []
 featured: false
 publishDate: 2025-12-25
