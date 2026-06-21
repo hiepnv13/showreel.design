@@ -2,7 +2,7 @@
 title: ong-motion showreel 2026
 author: ong-motion
 authorAvatar: /uploads/favicon_ong_motion_jp_64x64.png
-category: 2D Animation
+category: Motion Graphics
 publishDate: 2026-06-02
 featured: false
 videoFileName: ong-motion showreel 2026.mp4

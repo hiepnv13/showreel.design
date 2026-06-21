@@ -2,7 +2,7 @@
 title: Philip von Borries Showreel
 author: Philip von Borries
 authorAvatar: /avatars/philipvonborries_com.png
-category: 2D Animation
+category: Motion Graphics
 publishDate: 2026-04-28
 featured: false
 videoFileName: Philip von Borries.mp4

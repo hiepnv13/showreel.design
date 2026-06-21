@@ -1,7 +1,7 @@
 ---
 title: Riku Kojima Showreel 2025
 author: Riku Kojima
-category: 2D Animation
+category: Motion Graphics
 publishDate: 2026-05-14
 featured: false
 videoFileName: Riku Kojima Showreel 2025.mp4

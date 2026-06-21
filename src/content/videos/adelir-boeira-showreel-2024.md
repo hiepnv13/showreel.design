@@ -1,7 +1,7 @@
 ---
 title: Adelir Boeira Showreel 2024
 author: Adelir Boeira
-category: 2D Animation
+category: Motion Graphics
 publishDate: 2026-04-28
 featured: false
 videoFileName: Adelir Boeira Showreel 2024.mp4
