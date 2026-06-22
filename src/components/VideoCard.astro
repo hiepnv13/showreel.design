@@ -1,4 +1,6 @@
 ---
+import { getTaxonomyLabel } from '../config/taxonomies';
+
 export interface Props {
   title: string;
   author: string;
@@ -20,251 +22,162 @@ const initials = (author ?? '')
   .slice(0, 2)
   .map((w: string) => w[0]?.toUpperCase() ?? '')
   .join('');
+
+// 1 chip per taxonomy group (skip if empty or no-sound)
+const chips = [
+  industries[0]  ? getTaxonomyLabel('industries', industries[0])  : null,
+  styles[0]      ? getTaxonomyLabel('styles', styles[0])          : null,
+  soundMusic[0] && soundMusic[0] !== 'no-sound'
+    ? getTaxonomyLabel('soundMusic', soundMusic[0]) : null,
+].filter(Boolean) as string[];
 ---
 
 <a href={slug ? `/videos/${slug}` : '#'} class="video-card group cursor-pointer block" data-video-url={videoUrl} data-video-taxonomies={taxonomyTags}>
+
+  <!-- Thumbnail frame: 16:9, no bg, no padding -->
   <div class="card-frame">
-    {videoUrl && (
+    {videoUrl ? (
       <video
-        class="card-bg-video"
+        class="video-element w-full h-full object-cover opacity-0 transition-opacity duration-500"
         muted
         loop
         playsinline
         preload="none"
         data-src={videoUrl}
-        aria-hidden="true"
+      >
+        <source data-src={videoUrl} type="video/mp4" />
+      </video>
+    ) : (
+      <img
+        src={thumbnail}
+        alt={title}
+        class="w-full h-full object-cover"
+        loading="lazy"
       />
     )}
-    <div class="card-media">
-      {videoUrl ? (
-        <video
-          class="video-element w-full h-full object-cover opacity-0 transition-opacity duration-500"
-          muted
-          loop
-          playsinline
-          preload="none"
-          data-src={videoUrl}
-        >
-          <source data-src={videoUrl} type="video/mp4" />
-        </video>
-      ) : (
-        <img
-          src={thumbnail}
-          alt={title}
-          class="w-full h-full object-cover"
-          loading="lazy"
-        />
-      )}
-    </div>
 
-    <!-- Hover title overlay -->
-    <div class="card-title-overlay">
-      <p class="card-title-text">{title}</p>
-    </div>
+    <!-- Taxonomy chips — appear on hover, bottom-left of thumbnail -->
+    {chips.length > 0 && (
+      <div class="card-chips">
+        {chips.map(chip => (
+          <span class="card-chip">{chip}</span>
+        ))}
+      </div>
+    )}
   </div>
 
-  <!-- Card info below frame -->
+  <!-- Card info: logo + video title -->
   <div class="card-info">
-    <div class="card-author-row">
-      {authorAvatar ? (
-        <img class="card-avatar" src={authorAvatar} alt={author} loading="lazy" />
-      ) : (
-        <div class="card-avatar card-avatar-initials">{initials}</div>
-      )}
-      <p class="card-author-name">{author}</p>
-    </div>
+    {authorAvatar ? (
+      <img class="card-avatar" src={authorAvatar} alt={author} loading="lazy" />
+    ) : (
+      <div class="card-avatar card-avatar-initials">{initials}</div>
+    )}
+    <p class="card-title">{title}</p>
   </div>
+
 </a>
 
 <script>
-  // Intersection Observer + Progressive Loading for Video Cards
+  // @ts-nocheck
   document.addEventListener('DOMContentLoaded', function() {
-    // Configuration
     const CONFIG = {
-      rootMargin: '50px', // Start loading 50px before entering viewport
-      threshold: 0.1, // Trigger when 10% of video is visible
-      maxConcurrentVideos: 4, // Maximum videos playing simultaneously
-      playThreshold: 0.5 // Play when 50% visible
+      rootMargin: '50px',
+      threshold: 0.1,
+      maxConcurrentVideos: 4,
+      playThreshold: 0.5
     };
 
-    let currentlyPlayingVideos = new Set<HTMLVideoElement>();
+    let currentlyPlayingVideos = new Set();
     let loadedVideos = new WeakSet();
 
-    // Create intersection observers
     const loadObserver = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          loadVideo(entry.target);
-        }
+        if (entry.isIntersecting) loadVideo(entry.target);
       });
-    }, {
-      rootMargin: CONFIG.rootMargin,
-      threshold: CONFIG.threshold
-    });
+    }, { rootMargin: CONFIG.rootMargin, threshold: CONFIG.threshold });
 
     const playObserver = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
-        const videoCard = entry.target;
-        const video = videoCard.querySelector('.video-element') as HTMLVideoElement;
-        
+        const card = entry.target;
+        const video = card.querySelector('.video-element');
         if (!video || !loadedVideos.has(video)) return;
-
         if (entry.isIntersecting && entry.intersectionRatio >= CONFIG.playThreshold) {
-          playVideo(video, videoCard);
+          playVideo(video, card);
         } else {
-          pauseVideo(video, videoCard);
+          pauseVideoElement(video);
         }
       });
-    }, {
-      threshold: CONFIG.playThreshold
-    });
+    }, { threshold: CONFIG.playThreshold });
 
-    // Load video function
-    function loadVideo(videoCard: Element) {
-      const video = videoCard.querySelector('.video-element') as HTMLVideoElement;
-
+    function loadVideo(card) {
+      const video = card.querySelector('.video-element');
       if (!video || loadedVideos.has(video)) return;
 
-      // Set video source
       const dataSrc = video.getAttribute('data-src');
       if (dataSrc) {
         const source = video.querySelector('source');
-        if (source) {
-          source.src = dataSrc;
-        }
+        if (source) source.src = dataSrc;
         video.src = dataSrc;
       }
 
-      // Handle video events
       video.addEventListener('canplay', () => {
         loadedVideos.add(video);
-
-        // Show video
         video.style.opacity = '1';
-
-        // Start observing for play/pause
-        playObserver.observe(videoCard);
+        card.querySelector('.card-frame')?.classList.add('card-loaded');
+        playObserver.observe(card);
       });
 
       video.addEventListener('error', () => {
         console.warn('Video failed to load:', dataSrc);
       });
 
-      // Load the video
       video.load();
-
-      // Load bg video (same src = served from browser cache, no extra request)
-      const bgVideo = videoCard.querySelector('.card-bg-video') as HTMLVideoElement;
-      if (bgVideo && bgVideo.getAttribute('data-src')) {
-        bgVideo.src = bgVideo.getAttribute('data-src')!;
-        bgVideo.load();
-        bgVideo.play().then(() => {
-          bgVideo.playbackRate = 0.1;
-          bgVideo.style.opacity = '1';
-          (videoCard as HTMLElement).querySelector('.card-frame')?.classList.add('card-loaded');
-        }).catch(() => {});
-      }
     }
 
-    // Play video with concurrency control
-    function playVideo(video: HTMLVideoElement, videoCard: Element) {
-      // Check if we've reached max concurrent videos
+    function playVideo(video, card) {
       if (currentlyPlayingVideos.size >= CONFIG.maxConcurrentVideos) {
-        // Pause the oldest playing video
-        const oldestVideo = currentlyPlayingVideos.values().next().value;
-        if (oldestVideo && oldestVideo !== video) {
-          pauseVideoElement(oldestVideo);
-        }
+        const oldest = currentlyPlayingVideos.values().next().value;
+        if (oldest && oldest !== video) pauseVideoElement(oldest);
       }
-
-      video.currentTime = 0; // Reset to beginning
+      video.currentTime = 0;
       video.play().then(() => {
         currentlyPlayingVideos.add(video);
-      }).catch((error) => {
-        console.log('Autoplay failed:', error);
-        // Handle autoplay restrictions (especially on mobile)
-        showPlayButton(videoCard);
-      });
+      }).catch(() => {});
     }
 
-    // Pause video
-    function pauseVideo(video: HTMLVideoElement, videoCard: Element) {
-      pauseVideoElement(video);
-    }
-
-    function pauseVideoElement(video: HTMLVideoElement) {
+    function pauseVideoElement(video) {
       video.pause();
       currentlyPlayingVideos.delete(video);
     }
 
-    // Show play button for manual interaction (fallback for autoplay restrictions)
-    function showPlayButton(videoCard: Element) {
-      const playButton = document.createElement('div');
-      playButton.className = 'absolute inset-0 flex items-center justify-center bg-black/20 cursor-pointer z-10';
-      playButton.innerHTML = `
-        <div class="bg-white/95 backdrop-blur-sm rounded-full p-4 shadow-lg hover:scale-110 transition-transform">
-          <svg class="w-8 h-8 text-gray-900" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M8 5v14l11-7z"/>
-          </svg>
-        </div>
-      `;
-      
-      playButton.addEventListener('click', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        const video = videoCard.querySelector('.video-element') as HTMLVideoElement;
-        if (video) {
-          video.play();
-          playButton.remove();
-        }
-      });
-      
-      videoCard.querySelector('.relative')?.appendChild(playButton);
-    }
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
-    // Handle reduced motion preference
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (prefersReducedMotion) {
-      console.log('Reduced motion detected, skipping video autoplay');
-      return;
-    }
-
-    // Initialize observers for all video cards
-    const videoCards = document.querySelectorAll('.video-card');
-    videoCards.forEach(card => {
+    document.querySelectorAll('.video-card').forEach(card => {
       loadObserver.observe(card);
     });
 
-    // Cleanup on page unload
-     window.addEventListener('beforeunload', () => {
-       currentlyPlayingVideos.forEach(video => {
-         video.pause();
-       });
-     });
+    window.addEventListener('beforeunload', () => {
+      currentlyPlayingVideos.forEach(v => v.pause());
+    });
 
-     // Handle visibility change (pause videos when tab is hidden)
-     document.addEventListener('visibilitychange', () => {
-       if (document.hidden) {
-         currentlyPlayingVideos.forEach(video => {
-           video.pause();
-         });
-       }
-     });
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) currentlyPlayingVideos.forEach(v => v.pause());
+    });
   });
 </script>
 
 <style>
+  /* Frame: 16:9, no padding, no background */
   .card-frame {
     position: relative;
-    border-radius: 12px;
-    aspect-ratio: 4 / 3;
-    display: flex;
-    align-items: center;
+    aspect-ratio: 16 / 9;
+    border-radius: 8px;
     overflow: hidden;
-    padding: 12px;
-    background: #e8e8e8;
+    background: #d0d0d0;
   }
 
+  /* Shimmer loading state */
   .card-frame::after {
     content: '';
     position: absolute;
@@ -287,95 +200,86 @@ const initials = (author ?? '')
     100% { background-position: -200% 0; }
   }
 
-  .card-bg-video {
+  /* Taxonomy chips — absolute in frame, show on hover */
+  .card-chips {
     position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    filter: blur(24px) brightness(0.85) saturate(1.3);
-    transform: scale(1.15);
-    z-index: 0;
-    pointer-events: none;
-    opacity: 0;
-    transition: opacity 0.6s ease;
-  }
-
-  .card-media {
-    position: relative;
-    z-index: 1;
-    width: 100%;
-    aspect-ratio: 16 / 9;
-    overflow: hidden;
-    background: #d0d0d0;
-    border-radius: 8px;
-  }
-
-  /* Hover title overlay */
-  .card-title-overlay {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
+    bottom: 8px;
+    left: 8px;
+    display: flex;
+    gap: 6px;
     z-index: 2;
-    padding: 28px 14px 10px;
-    background: linear-gradient(transparent, rgba(0,0,0,0.55));
-    border-radius: 0 0 8px 8px;
     opacity: 0;
-    transition: opacity 0.25s ease;
-    pointer-events: none;
+    transition: opacity 0.2s ease;
   }
 
-  .group:hover .card-title-overlay {
+  .group:hover .card-chips {
     opacity: 1;
   }
 
-  .card-title-text {
-    font-size: 12px;
-    font-weight: 400;
-    color: rgba(255,255,255,0.9);
-    line-height: 1.4;
+  .card-chip {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 24px;
+    padding: 0 6.5px;
+    border-radius: 8px;
+    background: rgba(90, 90, 90, 0.4);
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+    box-shadow:
+      0px -1px 0px 0px rgba(255,255,255,0.35),
+      1px  0px 0px 0px rgba(255,255,255,0.15),
+      -1px 0px 0px 0px rgba(255,255,255,0.15),
+      0px  1px 0px 0px rgba(255,255,255,0.30),
+      0px  1px 1px 0px rgba(0,0,0,0.20);
+    color: #fff;
+    font-size: 10px;
+    letter-spacing: -0.08px;
     white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    line-height: 13px;
   }
 
-  /* Author row below frame */
+  /* Card info below frame */
   .card-info {
-    padding: 8px 2px 12px 2px;
-  }
-
-  .card-author-row {
     display: flex;
     align-items: center;
     gap: 8px;
+    padding: 10px 0 12px;
   }
 
   .card-avatar {
     width: 32px;
     height: 32px;
-    border-radius: 30%;
+    border-radius: 8px;
     object-fit: cover;
     flex-shrink: 0;
+    background: #fff;
     border: 1px solid #eeeeee;
   }
 
   .card-avatar-initials {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
     background: #2f2f2f;
     color: #ffffff;
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 600;
     display: flex;
     align-items: center;
     justify-content: center;
-    letter-spacing: 0px;
+    flex-shrink: 0;
   }
 
-  .card-author-name {
-    font-size: 16px;
-    color: #1b1b1b;
-    white-space: nowrap;
+  .card-title {
+    font-size: 13px;
+    color: #000;
+    line-height: 1.191;
+    flex: 1;
+    min-width: 0;
     overflow: hidden;
-    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
   }
 </style>
