@@ -4,52 +4,25 @@ import VideoGrid from "../components/VideoGrid.astro";
 import TopBar from "../components/TopBar.astro";
 import { getAllVideos, sortVideosByDate } from "../utils/videoUtils";
 
-const url = Astro.url;
-const activeIndustries = url.searchParams.get('industry')?.split(',').filter(Boolean) ?? [];
-const activeStyles     = url.searchParams.get('style')?.split(',').filter(Boolean) ?? [];
-const activeSounds     = url.searchParams.get('sound')?.split(',').filter(Boolean) ?? [];
-const pageNum          = Math.max(1, parseInt(url.searchParams.get('page') ?? '1'));
+export const prerender = true;
 
 const allVideos = await getAllVideos();
-const sorted = sortVideosByDate(allVideos);
-
-let filtered = sorted;
-if (activeIndustries.length > 0) {
-  filtered = filtered.filter((v: any) => activeIndustries.some(f => (v.data.industries ?? []).includes(f)));
-}
-if (activeStyles.length > 0) {
-  filtered = filtered.filter((v: any) => activeStyles.some(f => (v.data.styles ?? []).includes(f)));
-}
-if (activeSounds.length > 0) {
-  filtered = filtered.filter((v: any) => activeSounds.some(f => (v.data.soundMusic ?? []).includes(f)));
-}
-
+const videos = sortVideosByDate(allVideos);
 const itemsPerPage = 24;
-const filterParams = new URLSearchParams();
-if (activeIndustries.length > 0) filterParams.set('industry', activeIndustries.join(','));
-if (activeStyles.length > 0)     filterParams.set('style', activeStyles.join(','));
-if (activeSounds.length > 0)     filterParams.set('sound', activeSounds.join(','));
 ---
 
 <Layout title="Showreel.design — Discover the Best Motion Design Showreels">
   <main>
     <TopBar
-      totalCount={sorted.length}
-      filteredCount={filtered.length}
+      totalCount={videos.length}
       category="Motion Design"
-      allVideos={sorted}
-      activeIndustries={activeIndustries}
-      activeStyles={activeStyles}
-      activeSounds={activeSounds}
-      filterBaseUrl="/"
-      currentPage={pageNum}
+      allVideos={videos}
     />
     <VideoGrid
-      videos={filtered}
-      currentPage={pageNum}
+      videos={videos}
+      currentPage={1}
       itemsPerPage={itemsPerPage}
       baseUrl="/"
-      filterParams={filterParams.toString()}
     />
   </main>
 </Layout>
