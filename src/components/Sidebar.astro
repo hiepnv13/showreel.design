@@ -13,7 +13,6 @@ for (const cat of allCategories) {
 }
 
 const isHome = currentPath === '/' || currentPath.startsWith('/page/');
-const isResourcesActive = currentPath.startsWith('/resources');
 const isAboutActive = currentPath === '/about';
 
 ---
@@ -37,24 +36,56 @@ const isAboutActive = currentPath === '/about';
       <span>.Design</span>
     </a>
 
-    <!-- Category nav -->
-    <nav class="sidebar-nav">
-      <a href="/" class={`sidebar-item sidebar-item-row ${isHome ? 'active' : ''}`}>
-        <span>All</span>
-        <span class={`sidebar-badge ${isHome ? '' : 'badge-hidden'}`}>{totalCount}</span>
-      </a>
-      {allCategories.map((cat) => {
-        const slug = generateSlug(cat);
-        const isActive = currentPath.includes(`/category/${slug}`);
-        const count = categoryCounts.get(cat) ?? 0;
-        return (
-          <a href={`/category/${slug}`} class={`sidebar-item sidebar-item-row ${isActive ? 'active' : ''}`}>
-            <span>{cat}</span>
-            <span class={`sidebar-badge ${isActive ? '' : 'badge-hidden'}`}>{count}</span>
+    <!-- Main nav: Category + Resource sections -->
+    <div class="sidebar-sections">
+
+      <!-- Category section -->
+      <div class="sidebar-section">
+        <p class="sidebar-section-label">Category</p>
+        <nav class="sidebar-nav">
+          <a href="/" class={`sidebar-item sidebar-item-icon ${isHome ? 'active' : ''}`}>
+            <img src="/uploads/more-03.svg" class="nav-icon" alt="" />
+            <span class="nav-label">All</span>
+            <span class="sidebar-badge badge-hover">{totalCount}</span>
           </a>
-        );
-      })}
-    </nav>
+          {allCategories.map((cat) => {
+            const slug = generateSlug(cat);
+            const isActive = currentPath.includes(`/category/${slug}`);
+            const iconMap: {[key: string]: string} = {
+              'Motion Graphics':    'ease-curve-control-points',
+              '3D / CGI':           '3d-view',
+              'Studio / Agency':    'global',
+              'Branding & Identity':'pen-tool-03',
+              'UI/UX Motion':       'web-design-02',
+            };
+            const icon = iconMap[cat] ?? 'more-03';
+            return (
+              <a href={`/category/${slug}`} class={`sidebar-item sidebar-item-icon ${isActive ? 'active' : ''}`}>
+                <img src={`/uploads/${icon}.svg`} class="nav-icon" alt="" />
+                <span class="nav-label">{cat}</span>
+                <span class="sidebar-badge badge-hover">{categoryCounts.get(cat) ?? 0}</span>
+              </a>
+            );
+          })}
+        </nav>
+      </div>
+
+      <!-- Resource section -->
+      <div class="sidebar-section">
+        <p class="sidebar-section-label">Resource</p>
+        <nav class="sidebar-nav">
+          <a href="/resources/tools" class={`sidebar-item sidebar-item-icon ${currentPath.startsWith('/resources/tools') ? 'active' : ''}`}>
+            <img src="/uploads/cursor-edit-02.svg" class="nav-icon" alt="" />
+            <span class="nav-label">Tools</span>
+          </a>
+          <a href="/resources/courses" class={`sidebar-item sidebar-item-icon ${currentPath.startsWith('/resources/courses') ? 'active' : ''}`}>
+            <img src="/uploads/canvas.svg" class="nav-icon" alt="" />
+            <span class="nav-label">Courses</span>
+          </a>
+        </nav>
+      </div>
+
+    </div>
 
     <!-- Spacer -->
     <div class="sidebar-spacer"></div>
@@ -62,20 +93,6 @@ const isAboutActive = currentPath === '/about';
     <!-- Footer nav -->
     <div class="sidebar-footer">
       <a href="/about" class={`sidebar-item ${isAboutActive ? 'active' : ''}`}>About Us</a>
-
-      <!-- Resource dropdown -->
-      <div class="sidebar-resource-wrap">
-        <button class={`sidebar-item sidebar-item-row sidebar-resource-btn ${isResourcesActive ? 'active' : ''}`} id="resource-btn" aria-expanded="false">
-          <span>Resource</span>
-          <svg class="resource-caret" width="12" height="12" viewBox="0 0 12 12" fill="none">
-            <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </button>
-        <div class="resource-dropdown" id="resource-dropdown">
-          <a href="/resources/tools" class={`resource-dropdown-item ${currentPath.startsWith('/resources/tools') ? 'active' : ''}`}>Tools</a>
-          <a href="/resources/courses" class={`resource-dropdown-item ${currentPath.startsWith('/resources/courses') ? 'active' : ''}`}>Courses</a>
-        </div>
-      </div>
 
       <!-- Follow Us on X -->
       <a href="https://x.com/showreeldesign" target="_blank" rel="noopener noreferrer" class="sidebar-item">Follow Us on X</a>
@@ -135,9 +152,6 @@ const isAboutActive = currentPath === '/about';
 </aside>
 
 <script>
-  const resourceBtn = document.getElementById('resource-btn')!;
-  const resourceDropdown = document.getElementById('resource-dropdown')!;
-
   // Partner slider
   const slider = document.getElementById('partner-slider');
   const track  = document.getElementById('partner-track');
@@ -170,11 +184,6 @@ const isAboutActive = currentPath === '/about';
 
   startAuto();
 
-  // Auto-open dropdown if on a resources page
-  if (window.location.pathname.startsWith('/resources')) {
-    resourceDropdown.classList.add('open');
-    resourceBtn?.setAttribute('aria-expanded', 'true');
-  }
 
 </script>
 
@@ -234,19 +243,38 @@ const isAboutActive = currentPath === '/about';
 
   .sidebar-logo:hover { opacity: 0.7; }
 
+  /* ── Sections ── */
+  .sidebar-sections {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+  }
+
+  .sidebar-section {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .sidebar-section-label {
+    font-size: 13px;
+    color: #b6b6b6;
+    line-height: 1.191;
+    margin: 0;
+  }
+
   /* ── Nav items ── */
   .sidebar-nav {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 10px;
   }
 
   .sidebar-item {
     font-size: 13px;
-    color: #000;
+    color: #999;
     text-decoration: none;
-    opacity: 0.4;
-    transition: opacity 0.15s;
+    transition: color 0.15s;
     line-height: 1.191;
     background: none;
     border: none;
@@ -257,15 +285,49 @@ const isAboutActive = currentPath === '/about';
     font-family: 'Aileron', sans-serif;
   }
 
-  .sidebar-item:hover,
-  .sidebar-item.active {
-    opacity: 1;
-  }
+  .sidebar-item:hover { color: #444; }
+  .sidebar-item.active { color: #111; }
 
   .sidebar-item-row {
     display: flex;
     align-items: center;
     justify-content: space-between;
+  }
+
+  /* Icon nav items */
+  .sidebar-item-icon {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .nav-icon {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    opacity: 0.5;
+    transition: opacity 0.15s;
+  }
+
+  .sidebar-item-icon:hover .nav-icon { opacity: 0.7; }
+  .sidebar-item-icon.active .nav-icon { opacity: 1; }
+
+  /* Badge — hover-only for category items */
+  .badge-hover {
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.15s;
+  }
+
+  .sidebar-item-icon:hover .badge-hover,
+  .sidebar-item-icon.active .badge-hover {
+    visibility: visible;
+    opacity: 1;
+  }
+
+  .nav-label {
+    flex: 1;
+    min-width: 0;
   }
 
   .sidebar-badge {
@@ -299,61 +361,6 @@ const isAboutActive = currentPath === '/about';
     flex-shrink: 0;
   }
 
-  /* ── Resource dropdown ── */
-  .sidebar-resource-wrap {
-    display: flex;
-    flex-direction: column;
-    gap: 0;
-  }
-
-  .sidebar-resource-btn {
-    width: 100%;
-  }
-
-  .resource-caret {
-    opacity: 0.4;
-    transition: transform 0.2s;
-    flex-shrink: 0;
-  }
-
-  .sidebar-resource-btn[aria-expanded="true"] .resource-caret {
-    transform: rotate(180deg);
-    opacity: 1;
-  }
-
-  .resource-dropdown {
-    display: none;
-    flex-direction: column;
-    gap: 10px;
-    padding: 10px 0 0 10px;
-  }
-
-  .resource-dropdown.open {
-    display: flex;
-  }
-
-  .sidebar-resource-wrap:hover .resource-dropdown {
-    display: flex;
-  }
-
-  .sidebar-resource-wrap:hover .resource-caret {
-    transform: rotate(180deg);
-    opacity: 1;
-  }
-
-  .resource-dropdown-item {
-    font-size: 12px;
-    color: #000;
-    text-decoration: none;
-    opacity: 0.4;
-    transition: opacity 0.15s;
-    line-height: 1.2;
-  }
-
-  .resource-dropdown-item:hover,
-  .resource-dropdown-item.active {
-    opacity: 1;
-  }
 
   /* ── Partner logos ── */
   .sidebar-partner {

@@ -8,7 +8,7 @@ interface Props {
     currentPage?: number;
     itemsPerPage?: number;
     baseUrl?: string;
-    filter?: string;
+    filterParams?: string;
 }
 
 const {
@@ -16,7 +16,7 @@ const {
     currentPage = 1,
     itemsPerPage = 24,
     baseUrl = "/",
-    filter = "",
+    filterParams = "",
 } = Astro.props;
 
 const allVideos = propsVideos || sortVideosByDate(await getAllVideos());
@@ -50,7 +50,7 @@ const displayVideos = allVideos.slice(startIndex, startIndex + itemsPerPage);
         currentPage={currentPage}
         totalPages={totalPages}
         baseUrl={baseUrl}
-        filter={filter}
+        filterParams={filterParams}
     />
 </main>
 

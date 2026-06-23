@@ -1,77 +1,92 @@
 ---
-import {
-    getVideosByCategorySlug,
-    getAllCategories,
-    sortVideosByDate,
-    generateSlug,
-} from "../../utils/videoUtils";
+import { getVideosByCategorySlug, getAllCategories, sortVideosByDate, generateSlug } from "../../utils/videoUtils";
 import Layout from "../../layouts/Layout.astro";
 import VideoGrid from "../../components/VideoGrid.astro";
-import FilterBar from "../../components/FilterBar.astro";
+import TopBar from "../../components/TopBar.astro";
 
 const { slug } = Astro.params;
-const filter  = Astro.url.searchParams.get('filter') ?? '';
-const pageNum = Math.max(1, parseInt(Astro.url.searchParams.get('page') ?? '1'));
+const url = Astro.url;
 
-// Resolve category label from slug
+// Read multi-filter params
+const activeIndustries = url.searchParams.get('industry')?.split(',').filter(Boolean) ?? [];
+const activeStyles     = url.searchParams.get('style')?.split(',').filter(Boolean) ?? [];
+const activeSounds     = url.searchParams.get('sound')?.split(',').filter(Boolean) ?? [];
+const pageNum          = Math.max(1, parseInt(url.searchParams.get('page') ?? '1'));
+
+// Resolve category label
 const allCategories = await getAllCategories();
 const category = allCategories.find(c => generateSlug(c) === slug) ?? slug!;
 
-// Get + filter videos
-const allVideos = await getVideosByCategorySlug(slug!);
-const sorted = sortVideosByDate(allVideos);
+// All videos in this category (for filter options)
+const allCategoryVideos = await getVideosByCategorySlug(slug!);
+const sorted = sortVideosByDate(allCategoryVideos);
 
-const filtered = filter
-  ? sorted.filter((v: any) => [
-      ...(v.data.industries ?? []),
-      ...(v.data.styles ?? []),
-      ...(v.data.soundMusic ?? []),
-    ].includes(filter))
-  : sorted;
+// Apply AND filtering: each active group must match
+let filtered = sorted;
+if (activeIndustries.length > 0) {
+  filtered = filtered.filter((v: any) => activeIndustries.some(f => (v.data.industries ?? []).includes(f)));
+}
+if (activeStyles.length > 0) {
+  filtered = filtered.filter((v: any) => activeStyles.some(f => (v.data.styles ?? []).includes(f)));
+}
+if (activeSounds.length > 0) {
+  filtered = filtered.filter((v: any) => activeSounds.some(f => (v.data.soundMusic ?? []).includes(f)));
+}
 
-const itemsPerPage = 24;
+const itemsPerPage  = 24;
 const filterBaseUrl = `/category/${slug}`;
+
+// Serialize active filters for pagination
+const filterParams = new URLSearchParams();
+if (activeIndustries.length > 0) filterParams.set('industry', activeIndustries.join(','));
+if (activeStyles.length > 0)     filterParams.set('style', activeStyles.join(','));
+if (activeSounds.length > 0)     filterParams.set('sound', activeSounds.join(','));
 ---
 
 <Layout
   title={`${category} — Showreel.design`}
-  description={`Curated ${category} motion design reels from studios and creators worldwide.`}
+  description={`Curated ${category} motion design reels from top studios and creators worldwide.`}
   canonicalUrl={`https://showreel.design/category/${slug}`}
 >
-    <main>
-        <FilterBar videos={sorted} activeFilter={filter} filterBaseUrl={filterBaseUrl} />
+  <main>
+    <TopBar
+      totalCount={sorted.length}
+      filteredCount={filtered.length}
+      category={category}
+      allVideos={sorted}
+      activeIndustries={activeIndustries}
+      activeStyles={activeStyles}
+      activeSounds={activeSounds}
+      filterBaseUrl={filterBaseUrl}
+      currentPage={pageNum}
+    />
 
-        <VideoGrid
-            videos={filtered}
-            currentCategory={category}
-            showAllTab={true}
-            currentPage={pageNum}
-            itemsPerPage={itemsPerPage}
-            baseUrl={filterBaseUrl}
-            filter={filter}
-        />
+    <VideoGrid
+      videos={filtered}
+      currentPage={pageNum}
+      itemsPerPage={itemsPerPage}
+      baseUrl={filterBaseUrl}
+      filterParams={filterParams.toString()}
+    />
 
-        <!-- Empty State (only show if no videos in this category) -->
-        {
-            filtered.length === 0 && (
-                <section class="py-20 bg-gray-50">
-                    <div class="section-container">
-                        <div class="text-center py-16">
-                            <div class="text-gray-400 text-6xl mb-4">🎬</div>
-                            <h3 class="text-2xl font-bold text-gray-900 mb-2">
-                                No videos found
-                            </h3>
-                            <p class="text-gray-600 mb-8">
-                                There are no videos in the {category} category
-                                yet.
-                            </p>
-                            <a href="/" class="btn-primary">
-                                Browse All Videos
-                            </a>
-                        </div>
-                    </div>
-                </section>
-            )
-        }
-    </main>
+    {filtered.length === 0 && (
+      <div class="empty-state">
+        <p class="empty-hint">No videos match the selected filters.</p>
+        <a href={filterBaseUrl} class="empty-clear">Clear filters</a>
+      </div>
+    )}
+  </main>
 </Layout>
+
+<style>
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding: 80px 24px;
+    text-align: center;
+  }
+  .empty-hint { font-size: 14px; color: #bbb; }
+  .empty-clear { font-size: 13px; color: #111; text-decoration: underline; }
+</style>

@@ -1,0 +1,383 @@
+---
+import { getTaxonomyLabel } from '../config/taxonomies';
+
+interface Props {
+  totalCount: number;
+  filteredCount: number;
+  category?: string;
+  allVideos: any[];        // all videos in category (for available filter options)
+  activeIndustries: string[];
+  activeStyles: string[];
+  activeSounds: string[];
+  filterBaseUrl: string;
+}
+
+const {
+  totalCount,
+  filteredCount,
+  category = 'Motion Design',
+  allVideos = [],
+  activeIndustries = [],
+  activeStyles = [],
+  activeSounds = [],
+  filterBaseUrl = '/',
+} = Astro.props;
+
+// SEO copy
+const h1 = `Discover ${totalCount} Best ${category} Showreels`;
+const h2 = `Curated ${category.toLowerCase()} reels from top studios and creators worldwide.`;
+
+// Available taxonomy options present in current category
+const availableIndustries = [...new Set(allVideos.flatMap((v: any) => v.data.industries ?? []))];
+const availableStyles     = [...new Set(allVideos.flatMap((v: any) => v.data.styles ?? []))];
+const availableSounds     = [...new Set(allVideos.flatMap((v: any) => v.data.soundMusic ?? []))].filter(s => s !== 'no-sound');
+
+// Build new URL toggling a filter value within a group
+function buildUrl(group: string, value: string) {
+  const params = new URLSearchParams();
+  // Preserve other groups
+  if (group !== 'industry' && activeIndustries.length > 0) params.set('industry', activeIndustries.join(','));
+  if (group !== 'style'    && activeStyles.length > 0)     params.set('style',    activeStyles.join(','));
+  if (group !== 'sound'    && activeSounds.length > 0)     params.set('sound',    activeSounds.join(','));
+  // Toggle value in current group
+  const current = group === 'industry' ? activeIndustries : group === 'style' ? activeStyles : activeSounds;
+  const next = current.includes(value) ? current.filter(v => v !== value) : [...current, value];
+  if (next.length > 0) params.set(group, next.join(','));
+  const qs = params.toString();
+  return qs ? `${filterBaseUrl}?${qs}` : filterBaseUrl;
+}
+
+// Clear all filters URL
+const clearUrl = filterBaseUrl;
+const hasFilters = activeIndustries.length > 0 || activeStyles.length > 0 || activeSounds.length > 0;
+
+// Filter group definitions
+const groups = [
+  {
+    key: 'industry',
+    label: 'Industry',
+    options: availableIndustries,
+    active: activeIndustries,
+    getLabel: (v: string) => getTaxonomyLabel('industries', v),
+  },
+  {
+    key: 'style',
+    label: 'Style',
+    options: availableStyles,
+    active: activeStyles,
+    getLabel: (v: string) => getTaxonomyLabel('styles', v),
+  },
+  {
+    key: 'sound',
+    label: 'Sound',
+    options: availableSounds,
+    active: activeSounds,
+    getLabel: (v: string) => getTaxonomyLabel('soundMusic', v),
+  },
+].filter(g => g.options.length > 0);
+---
+
+<div class="topbar-wrap">
+
+  <!-- H1 / H2 — static, scrolls with page -->
+  <div class="topbar-heading">
+    <h1 class="topbar-h1">{h1}</h1>
+    <p class="topbar-h2">{h2}</p>
+  </div>
+
+  <!-- Filter row — sticky -->
+  <div class="topbar-filter" id="topbar-filter">
+    <div class="topbar-filter-left">
+
+      <!-- Filter group dropdowns -->
+      {groups.map(group => (
+        <div class="filter-group" data-group={group.key}>
+          <button class={`filter-group-btn ${group.active.length > 0 ? 'active' : ''}`} data-group-btn={group.key}>
+            <span>{group.label}</span>
+            {group.active.length > 0 && <span class="filter-group-count">{group.active.length}</span>}
+            <svg class="filter-group-caret" width="12" height="12" viewBox="0 0 12 12" fill="none">
+              <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+          <div class="filter-group-panel" data-group-panel={group.key}>
+            {group.options.map(value => {
+              const isChecked = group.active.includes(value);
+              const href = buildUrl(group.key, value);
+              return (
+                <a href={href} class={`filter-option ${isChecked ? 'checked' : ''}`}>
+                  <span class="filter-checkbox-box">{isChecked ? '✓' : ''}</span>
+                  <span>{group.getLabel(value)}</span>
+                </a>
+              );
+            })}
+          </div>
+        </div>
+      ))}
+
+      <!-- Clear filters -->
+      {hasFilters && (
+        <a href={clearUrl} class="filter-clear">Clear</a>
+      )}
+
+      <!-- Result count when filtered -->
+      {hasFilters && (
+        <span class="filter-result-count">{filteredCount} result{filteredCount !== 1 ? 's' : ''}</span>
+      )}
+    </div>
+
+    <!-- Search -->
+    <form action="/search" method="get" class="topbar-search">
+      <input
+        type="text"
+        name="q"
+        placeholder="Search"
+        class="topbar-search-input"
+        autocomplete="off"
+      />
+      <svg width="16" height="16" viewBox="0 0 256 256" fill="currentColor" class="topbar-search-icon">
+        <path d="M229.66 218.34l-50.06-50.07a88.11 88.11 0 1 0-11.31 11.31l50.06 50.07a8 8 0 0 0 11.31-11.31zM40 112a72 72 0 1 1 72 72 72.08 72.08 0 0 1-72-72z"/>
+      </svg>
+    </form>
+  </div>
+
+</div>
+
+<script>
+  // @ts-nocheck
+  document.querySelectorAll('[data-group-btn]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const key = btn.dataset.groupBtn;
+      const panel = document.querySelector(`[data-group-panel="${key}"]`);
+      const isOpen = panel?.classList.contains('open');
+      document.querySelectorAll('[data-group-panel]').forEach(p => p.classList.remove('open'));
+      document.querySelectorAll('[data-group-btn]').forEach(b => b.classList.remove('panel-open'));
+      if (!isOpen) {
+        panel?.classList.add('open');
+        btn.classList.add('panel-open');
+      }
+    });
+  });
+
+  document.addEventListener('click', () => {
+    document.querySelectorAll('[data-group-panel]').forEach(p => p.classList.remove('open'));
+    document.querySelectorAll('[data-group-btn]').forEach(b => b.classList.remove('panel-open'));
+  });
+</script>
+
+<style>
+  .topbar-wrap {
+    width: 100%;
+  }
+
+  /* ── Heading (static) ── */
+  .topbar-heading {
+    padding: 32px 32px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .topbar-h1 {
+    font-size: 40px;
+    font-weight: 400;
+    letter-spacing: -0.5px;
+    line-height: 1.1;
+    color: #000;
+    margin: 0;
+  }
+
+  .topbar-h2 {
+    font-size: 13px;
+    color: #000;
+    opacity: 0.5;
+    line-height: 1.191;
+    margin: 0;
+  }
+
+  /* ── Filter row (sticky) ── */
+  .topbar-filter {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    background: #fff;
+    border-bottom: 1px solid #f0f0f0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 8px 32px;
+    min-height: 44px;
+  }
+
+  .topbar-filter-left {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex: 1;
+    min-width: 0;
+  }
+
+  /* ── Filter group ── */
+  .filter-group {
+    position: relative;
+  }
+
+  .filter-group-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    height: 23px;
+    padding: 0 6px;
+    background: #f5f5f5;
+    border: none;
+    border-radius: 4px;
+    font-size: 10px;
+    color: #4b5563;
+    font-family: 'Aileron', sans-serif;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+    white-space: nowrap;
+  }
+
+  .filter-group-btn:hover,
+  .filter-group-btn.panel-open {
+    background: #e5e5e5;
+  }
+
+  .filter-group-btn.active {
+    background: #333;
+    color: #fff;
+  }
+
+  .filter-group-count {
+    background: rgba(255,255,255,0.25);
+    border-radius: 3px;
+    padding: 0 3px;
+    font-size: 9px;
+    line-height: 14px;
+  }
+
+  .filter-group-btn:not(.active) .filter-group-count {
+    background: rgba(0,0,0,0.1);
+  }
+
+  .filter-group-caret {
+    flex-shrink: 0;
+    transition: transform 0.2s;
+  }
+
+  .filter-group-btn.panel-open .filter-group-caret {
+    transform: rotate(180deg);
+  }
+
+  /* ── Dropdown panel ── */
+  .filter-group-panel {
+    display: none;
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    background: #fff;
+    border: 1px solid #f0f0f0;
+    border-radius: 8px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+    padding: 6px;
+    min-width: 180px;
+    z-index: 50;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .filter-group-panel.open {
+    display: flex;
+  }
+
+  .filter-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 8px;
+    font-size: 12px;
+    color: #333;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: background 0.1s;
+    white-space: nowrap;
+  }
+
+  .filter-option:hover { background: #f5f5f5; }
+  .filter-option.checked { color: #111; font-weight: 500; }
+
+  .filter-checkbox-box {
+    width: 14px;
+    height: 14px;
+    border: 1px solid #d0d0d0;
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 9px;
+    flex-shrink: 0;
+    background: #fff;
+    color: #111;
+  }
+
+  .filter-option.checked .filter-checkbox-box {
+    background: #111;
+    border-color: #111;
+    color: #fff;
+  }
+
+  /* Clear + result count */
+  .filter-clear {
+    font-size: 10px;
+    color: #999;
+    text-decoration: none;
+    padding: 0 4px;
+    transition: color 0.15s;
+  }
+
+  .filter-clear:hover { color: #333; }
+
+  .filter-result-count {
+    font-size: 10px;
+    color: #bbb;
+    white-space: nowrap;
+  }
+
+  /* ── Search ── */
+  .topbar-search {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #f5f5f5;
+    border-radius: 8px;
+    padding: 8px 12px;
+    width: 300px;
+    flex-shrink: 0;
+  }
+
+  .topbar-search-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    font-size: 13px;
+    font-family: 'Aileron', sans-serif;
+    color: #111;
+    opacity: 0.5;
+    min-width: 0;
+  }
+
+  .topbar-search-input::placeholder { color: #000; }
+  .topbar-search-input:focus { opacity: 1; }
+  .topbar-search-icon { color: #888; flex-shrink: 0; }
+
+  /* ── Mobile ── */
+  @media (max-width: 768px) {
+    .topbar-heading { padding: 20px 16px 16px; }
+    .topbar-h1 { font-size: 24px; }
+    .topbar-filter { padding: 8px 16px; top: 52px; }
+    .topbar-search { display: none; } /* hidden — mobile has search in MobileHeader */
+  }
+</style>
