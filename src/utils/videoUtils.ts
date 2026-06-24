@@ -87,6 +87,40 @@ export async function getVideosByIndustry(slug: string): Promise<CollectionEntry
   return allVideos.filter(video => (video.data.industries ?? []).includes(slug as any));
 }
 
+// Get all styles that have at least one video (sorted by count desc)
+export async function getAllStyles(): Promise<string[]> {
+  const videos = await getCollection('videos');
+  const counts: Record<string, number> = {};
+  videos.forEach((video: CollectionEntry<'videos'>) => {
+    (video.data.styles ?? []).forEach((s: string) => {
+      counts[s] = (counts[s] ?? 0) + 1;
+    });
+  });
+  return Object.keys(counts).sort((a, b) => counts[b] - counts[a]);
+}
+
+export async function getVideosByStyle(slug: string): Promise<CollectionEntry<'videos'>[]> {
+  const allVideos = await getAllVideos();
+  return allVideos.filter(video => (video.data.styles ?? []).includes(slug as any));
+}
+
+// Get all sound values that have at least one video (sorted by count desc)
+export async function getAllSounds(): Promise<string[]> {
+  const videos = await getCollection('videos');
+  const counts: Record<string, number> = {};
+  videos.forEach((video: CollectionEntry<'videos'>) => {
+    (video.data.soundMusic ?? []).forEach((s: string) => {
+      if (s !== 'no-sound') counts[s] = (counts[s] ?? 0) + 1;
+    });
+  });
+  return Object.keys(counts).sort((a, b) => counts[b] - counts[a]);
+}
+
+export async function getVideosBySound(slug: string): Promise<CollectionEntry<'videos'>[]> {
+  const allVideos = await getAllVideos();
+  return allVideos.filter(video => (video.data.soundMusic ?? []).includes(slug as any));
+}
+
 // Get all unique years (sorted descending)
 export async function getAllYears(): Promise<number[]> {
   const videos = await getCollection('videos');
