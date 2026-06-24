@@ -3,21 +3,22 @@ import { getTaxonomyLabel } from '../config/taxonomies';
 
 interface Props {
   totalCount: number;
-  category?: string;
   allVideos: any[];
+  h1Text?: string;
+  h2Text?: string;
 }
 
 const {
   totalCount,
-  category = 'Motion Design',
   allVideos = [],
+  h1Text,
+  h2Text,
 } = Astro.props;
 
 const currentPath = Astro.url.pathname;
 
-// SEO copy
-const h1 = `Discover ${totalCount} Best ${category} Showreels`;
-const h2 = `Curated ${category} reels from top studios and creators worldwide.`;
+const h1 = h1Text ?? `Discover ${totalCount} Best Showreels`;
+const h2 = h2Text ?? `Curated showreels from top studios and creators worldwide.`;
 
 // Active filter detection from URL
 const industryMatch = currentPath.match(/^\/industry\/(.+)/);

@@ -31,8 +31,9 @@ const itemsPerPage = 24;
   <main>
     <TopBar
       totalCount={videos.length}
-      category={`${label} Motion Design`}
       allVideos={videos}
+      h1Text={`Discover ${videos.length} Best Showreels Made for ${label}`}
+      h2Text={`Curated showreels crafted for ${label} — top studios and creators worldwide.`}
     />
     <VideoGrid videos={videos} currentPage={1} itemsPerPage={itemsPerPage} baseUrl={`/industry/${slug}`} />
   </main>

@@ -40,8 +40,9 @@ const itemsPerPage = 24;
     <main>
         <TopBar
             totalCount={videos.length}
-            category={category}
             allVideos={videos}
+            h1Text={`Discover ${videos.length} Best ${category} Showreels`}
+            h2Text={`Curated ${category} showreels from top studios and creators worldwide.`}
         />
         <VideoGrid
             videos={videos}
