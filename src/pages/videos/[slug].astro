@@ -1,6 +1,7 @@
 ---
 import { getCollection, type CollectionEntry } from "astro:content";
 import { getAllVideos, getRelatedVideos, generateSlug, getIndustryLabel } from "../../utils/videoUtils";
+import { getTaxonomyLabel } from "../../config/taxonomies";
 import Layout from "../../layouts/Layout.astro";
 import VideoCard from "../../components/VideoCard.astro";
 import FilterBar from "../../components/FilterBar.astro";
@@ -285,13 +286,21 @@ const jsonLd = {
           {hasStyles && (
             <div class="detail-row">
               <span class="detail-key">Style</span>
-              <span class="detail-val">{formatTaxonomyValue(video.data.styles)}</span>
+              <span class="detail-val">
+                {video.data.styles.map((s: string, i: number) => (
+                  <>{i > 0 && <span> · </span>}<a href={`/style/${s}`} class="detail-link">{getTaxonomyLabel('styles', s)}</a></>
+                ))}
+              </span>
             </div>
           )}
           {hasSoundMusic && (
             <div class="detail-row">
               <span class="detail-key">Sound / Music</span>
-              <span class="detail-val">{formatTaxonomyValue(video.data.soundMusic)}</span>
+              <span class="detail-val">
+                {video.data.soundMusic.filter((s: string) => s !== 'no-sound').map((s: string, i: number) => (
+                  <>{i > 0 && <span> · </span>}<a href={`/sound/${s}`} class="detail-link">{getTaxonomyLabel('soundMusic', s)}</a></>
+                ))}
+              </span>
             </div>
           )}
           {video.data.sourceUrl && (
