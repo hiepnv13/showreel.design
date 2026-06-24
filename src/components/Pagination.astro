@@ -3,10 +3,9 @@ interface Props {
     currentPage: number;
     totalPages: number;
     baseUrl: string;
-    filterParams?: string; // serialized query string of active filters e.g. "industry=tech-saas&style=minimal-clean"
 }
 
-const { currentPage, totalPages, baseUrl, filterParams = '' } = Astro.props;
+const { currentPage, totalPages, baseUrl } = Astro.props;
 
 // Calculate which pages to show
 const getVisiblePages = (current: number, total: number) => {
@@ -50,13 +49,12 @@ const getVisiblePages = (current: number, total: number) => {
 
 const visiblePages = getVisiblePages(currentPage, totalPages);
 
-// Helper function to generate page URL (preserves all filter params)
+// Helper function to generate page URL (path-based)
 const getPageUrl = (page: number) => {
-    const params = new URLSearchParams(filterParams);
-    if (page > 1) params.set('page', String(page));
-    else params.delete('page');
-    const qs = params.toString();
-    return qs ? `${baseUrl}?${qs}` : baseUrl;
+    if (page === 1) {
+        return baseUrl === '/' ? '/' : baseUrl;
+    }
+    return baseUrl === '/' ? `/page/${page}` : `${baseUrl}/${page}`;
 };
 ---
 
