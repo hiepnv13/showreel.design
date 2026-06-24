@@ -5,6 +5,7 @@ import { getAllSounds, getVideosBySound, sortVideosByDate } from "../../utils/vi
 import { getTaxonomyLabel } from "../../config/taxonomies";
 import Layout from "../../layouts/Layout.astro";
 import VideoGrid from "../../components/VideoGrid.astro";
+import TopBar from "../../components/TopBar.astro";
 import type { GetStaticPaths } from "astro";
 
 export const getStaticPaths: GetStaticPaths = async () => {
@@ -18,36 +19,22 @@ export const getStaticPaths: GetStaticPaths = async () => {
 interface Props { slug: string; }
 const { slug } = Astro.props;
 
-const allSounds = await getAllSounds();
 const label = getTaxonomyLabel('soundMusic', slug);
 const videos = sortVideosByDate(await getVideosBySound(slug));
 const itemsPerPage = 24;
 ---
 
-<Layout title={`${label} Motion Design — Showreel.design`}>
-  <div class="sound-chips">
-    {allSounds.map(s => (
-      <a href={`/sound/${s}`} class={`filter-btn${s === slug ? ' active' : ''}`}>
-        {getTaxonomyLabel('soundMusic', s)}
-      </a>
-    ))}
-  </div>
-
-  <VideoGrid videos={videos} currentPage={1} itemsPerPage={itemsPerPage} baseUrl={`/sound/${slug}`} />
+<Layout
+  title={`${label} Motion Design Showreels — Showreel.design`}
+  description={`Curated motion design reels with ${label} soundtrack.`}
+  canonicalUrl={`https://showreel.design/sound/${slug}`}
+>
+  <main>
+    <TopBar
+      totalCount={videos.length}
+      category={`${label} Motion Design`}
+      allVideos={videos}
+    />
+    <VideoGrid videos={videos} currentPage={1} itemsPerPage={itemsPerPage} baseUrl={`/sound/${slug}`} />
+  </main>
 </Layout>
-
-<style>
-  .sound-chips {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 12px 16px;
-    flex-wrap: wrap;
-    overflow-x: auto;
-    scrollbar-width: none;
-  }
-  .sound-chips::-webkit-scrollbar { display: none; }
-  @media (min-width: 640px) {
-    .sound-chips { padding: 16px 32px; flex-wrap: wrap; overflow-x: visible; }
-  }
-</style>
