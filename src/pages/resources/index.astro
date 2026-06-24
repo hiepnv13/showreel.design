@@ -1,0 +1,160 @@
+---
+import { getCollection } from "astro:content";
+import Layout from "../../layouts/Layout.astro";
+import ToolCard from "../../components/ToolCard.astro";
+
+export const prerender = true;
+
+const allTools = await getCollection('tools');
+const tools = allTools.sort((a, b) => (a.data.order ?? 0) - (b.data.order ?? 0));
+
+const allCourses = await getCollection('courses');
+const courses = allCourses.sort((a, b) => (a.data.order ?? 0) - (b.data.order ?? 0));
+
+const sections = [
+  {
+    label: 'Tools',
+    href: '/resources/tools',
+    items: tools.slice(0, 4),
+    total: tools.length,
+    available: true,
+  },
+  {
+    label: 'Courses',
+    href: '/resources/courses',
+    items: courses.slice(0, 4),
+    total: courses.length,
+    available: true,
+  },
+];
+---
+
+<Layout
+  title="Motion Design Resources — Showreel.design"
+  description="Curated tools, courses, templates, and more for motion designers and studios worldwide."
+  canonicalUrl="https://showreel.design/resources"
+>
+
+  <main class="w-full bg-white px-4 sm:px-8 pb-16">
+
+    {sections.map((section) => (
+      <div class="resource-section">
+
+        <!-- Section header -->
+        <div class="resource-section-header">
+          <div class="resource-section-left">
+            <p class="resource-section-label">{section.label}</p>
+            {section.total > 4 && (
+              <span class="resource-section-count">{section.total} total</span>
+            )}
+          </div>
+          {section.available && (
+            <a href={section.href} class="resource-view-all">
+              View all {section.label}
+              <svg viewBox="0 0 16 16" fill="none">
+                <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </a>
+          )}
+        </div>
+
+        <!-- Cards grid -->
+        {section.items.length > 0 ? (
+          <div class="resource-grid">
+            {section.items.map((tool: any) => (
+              <ToolCard
+                name={tool.data.name}
+                pricing={tool.data.pricing}
+                href={tool.data.href}
+                thumbnail={tool.data.thumbnail}
+                tags={tool.data.tags}
+              />
+            ))}
+          </div>
+        ) : (
+          <div class="resource-empty">
+            <p>Coming soon.</p>
+          </div>
+        )}
+
+      </div>
+    ))}
+
+  </main>
+
+</Layout>
+
+<style>
+  .resource-section {
+    margin-bottom: 56px;
+  }
+
+  .resource-section-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    padding: 20px 0 16px;
+    border-bottom: 1px solid #f0f0f0;
+    margin-bottom: 20px;
+  }
+
+  .resource-section-left {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+  }
+
+  .resource-section-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: #111;
+  }
+
+  .resource-section-count {
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #ccc;
+  }
+
+  .resource-view-all {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: #888;
+    text-decoration: none;
+    transition: color 0.2s, gap 0.2s;
+  }
+
+  .resource-view-all:hover {
+    color: #111;
+    gap: 10px;
+  }
+
+  .resource-view-all svg {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+  }
+
+  .resource-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px 12px;
+  }
+
+  .resource-empty {
+    padding: 40px 0;
+    font-size: 13px;
+    color: #ccc;
+  }
+
+  @media (max-width: 1024px) {
+    .resource-grid { grid-template-columns: repeat(3, 1fr); }
+  }
+
+  @media (max-width: 640px) {
+    .resource-grid { grid-template-columns: repeat(2, 1fr); gap: 12px 8px; }
+  }
+</style>

@@ -1,16 +1,10 @@
 ---
 export const prerender = true;
 
-import {
-  getVideosByIndustry,
-  getAllIndustries,
-  getIndustryLabel,
-  sortVideosByDate,
-} from "../../utils/videoUtils";
+import { getVideosByIndustry, getAllIndustries, getIndustryLabel, sortVideosByDate } from "../../utils/videoUtils";
 import Layout from "../../layouts/Layout.astro";
-import Header from "../../components/Header.astro";
-import Footer from "../../components/Footer.astro";
 import VideoGrid from "../../components/VideoGrid.astro";
+import TopBar from "../../components/TopBar.astro";
 import type { GetStaticPaths } from "astro";
 
 export const getStaticPaths: GetStaticPaths = async () => {
@@ -21,67 +15,26 @@ export const getStaticPaths: GetStaticPaths = async () => {
   }));
 };
 
-interface Props {
-  slug: string;
-}
-
+interface Props { slug: string; }
 const { slug } = Astro.props;
-const allIndustries = await getAllIndustries();
+
 const label = getIndustryLabel(slug);
-
-const allVideos = await getVideosByIndustry(slug);
-const videos = sortVideosByDate(allVideos);
+const videos = sortVideosByDate(await getVideosByIndustry(slug));
 const itemsPerPage = 24;
-const totalCount = videos.length;
-const showingCount = Math.min(itemsPerPage, totalCount);
-
 ---
 
-<Layout title={`${label} Motion Design — Showreel.design`}>
-  <Header showingCount={showingCount} totalCount={totalCount} />
-
-  <!-- Industry filter chips -->
-  <div class="industry-chips">
-    {allIndustries.map((ind) => (
-      <a
-        href={`/industry/${ind}`}
-        class={`filter-btn${ind === slug ? ' active' : ''}`}
-      >
-        {getIndustryLabel(ind)}
-      </a>
-    ))}
-  </div>
-
-  <VideoGrid
-    videos={videos}
-    currentPage={1}
-    itemsPerPage={itemsPerPage}
-    baseUrl={`/industry/${slug}`}
-  />
-  <Footer />
+<Layout
+  title={`${label} Showreels — Showreel.design`}
+  description={`Curated ${label} motion design reels from top studios and creators worldwide.`}
+  canonicalUrl={`https://showreel.design/industry/${slug}`}
+>
+  <main>
+    <TopBar
+      totalCount={videos.length}
+      allVideos={videos}
+      h1Text={`Discover ${videos.length} Best ${label} Showreels`}
+      h2Text={`Curated ${label} showreels from top studios and creators worldwide.`}
+    />
+    <VideoGrid videos={videos} currentPage={1} itemsPerPage={itemsPerPage} baseUrl={`/industry/${slug}`} />
+  </main>
 </Layout>
-
-<style>
-  .industry-chips {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 12px 16px;
-    flex-wrap: wrap;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-  }
-
-  .industry-chips::-webkit-scrollbar {
-    display: none;
-  }
-
-  @media (min-width: 640px) {
-    .industry-chips {
-      padding: 16px 32px;
-      flex-wrap: wrap;
-      overflow-x: visible;
-    }
-  }
-</style>

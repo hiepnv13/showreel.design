@@ -1,0 +1,41 @@
+---
+export const prerender = true;
+
+import { getAllSounds, getVideosBySound, sortVideosByDate } from "../../utils/videoUtils";
+import { getTaxonomyLabel } from "../../config/taxonomies";
+import Layout from "../../layouts/Layout.astro";
+import VideoGrid from "../../components/VideoGrid.astro";
+import TopBar from "../../components/TopBar.astro";
+import type { GetStaticPaths } from "astro";
+
+export const getStaticPaths: GetStaticPaths = async () => {
+  const sounds = await getAllSounds();
+  return sounds.map((slug: string) => ({
+    params: { slug },
+    props: { slug },
+  }));
+};
+
+interface Props { slug: string; }
+const { slug } = Astro.props;
+
+const label = getTaxonomyLabel('soundMusic', slug);
+const videos = sortVideosByDate(await getVideosBySound(slug));
+const itemsPerPage = 24;
+---
+
+<Layout
+  title={`${label} Showreels — Showreel.design`}
+  description={`Curated motion design reels with ${label} soundtrack.`}
+  canonicalUrl={`https://showreel.design/sound/${slug}`}
+>
+  <main>
+    <TopBar
+      totalCount={videos.length}
+      allVideos={videos}
+      h1Text={`Discover ${videos.length} Best Showreels with ${label} Music`}
+      h2Text={`Curated showreels featuring ${label} soundtrack — top studios and creators worldwide.`}
+    />
+    <VideoGrid videos={videos} currentPage={1} itemsPerPage={itemsPerPage} baseUrl={`/sound/${slug}`} />
+  </main>
+</Layout>

@@ -1,0 +1,96 @@
+---
+import { getCollection } from "astro:content";
+import Layout from "../../layouts/Layout.astro";
+import ToolCard from "../../components/ToolCard.astro";
+
+export const prerender = true;
+
+const allTools = await getCollection('tools');
+const tools = allTools.sort((a, b) => (a.data.order ?? 0) - (b.data.order ?? 0));
+
+const categories = [
+  'Animation Software',
+  'Web & UI Animation',
+  'AI Motion Tools',
+  'Assets & Resources',
+] as const;
+---
+
+<Layout
+  title="Motion Design Tools — Showreel.design"
+  description="The best software, apps, and tools for professional motion designers — from After Effects and Cinema 4D to AI video tools and web animation platforms."
+  canonicalUrl="https://showreel.design/resources/tools"
+>
+
+  <main class="w-full bg-white px-4 sm:px-8 pb-16">
+
+    {categories.map((category) => {
+      const categoryTools = tools.filter(t => t.data.category === category);
+      if (categoryTools.length === 0) return null;
+      return (
+        <section class="tools-section">
+          <div class="section-header">
+            <p class="section-label">{category}</p>
+            <span class="section-count">{categoryTools.length} tool{categoryTools.length > 1 ? 's' : ''}</span>
+          </div>
+          <div class="tools-grid">
+            {categoryTools.map((tool) => (
+              <ToolCard
+                name={tool.data.name}
+                pricing={tool.data.pricing}
+                href={tool.data.href}
+                thumbnail={tool.data.thumbnail}
+                tags={tool.data.tags}
+              />
+            ))}
+          </div>
+        </section>
+      );
+    })}
+
+  </main>
+
+</Layout>
+
+<style>
+  .tools-section {
+    margin-bottom: 48px;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    padding: 20px 0 16px;
+    border-bottom: 1px solid #f0f0f0;
+    margin-bottom: 20px;
+  }
+
+  .section-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: #111;
+    letter-spacing: 0;
+  }
+
+  .section-count {
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #ccc;
+  }
+
+  .tools-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px 12px;
+  }
+
+  @media (max-width: 1024px) {
+    .tools-grid { grid-template-columns: repeat(3, 1fr); }
+  }
+
+  @media (max-width: 640px) {
+    .tools-grid { grid-template-columns: repeat(2, 1fr); gap: 12px 8px; }
+  }
+</style>

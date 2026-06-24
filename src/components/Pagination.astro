@@ -2,7 +2,7 @@
 interface Props {
     currentPage: number;
     totalPages: number;
-    baseUrl: string; // Base URL for pagination links (e.g., "/", "/category/motion-graphics")
+    baseUrl: string;
 }
 
 const { currentPage, totalPages, baseUrl } = Astro.props;
@@ -49,12 +49,12 @@ const getVisiblePages = (current: number, total: number) => {
 
 const visiblePages = getVisiblePages(currentPage, totalPages);
 
-// Helper function to generate page URL
+// Helper function to generate page URL (path-based)
 const getPageUrl = (page: number) => {
     if (page === 1) {
-        return baseUrl === "/" ? "/" : baseUrl;
+        return baseUrl === '/' ? '/' : baseUrl;
     }
-    return baseUrl === "/" ? `/page/${page}` : `${baseUrl}/${page}`;
+    return baseUrl === '/' ? `/page/${page}` : `${baseUrl}/${page}`;
 };
 ---
 

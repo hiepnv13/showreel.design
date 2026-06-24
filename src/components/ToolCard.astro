@@ -1,0 +1,151 @@
+---
+export interface Props {
+  name: string;
+  pricing: string;
+  href: string;
+  thumbnail?: string;
+  tags?: { label: string; color: string }[];
+}
+
+const { name, pricing, href, thumbnail, tags = [] } = Astro.props;
+
+const colorMap: Record<string, { bg: string; text: string }> = {
+  blue:   { bg: '#dbeafe', text: '#1d4ed8' },
+  green:  { bg: '#dcfce7', text: '#16a34a' },
+  orange: { bg: '#ffedd5', text: '#ea580c' },
+  purple: { bg: '#f3e8ff', text: '#9333ea' },
+  gray:   { bg: '#f0f0f0', text: '#888888' },
+};
+---
+
+<a href={href} target="_blank" rel="noopener noreferrer" class="tool-card group cursor-pointer block">
+  <div class="card-frame">
+    <div class="card-media">
+      <img
+        src={thumbnail || '/placeholder.svg'}
+        alt={name}
+        class="w-full h-full object-cover"
+        loading="lazy"
+      />
+    </div>
+
+    <!-- Hover name overlay -->
+    <div class="card-title-overlay">
+      <p class="card-title-text">{name}</p>
+    </div>
+  </div>
+
+  <!-- Info below frame -->
+  <div class="card-info">
+    <div class="card-name-row">
+      <p class="card-name">{name}</p>
+      <p class="card-pricing">{pricing}</p>
+    </div>
+    {tags.length > 0 && (
+      <div class="card-tags">
+        {tags.map((tag) => {
+          const c = colorMap[tag.color] ?? colorMap.gray;
+          return (
+            <span class="card-tag" style={`background:${c.bg};color:${c.text}`}>
+              {tag.label}
+            </span>
+          );
+        })}
+      </div>
+    )}
+  </div>
+</a>
+
+<style>
+  .card-frame {
+    position: relative;
+    border-radius: 12px;
+    aspect-ratio: 4 / 3;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    padding: 12px;
+    background: #e8e8e8;
+  }
+
+  .card-media {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    background: #d0d0d0;
+    border-radius: 8px;
+  }
+
+  .card-title-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 2;
+    padding: 28px 14px 10px;
+    background: linear-gradient(transparent, rgba(0,0,0,0.55));
+    border-radius: 0 0 8px 8px;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+    pointer-events: none;
+  }
+
+  .group:hover .card-title-overlay {
+    opacity: 1;
+  }
+
+  .card-title-text {
+    font-size: 12px;
+    font-weight: 400;
+    color: rgba(255,255,255,0.9);
+    line-height: 1.4;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .card-info {
+    padding: 8px 2px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .card-name-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .card-name {
+    font-size: 14px;
+    color: #1b1b1b;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .card-pricing {
+    font-size: 11px;
+    color: #bbb;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .card-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
+  .card-tag {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.2px;
+    padding: 2px 8px;
+    border-radius: 20px;
+  }
+</style>

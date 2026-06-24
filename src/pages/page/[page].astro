@@ -2,9 +2,8 @@
 export const prerender = true;
 
 import Layout from "../../layouts/Layout.astro";
-import Header from "../../components/Header.astro";
-import Footer from "../../components/Footer.astro";
 import VideoGrid from "../../components/VideoGrid.astro";
+import TopBar from "../../components/TopBar.astro";
 import { getAllVideos, sortVideosByDate } from "../../utils/videoUtils";
 
 export async function getStaticPaths() {
@@ -51,12 +50,16 @@ const showingCount = endIndex - startIndex;
 ---
 
 <Layout title={`Showreel.design - Page ${pageNumber}`}>
-    <Header showingCount={showingCount} totalCount={totalCount} />
+    <TopBar
+        totalCount={totalCount}
+        allVideos={videos}
+        h1Text={`Discover ${totalCount} Best Showreels`}
+        h2Text="The best motion design reels from top studios and creators worldwide."
+    />
     <VideoGrid
         videos={videos}
         currentPage={pageNumber}
         itemsPerPage={itemsPerPage}
         baseUrl="/"
     />
-  <Footer />
 </Layout>

@@ -1,65 +1,35 @@
 ---
 import VideoCard from "./VideoCard.astro";
 import Pagination from "./Pagination.astro";
-import {
-    getAllVideos,
-    getAllCategories,
-    sortVideosByDate,
-    generateSlug,
-} from "../utils/videoUtils";
+import { getAllVideos, sortVideosByDate } from "../utils/videoUtils";
 
-// Props interface for reusability
 interface Props {
-    videos?: any[]; // Pre-filtered videos from parent page
-    currentCategory?: string; // Current active category for highlighting tabs
-    showAllTab?: boolean; // Whether to show "All Work" tab
-    currentPage?: number; // Current page number
-    itemsPerPage?: number; // Items per page
-    baseUrl?: string; // Base URL for pagination
+    videos?: any[];
+    currentPage?: number;
+    itemsPerPage?: number;
+    baseUrl?: string;
+    filterParams?: string;
 }
 
 const {
     videos: propsVideos,
-    currentCategory = "All",
-    showAllTab = true,
     currentPage = 1,
     itemsPerPage = 24,
     baseUrl = "/",
+    filterParams = "",
 } = Astro.props;
 
-// If videos are passed as props, use them. Otherwise get all videos
 const allVideos = propsVideos || sortVideosByDate(await getAllVideos());
 
-// Calculate pagination
-const totalVideos = allVideos.length;
-const totalPages = Math.ceil(totalVideos / itemsPerPage);
+const totalPages = Math.ceil(allVideos.length / itemsPerPage);
 const startIndex = (currentPage - 1) * itemsPerPage;
-const endIndex = startIndex + itemsPerPage;
-const displayVideos = allVideos.slice(startIndex, endIndex);
-
-// Get all categories for filter tabs
-const categories = await getAllCategories();
-
-// Calculate video count for each category (using all videos for accurate counts)
-const allVideosForCount = propsVideos ? await getAllVideos() : allVideos;
-const categoryVideoCounts = categories.reduce(
-    (counts, category) => {
-        counts[category] = allVideosForCount.filter(
-            (video) => video.data.category === category,
-        ).length;
-        return counts;
-    },
-    {} as Record<string, number>,
-);
-
-// Total video count for "All Work" tab
-const totalVideoCount = allVideosForCount.length;
+const displayVideos = allVideos.slice(startIndex, startIndex + itemsPerPage);
 ---
 
-<main class="w-full bg-white video-grid px-4 sm:px-8 pb-10">
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+<main class="w-full bg-white video-grid px-4 sm:px-8 pt-8 pb-10">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
         {
-            displayVideos.map((video: any, index: number) => (
+            displayVideos.map((video: any) => (
                 <VideoCard
                     title={video.data.title}
                     author={video.data.author}
@@ -67,6 +37,9 @@ const totalVideoCount = allVideosForCount.length;
                     thumbnail={video.data.thumbnail}
                     videoUrl={video.data.thumbnailUrl}
                     slug={video.id}
+                    industries={video.data.industries ?? []}
+                    styles={video.data.styles ?? []}
+                    soundMusic={video.data.soundMusic ?? []}
                 />
             ))
         }
@@ -77,6 +50,7 @@ const totalVideoCount = allVideosForCount.length;
         currentPage={currentPage}
         totalPages={totalPages}
         baseUrl={baseUrl}
+        filterParams={filterParams}
     />
 </main>
 

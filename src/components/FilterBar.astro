@@ -1,0 +1,373 @@
+---
+import { getTaxonomyLabel } from '../config/taxonomies';
+
+interface Props {
+  videos?: any[];
+  breadcrumb?: Array<{ label: string; href: string }>;
+  activeFilter?: string;
+  filterBaseUrl?: string;
+  label?: string; // freeform left-side text (e.g. search results count)
+}
+
+const { videos = [], breadcrumb, activeFilter = '', filterBaseUrl = '', label } = Astro.props;
+
+// Count frequency of each taxonomy value across current videos
+function topByFrequency(field: string, n: number, exclude: string[] = []) {
+  const counts = new Map<string, number>();
+  for (const v of videos) {
+    for (const val of (v.data[field] ?? [])) {
+      if (!exclude.includes(val)) counts.set(val, (counts.get(val) ?? 0) + 1);
+    }
+  }
+  return [...counts.entries()]
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, n)
+    .map(([val]) => val);
+}
+
+// Top 3 per taxonomy by actual frequency in current videos
+const topIndustries = topByFrequency('industries', 3)
+  .map(val => ({ value: val, label: getTaxonomyLabel('industries', val), group: 'industry' }));
+
+const topStyles = topByFrequency('styles', 3)
+  .map(val => ({ value: val, label: getTaxonomyLabel('styles', val), group: 'style' }));
+
+const topSounds = topByFrequency('soundMusic', 3, ['no-sound'])
+  .map(val => ({ value: val, label: getTaxonomyLabel('soundMusic', val), group: 'sound' }));
+
+const barChips = [...topIndustries, ...topStyles, ...topSounds];
+const hasChips = barChips.length > 0;
+
+// Panel: ALL values by frequency, organized by group
+const allIndustries = topByFrequency('industries', 99)
+  .map(val => ({ value: val, label: getTaxonomyLabel('industries', val), group: 'industry' }));
+const allStyles = topByFrequency('styles', 99)
+  .map(val => ({ value: val, label: getTaxonomyLabel('styles', val), group: 'style' }));
+const allSounds = topByFrequency('soundMusic', 99, ['no-sound'])
+  .map(val => ({ value: val, label: getTaxonomyLabel('soundMusic', val), group: 'sound' }));
+
+const panelGroups = [
+  { label: 'Industry', chips: allIndustries },
+  { label: 'Style', chips: allStyles },
+  { label: 'Sound', chips: allSounds },
+].filter(g => g.chips.length > 0);
+---
+
+{(hasChips || breadcrumb || label) && (
+  <div class="filter-bar-wrap" id="filter-bar">
+
+    <!-- Main bar -->
+    <div class="filter-bar">
+
+      <!-- Left: label OR breadcrumb OR filter chips -->
+      <div class="filter-bar-left">
+        {label ? (
+          <span class="filter-label">{label}</span>
+        ) : breadcrumb ? (
+          <!-- Breadcrumb mode -->
+          <nav class="filter-breadcrumb">
+            {breadcrumb.map((item, i) => (
+              <>
+                {item.href ? (
+                  <a href={item.href} class="filter-breadcrumb-item">{item.label}</a>
+                ) : (
+                  <span class="filter-breadcrumb-item filter-breadcrumb-current">{item.label}</span>
+                )}
+                {i < breadcrumb.length - 1 && (
+                  <span class="filter-breadcrumb-sep">›</span>
+                )}
+              </>
+            ))}
+          </nav>
+        ) : (
+          <>
+            <button class="filter-icon-btn" id="filter-panel-btn" title="Toggle filters" aria-expanded="false">
+              <svg width="16" height="16" viewBox="0 0 256 256" fill="currentColor">
+                <path d="M32 72h24a24 24 0 0 0 46 0h122a8 8 0 0 0 0-16H102a24 24 0 0 0-46 0H32a8 8 0 0 0 0 16zm48-16a8 8 0 1 1-8 8 8 8 0 0 1 8-8zm144 56H208a24 24 0 0 0-46 0H32a8 8 0 0 0 0 16h130a24 24 0 0 0 46 0h16a8 8 0 0 0 0-16zm-48 16a8 8 0 1 1 8-8 8 8 0 0 1-8 8zm48 40H102a24 24 0 0 0-46 0H32a8 8 0 0 0 0 16h24a24 24 0 0 0 46 0h122a8 8 0 0 0 0-16zm-152 16a8 8 0 1 1 8-8 8 8 0 0 1-8 8z"/>
+              </svg>
+            </button>
+            <div class="filter-chips-scroll" id="filter-chips-row">
+              {barChips.map((chip: { value: string; label: string; group: string }) => {
+                const isActive = activeFilter === chip.value;
+                const href = isActive
+                  ? filterBaseUrl                                    // deselect: clear filter
+                  : `${filterBaseUrl}?filter=${chip.value}`;         // select: add filter
+                return (
+                  <a href={href} class={`filter-chip ${isActive ? 'active' : ''}`}>
+                    {chip.label}
+                  </a>
+                );
+              })}
+            </div>
+          </>
+        )}
+      </div>
+
+      <!-- Right: search -->
+      <form action="/search" method="get" class="filter-search" id="filter-search-form">
+        <input
+          type="text"
+          name="q"
+          placeholder="Search"
+          class="filter-search-input"
+          autocomplete="off"
+          id="filter-search-input"
+        />
+        <svg width="16" height="16" viewBox="0 0 256 256" fill="currentColor" class="filter-search-icon">
+          <path d="M229.66 218.34l-50.06-50.07a88.11 88.11 0 1 0-11.31 11.31l50.06 50.07a8 8 0 0 0 11.31-11.31zM40 112a72 72 0 1 1 72 72 72.08 72.08 0 0 1-72-72z"/>
+        </svg>
+      </form>
+    </div>
+
+    <!-- Advanced panel (toggle) -->
+    <div class="filter-panel" id="filter-panel">
+      {panelGroups.map(group => (
+        <div class="filter-panel-group">
+          <span class="filter-panel-label">{group.label}</span>
+          <div class="filter-panel-chips">
+            {group.chips.map((chip: { value: string; label: string; group: string }) => {
+              const isActive = activeFilter === chip.value;
+              const href = isActive ? filterBaseUrl : `${filterBaseUrl}?filter=${chip.value}`;
+              return (
+                <a href={href} class={`filter-chip filter-panel-chip ${isActive ? 'active' : ''}`}>
+                  {chip.label}
+                </a>
+              );
+            })}
+          </div>
+        </div>
+      ))}
+    </div>
+
+  </div>
+)}
+
+<script>
+  // Toggle advanced panel only
+  const panelBtn = document.getElementById('filter-panel-btn');
+  const panel = document.getElementById('filter-panel');
+  panelBtn?.addEventListener('click', () => {
+    const isOpen = panel?.classList.toggle('open');
+    panelBtn.setAttribute('aria-expanded', String(isOpen));
+    panelBtn.classList.toggle('active', !!isOpen);
+  });
+</script>
+
+<style>
+  .filter-bar-wrap {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    background: #fff;
+    border-bottom: 1px solid #f0f0f0;
+  }
+
+  @media (max-width: 768px) {
+    .filter-bar-wrap {
+      top: 52px; /* below MobileHeader */
+    }
+  }
+
+  /* Main bar */
+  .filter-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 8px 32px;
+    min-height: 44px;
+  }
+
+  .filter-bar-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+    min-width: 0;
+  }
+
+  /* Filter icon button */
+  .filter-icon-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 10px;
+    background: #ececec;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    color: #555;
+    flex-shrink: 0;
+    transition: background 0.15s, color 0.15s;
+  }
+
+  .filter-icon-btn:hover,
+  .filter-icon-btn.active {
+    background: #333;
+    color: #fff;
+  }
+
+  /* Chips scrollable row */
+  .filter-chips-scroll {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .filter-chips-scroll::-webkit-scrollbar { display: none; }
+
+  /* Chips */
+  .filter-chip {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    padding: 8px 12px;
+    background: #f5f5f5;
+    color: #4b5563;
+    font-size: 13px;
+    font-family: 'Aileron', sans-serif;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.15s, color 0.15s;
+    letter-spacing: 0;
+    line-height: 1.191;
+  }
+
+  .filter-chip:hover { background: #e5e5e5; }
+
+  .filter-chip.active {
+    background: #333;
+    color: #fff;
+  }
+
+  /* Label mode (search results) */
+  .filter-label {
+    font-size: 13px;
+    color: #111;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Breadcrumb mode */
+  .filter-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .filter-breadcrumb-item {
+    font-size: 13px;
+    color: #000;
+    opacity: 0.4;
+    text-decoration: none;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: opacity 0.15s;
+  }
+
+  .filter-breadcrumb-item:hover { opacity: 0.8; }
+
+  .filter-breadcrumb-current {
+    opacity: 1;
+    font-weight: 500;
+    pointer-events: none;
+  }
+
+  .filter-breadcrumb-sep {
+    font-size: 13px;
+    color: #ccc;
+    flex-shrink: 0;
+  }
+
+  /* Search */
+  .filter-search {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #f5f5f5;
+    border-radius: 8px;
+    padding: 8px 12px;
+    width: 200px;
+    flex-shrink: 0;
+  }
+
+  .filter-search-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    font-size: 13px;
+    font-family: 'Aileron', sans-serif;
+    color: #111;
+    opacity: 0.5;
+    min-width: 0;
+  }
+
+  .filter-search-input::placeholder { color: #000; }
+  .filter-search-input:focus { opacity: 1; }
+
+  .filter-search-icon {
+    color: #888;
+    flex-shrink: 0;
+  }
+
+  /* Advanced panel */
+  .filter-panel {
+    display: none;
+    flex-direction: column;
+    gap: 12px;
+    padding: 12px 32px 16px;
+    border-top: 1px solid #f5f5f5;
+    background: #fafafa;
+  }
+
+  .filter-panel.open { display: flex; }
+
+  .filter-panel-group {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .filter-panel-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #bbb;
+    padding-top: 4px;
+    width: 60px;
+    flex-shrink: 0;
+  }
+
+  .filter-panel-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  /* Mobile */
+  @media (max-width: 768px) {
+    .filter-bar {
+      padding: 8px 16px;
+      gap: 10px;
+    }
+
+    .filter-panel {
+      padding: 12px 16px 16px;
+    }
+
+    .filter-search {
+      display: none;
+    }
+  }
+</style>

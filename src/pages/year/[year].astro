@@ -3,9 +3,8 @@ export const prerender = true;
 
 import { getVideosByYear, getAllYears, sortVideosByDate } from "../../utils/videoUtils";
 import Layout from "../../layouts/Layout.astro";
-import Header from "../../components/Header.astro";
-import Footer from "../../components/Footer.astro";
 import VideoGrid from "../../components/VideoGrid.astro";
+import TopBar from "../../components/TopBar.astro";
 import type { GetStaticPaths } from "astro";
 
 export const getStaticPaths: GetStaticPaths = async () => {
@@ -16,42 +15,36 @@ export const getStaticPaths: GetStaticPaths = async () => {
   }));
 };
 
-interface Props {
-  year: number;
-}
+interface Props { year: number; }
 
 const { year } = Astro.props;
 const allYears = await getAllYears();
-
-const allVideos = await getVideosByYear(year);
-const videos = sortVideosByDate(allVideos);
+const videos = sortVideosByDate(await getVideosByYear(year));
 const itemsPerPage = 24;
-const totalCount = videos.length;
-const showingCount = Math.min(itemsPerPage, totalCount);
-
-const breadcrumb = [
-  { label: 'Home', href: '/' },
-  { label: String(year), href: '' },
-];
 ---
 
-<Layout title={`${year} Motion Design Showreels — Showreel.design`}>
-  <Header showingCount={showingCount} totalCount={totalCount} breadcrumb={breadcrumb} />
+<Layout
+  title={`${year} Showreels — Showreel.design`}
+  description={`Curated ${year} motion design reels from top studios and creators worldwide.`}
+  canonicalUrl={`https://showreel.design/year/${year}`}
+>
+  <main>
+    <TopBar
+      totalCount={videos.length}
+      allVideos={videos}
+      h1Text={`Discover ${videos.length} Best ${year} Showreels`}
+      h2Text={`The best showreels from ${year} — studios and creators worldwide.`}
+    />
 
-  <!-- Year filter chips -->
-  <div class="year-chips">
-    {allYears.map((y) => (
-      <a href={`/year/${y}`} class={`filter-btn${y === year ? ' active' : ''}`}>{y}</a>
-    ))}
-  </div>
+    <!-- Year navigation chips — below TopBar -->
+    <div class="year-chips">
+      {allYears.map((y) => (
+        <a href={`/year/${y}`} class={`filter-btn${y === year ? ' active' : ''}`}>{y}</a>
+      ))}
+    </div>
 
-  <VideoGrid
-    videos={videos}
-    currentPage={1}
-    itemsPerPage={itemsPerPage}
-    baseUrl={`/year/${year}`}
-  />
-  <Footer />
+    <VideoGrid videos={videos} currentPage={1} itemsPerPage={itemsPerPage} baseUrl={`/year/${year}`} />
+  </main>
 </Layout>
 
 <style>
@@ -61,5 +54,6 @@ const breadcrumb = [
     gap: 8px;
     padding: 16px 32px;
     flex-wrap: wrap;
+    border-bottom: 1px solid #f0f0f0;
   }
 </style>

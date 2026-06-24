@@ -1,29 +1,56 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import Header from "../components/Header.astro";
-import Footer from "../components/Footer.astro";
 import VideoGrid from "../components/VideoGrid.astro";
+import TopBar from "../components/TopBar.astro";
 import { getAllVideos, sortVideosByDate } from "../utils/videoUtils";
 
 export const prerender = true;
 
-// Get all videos sorted by date
 const allVideos = await getAllVideos();
 const videos = sortVideosByDate(allVideos);
-
-// Calculate counts for header
 const itemsPerPage = 24;
-const totalCount = videos.length;
-const showingCount = Math.min(itemsPerPage, totalCount);
 ---
 
-<Layout title="Showreel.design - Discover amazing showreels">
-    <Header showingCount={showingCount} totalCount={totalCount} />
-    <VideoGrid
-        videos={videos}
-        currentPage={1}
-        itemsPerPage={itemsPerPage}
-        baseUrl="/"
+<Layout title="Showreel.design — Discover the Best Showreels">
+  <main>
+    <TopBar
+      totalCount={videos.length}
+      allVideos={videos}
+      h1Text={`Discover ${videos.length} Best Showreels`}
+      h2Text="The best motion design reels from top studios and creators worldwide."
     />
-  <Footer />
+    <VideoGrid
+      videos={videos}
+      currentPage={1}
+      itemsPerPage={itemsPerPage}
+      baseUrl="/"
+    />
+
+    <!-- Newsletter footer -->
+    <div class="newsletter-footer">
+      <p class="newsletter-title">The best motion reels, weekly.</p>
+      <div class="klaviyo-form-SffEDu"></div>
+    </div>
+
+  </main>
 </Layout>
+
+<style>
+  .newsletter-footer {
+    padding: 64px 32px 80px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+    border-top: 1px solid #f0f0f0;
+    text-align: center;
+  }
+
+  .newsletter-title {
+    font-size: 28px;
+    font-weight: 400;
+    letter-spacing: -0.3px;
+    color: #111;
+    margin: 0;
+  }
+</style>
