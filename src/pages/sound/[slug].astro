@@ -25,7 +25,7 @@ const itemsPerPage = 24;
 ---
 
 <Layout
-  title={`${label} Motion Design Showreels — Showreel.design`}
+  title={`${label} Showreels — Showreel.design`}
   description={`Curated motion design reels with ${label} soundtrack.`}
   canonicalUrl={`https://showreel.design/sound/${slug}`}
 >
@@ -33,8 +33,8 @@ const itemsPerPage = 24;
     <TopBar
       totalCount={videos.length}
       allVideos={videos}
-      h1Text={`Discover ${videos.length} Best Motion Design Showreels with ${label} Music`}
-      h2Text={`Curated motion design showreels featuring ${label} soundtrack — top studios and creators worldwide.`}
+      h1Text={`Discover ${videos.length} Best Showreels with ${label} Music`}
+      h2Text={`Curated showreels featuring ${label} soundtrack — top studios and creators worldwide.`}
     />
     <VideoGrid videos={videos} currentPage={1} itemsPerPage={itemsPerPage} baseUrl={`/sound/${slug}`} />
   </main>
