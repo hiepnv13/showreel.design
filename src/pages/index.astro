@@ -54,3 +54,25 @@ const itemsPerPage = 24;
     margin: 0;
   }
 </style>
+
+<style is:global>
+  /* Klaviyo form width override */
+  .newsletter-footer .klaviyo-form-SffEDu,
+  .newsletter-footer .klaviyo-form-SffEDu .klaviyo-form,
+  .newsletter-footer .klaviyo-form-SffEDu.klaviyo-form.form-version-cid-1 {
+    width: 500px !important;
+    max-width: 100%;
+  }
+
+  @media (max-width: 768px) {
+    .newsletter-footer {
+      padding: 48px 16px 64px;
+    }
+
+    .newsletter-footer .klaviyo-form-SffEDu,
+    .newsletter-footer .klaviyo-form-SffEDu .klaviyo-form,
+    .newsletter-footer .klaviyo-form-SffEDu.klaviyo-form.form-version-cid-1 {
+      width: calc(100vw - 32px) !important;
+    }
+  }
+</style>
