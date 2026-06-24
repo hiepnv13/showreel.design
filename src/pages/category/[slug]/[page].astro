@@ -10,7 +10,7 @@ import {
 } from "../../../utils/videoUtils";
 import Layout from "../../../layouts/Layout.astro";
 import VideoGrid from "../../../components/VideoGrid.astro";
-import FilterBar from "../../../components/FilterBar.astro";
+import TopBar from "../../../components/TopBar.astro";
 import type { GetStaticPaths } from "astro";
 
 export const getStaticPaths: GetStaticPaths = async () => {
@@ -69,7 +69,12 @@ const allCategories = await getAllCategories();
 
 <Layout title={`${category} — Page ${pageNumber} | Showreel.design`}>
     <main>
-        <FilterBar videos={videos} />
+        <TopBar
+            totalCount={videos.length}
+            allVideos={videos}
+            h1Text={`Discover ${videos.length} Best ${category} Showreels`}
+            h2Text={`Curated ${category} showreels from top studios and creators worldwide.`}
+        />
         <VideoGrid
             videos={videos}
             currentCategory={category}
