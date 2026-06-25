@@ -16,11 +16,18 @@ const {
 } = Astro.props;
 
 const currentPath = Astro.url.pathname;
+const showBanner =
+  currentPath === '/' ||
+  currentPath.startsWith('/page/') ||
+  currentPath.startsWith('/category/') ||
+  currentPath.startsWith('/industry/') ||
+  currentPath.startsWith('/style/') ||
+  currentPath.startsWith('/sound/') ||
+  currentPath.startsWith('/year/');
 
 const h1 = h1Text ?? `Discover ${totalCount} Best Showreels`;
 const h2 = h2Text ?? `Curated showreels from top studios and creators worldwide.`;
 
-// Active filter detection from URL
 const industryMatch = currentPath.match(/^\/industry\/(.+)/);
 const styleMatch    = currentPath.match(/^\/style\/(.+)/);
 const soundMatch    = currentPath.match(/^\/sound\/(.+)/);
@@ -28,7 +35,6 @@ const activeIndustry = industryMatch?.[1] ?? '';
 const activeStyle    = styleMatch?.[1]    ?? '';
 const activeSound    = soundMatch?.[1]    ?? '';
 
-// Available options from current view's videos
 const availableIndustries = [...new Set(allVideos.flatMap((v: any) => v.data.industries ?? []))];
 const availableStyles     = [...new Set(allVideos.flatMap((v: any) => v.data.styles ?? []))];
 const availableSounds     = [...new Set(allVideos.flatMap((v: any) => v.data.soundMusic ?? []))].filter(s => s !== 'no-sound');
@@ -36,89 +42,122 @@ const availableSounds     = [...new Set(allVideos.flatMap((v: any) => v.data.sou
 const groups = [
   {
     key: 'industry', label: 'Industry', title: 'Made for...',
-    options: availableIndustries,
-    active: activeIndustry,
+    options: availableIndustries, active: activeIndustry,
     getLabel: (v: string) => getTaxonomyLabel('industries', v),
-    getUrl:   (v: string) => `/industry/${v}`,
-    clearUrl: '/',
+    getUrl: (v: string) => `/industry/${v}`, clearUrl: '/',
   },
   {
     key: 'style', label: 'Style', title: 'Looks like...',
-    options: availableStyles,
-    active: activeStyle,
+    options: availableStyles, active: activeStyle,
     getLabel: (v: string) => getTaxonomyLabel('styles', v),
-    getUrl:   (v: string) => `/style/${v}`,
-    clearUrl: '/',
+    getUrl: (v: string) => `/style/${v}`, clearUrl: '/',
   },
   {
     key: 'sound', label: 'Sound', title: 'Sounds like...',
-    options: availableSounds,
-    active: activeSound,
+    options: availableSounds, active: activeSound,
     getLabel: (v: string) => getTaxonomyLabel('soundMusic', v),
-    getUrl:   (v: string) => `/sound/${v}`,
-    clearUrl: '/',
+    getUrl: (v: string) => `/sound/${v}`, clearUrl: '/',
   },
 ].filter(g => g.options.length > 0);
 
 const hasActiveFilter = !!(activeIndustry || activeStyle || activeSound);
+
+const BANNER_VIDEO = 'https://video.showreel.design/Banner/Lotie%20MCP.mp4';
+const BANNER_LINK  = 'https://lottie.link/showreeldesign';
 ---
 
 <div class="topbar-wrap">
 
-  <!-- H1 / H2 — static -->
-  <div class="topbar-heading">
-    <h1 class="topbar-h1">{h1}</h1>
-    <p class="topbar-h2">{h2}</p>
-  </div>
+  <!-- Single heading block: H1+H2+Search+Filter | Banner -->
+  <div class="topbar-block">
 
-  <!-- Filter row — sticky -->
-  <div class="topbar-filter">
-    <div class="topbar-filter-left">
+    <!-- Left: top = H1+H2+Search, bottom = filter -->
+    <div class="topbar-left">
 
-      {groups.map(group => (
-        <div class="filter-group" data-group={group.key}>
-          <button class={`filter-group-btn ${group.active ? 'active' : ''}`} data-group-btn={group.key}>
-            <span class="filter-group-label">
-              {group.active ? group.getLabel(group.active) : group.label}
-            </span>
-            <svg class="filter-group-caret" width="12" height="12" viewBox="0 0 12 12" fill="none">
-              <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </button>
-          <div class="filter-group-panel" data-group-panel={group.key}>
-            <p class="filter-group-title">{group.title}</p>
-            {group.options.map(value => (
-              <a
-                href={group.active === value ? group.clearUrl : group.getUrl(value)}
-                class={`filter-option ${group.active === value ? 'checked' : ''}`}
-              >
-                <span class="filter-option-label">{group.getLabel(value)}</span>
-                <span class="filter-option-check">✓</span>
-              </a>
-            ))}
+      <!-- Top group -->
+      <div class="topbar-top">
+        <h1 class="topbar-h1">{h1}</h1>
+        <p class="topbar-h2">{h2}</p>
+
+      </div>
+
+      <!-- Bottom: filter groups — align bottom -->
+      <div class="topbar-filters">
+        {groups.map(group => (
+          <div class="filter-group" data-group={group.key}>
+            <button class={`filter-group-btn ${group.active ? 'active' : ''}`} data-group-btn={group.key}>
+              <span class="filter-group-label">
+                {group.active ? group.getLabel(group.active) : group.label}
+              </span>
+              <svg class="filter-group-caret" width="12" height="12" viewBox="0 0 12 12" fill="none">
+                <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+            <div class="filter-group-panel" data-group-panel={group.key}>
+              <p class="filter-group-title">{group.title}</p>
+              {group.options.map(value => (
+                <a
+                  href={group.active === value ? group.clearUrl : group.getUrl(value)}
+                  class={`filter-option ${group.active === value ? 'checked' : ''}`}
+                >
+                  <span class="filter-option-label">{group.getLabel(value)}</span>
+                  <span class="filter-option-check">✓</span>
+                </a>
+              ))}
+            </div>
           </div>
-        </div>
-      ))}
+        ))}
+        {hasActiveFilter && <a href="/" class="filter-clear">Clear</a>}
+      </div>
 
-      {hasActiveFilter && (
-        <a href="/" class="filter-clear">Clear</a>
-      )}
     </div>
 
-    <!-- Search -->
-    <form action="/search" method="get" class="topbar-search">
-      <input type="text" name="q" placeholder="Search" class="topbar-search-input" autocomplete="off" />
-      <svg width="16" height="16" viewBox="0 0 256 256" fill="currentColor" class="topbar-search-icon">
-        <path d="M229.66 218.34l-50.06-50.07a88.11 88.11 0 1 0-11.31 11.31l50.06 50.07a8 8 0 0 0 11.31-11.31zM40 112a72 72 0 1 1 72 72 72.08 72.08 0 0 1-72-72z"/>
-      </svg>
-    </form>
+    <!-- Right: video banner (homepage only) -->
+    {showBanner && (
+      <div class="topbar-banner">
+        <div class="banner-video-wrap group" id="banner-wrap">
+          <!-- Video click → open link -->
+          <a href={BANNER_LINK} target="_blank" rel="noopener noreferrer" class="banner-video-link" id="banner-link">
+            <video
+              id="banner-video"
+              class="banner-video"
+              src={BANNER_VIDEO}
+              autoplay
+              muted
+              loop
+              playsinline
+            ></video>
+          </a>
+
+          <!-- Mute button (always visible) -->
+          <button class="banner-btn banner-mute-btn" id="banner-mute-btn" aria-label="Toggle mute">
+            <svg id="banner-icon-muted" width="14" height="14" viewBox="0 0 256 256" fill="currentColor">
+              <path d="M53.92 34.62a8 8 0 1 0-11.84 10.76L72 80.14V104H48a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h19.59L72 221.48V232a8 8 0 0 0 13.34 6l44.06-40.52 30.92 33.78a8 8 0 1 0 11.84-10.76ZM88 211.48l-16-17.47V152H48v-32h24v-28.66Zm99.25-42.77a48 48 0 0 0 0-81.42 8 8 0 0 0-8 13.86 32 32 0 0 1 0 53.7 8 8 0 0 0 8 13.86ZM240 128a79.9 79.9 0 0 1-37.65 68.12 8 8 0 0 1-8-13.86 64 64 0 0 0 0-108.52 8 8 0 1 1 8-13.86A79.9 79.9 0 0 1 240 128ZM80 88.14 152 24a8 8 0 0 1 8 .38V112l-80-23.86Z"/>
+            </svg>
+            <svg id="banner-icon-unmuted" width="14" height="14" viewBox="0 0 256 256" fill="currentColor" style="display:none">
+              <path d="M155.51 24.81a8 8 0 0 0-8.42.88L77.25 80H48A16 16 0 0 0 32 96v64a16 16 0 0 0 16 16h29.25l69.84 54.31A8 8 0 0 0 160 224V32a8 8 0 0 0-4.49-7.19ZM144 207.64l-56-43.55A8 8 0 0 0 83 160H48V96h35a8 8 0 0 0 5-1.68l56-43.55Zm50.41-107.95a8 8 0 0 1 0 11.32 48.15 48.15 0 0 1 0 33.94 8 8 0 0 1-11.32-11.32 32.09 32.09 0 0 0 0-22.62 8 8 0 0 1 11.32-11.32Z"/>
+            </svg>
+          </button>
+
+          <!-- Arrow button — show on hover -->
+          <a href={BANNER_LINK} target="_blank" rel="noopener noreferrer" class="banner-btn banner-arrow-btn" aria-label="Open link">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M7 17L17 7M17 7H7M17 7v10"/>
+            </svg>
+          </a>
+        </div>
+
+        <p class="banner-title">Meet Lottie Creator: The AI-powered motion tool for designers.</p>
+      </div>
+    )}
+
   </div>
 
 </div>
 
 <script is:inline>
 (function() {
-  // Dropdown toggle only — no JS filtering needed (URL-based)
+  // Dropdown toggle
   document.querySelectorAll('[data-group-btn]').forEach(function(btn) {
     btn.addEventListener('click', function(e) {
       e.stopPropagation();
@@ -134,17 +173,50 @@ const hasActiveFilter = !!(activeIndustry || activeStyle || activeSound);
     document.querySelectorAll('[data-group-panel]').forEach(function(p) { p.classList.remove('open'); });
     document.querySelectorAll('[data-group-btn]').forEach(function(b) { b.classList.remove('panel-open'); });
   });
+
+  // Mute toggle
+  var vid = document.getElementById('banner-video');
+  var muteBtn = document.getElementById('banner-mute-btn');
+  var iconMuted = document.getElementById('banner-icon-muted');
+  var iconUnmuted = document.getElementById('banner-icon-unmuted');
+
+  if (muteBtn && vid) {
+    muteBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      vid.muted = !vid.muted;
+      iconMuted.style.display = vid.muted ? '' : 'none';
+      iconUnmuted.style.display = vid.muted ? 'none' : '';
+    });
+  }
 })();
 </script>
 
 <style>
   .topbar-wrap { width: 100%; }
 
-  .topbar-heading {
+  /* ── Main block: 2 columns ── */
+  .topbar-block {
+    display: flex;
+    gap: 32px;             /* matches grid gap-8 */
     padding: 32px 32px 24px;
+    align-items: stretch;
+  }
+
+  /* Left: flex-col, space between top & filter */
+  .topbar-left {
+    flex: 2;
+    min-width: 0;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    justify-content: space-between;
+    gap: 24px;
+  }
+
+  .topbar-top {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
   }
 
   .topbar-h1 {
@@ -164,35 +236,23 @@ const hasActiveFilter = !!(activeIndustry || activeStyle || activeSound);
     margin: 0;
   }
 
-  .topbar-filter {
-    position: sticky;
-    top: 0;
-    z-index: 40;
-    background: #fff;
-    border-bottom: 1px solid #f0f0f0;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 16px;
-    padding: 8px 32px;
-  }
 
-  .topbar-filter-left {
+  /* Filter — bottom of left column */
+  .topbar-filters {
     display: flex;
     align-items: center;
     gap: 6px;
-    flex: 1;
-    min-width: 0;
+    flex-wrap: wrap;
   }
 
-  /* Filter group */
+  /* Filter groups */
   .filter-group { position: relative; }
 
   .filter-group-btn {
     display: inline-flex;
     align-items: center;
     gap: 5px;
-    padding: 8px 10px;          /* matches search box height */
+    padding: 8px 10px;
     background: #f5f5f5;
     border: none;
     border-radius: 8px;
@@ -204,23 +264,12 @@ const hasActiveFilter = !!(activeIndustry || activeStyle || activeSound);
     white-space: nowrap;
   }
 
-  .filter-group-btn:hover,
-  .filter-group-btn.panel-open { background: #e5e5e5; }
-
-  .filter-group-btn.active {
-    background: #111;
-    color: #fff;
-  }
-
-  .filter-group-caret {
-    flex-shrink: 0;
-    transition: transform 0.2s;
-  }
-
+  .filter-group-btn:hover, .filter-group-btn.panel-open { background: #e5e5e5; }
+  .filter-group-btn.active { background: #111; color: #fff; }
+  .filter-group-caret { flex-shrink: 0; transition: transform 0.2s; }
   .filter-group-btn.panel-open .filter-group-caret { transform: rotate(180deg); }
   .filter-group-btn.active .filter-group-caret path { stroke: #fff; }
 
-  /* Dropdown panel */
   .filter-group-panel {
     display: none;
     position: absolute;
@@ -245,9 +294,8 @@ const hasActiveFilter = !!(activeIndustry || activeStyle || activeSound);
     text-transform: uppercase;
     color: #bbb;
     padding: 4px 8px 6px;
-    margin: 0;
+    margin: 0 0 4px;
     border-bottom: 1px solid #f5f5f5;
-    margin-bottom: 4px;
   }
 
   .filter-option {
@@ -258,7 +306,6 @@ const hasActiveFilter = !!(activeIndustry || activeStyle || activeSound);
     font-size: 12px;
     color: #555;
     text-decoration: none;
-    cursor: pointer;
     border-radius: 5px;
     transition: background 0.1s, color 0.1s;
     white-space: nowrap;
@@ -266,25 +313,11 @@ const hasActiveFilter = !!(activeIndustry || activeStyle || activeSound);
   }
 
   .filter-option:hover { background: #f5f5f5; color: #111; }
-
-  .filter-option.checked {
-    color: #111;
-    font-weight: 500;
-    background: #f9f9f9;
-  }
-
+  .filter-option.checked { color: #111; font-weight: 500; background: #f9f9f9; }
   .filter-option-label { flex: 1; }
-
-  .filter-option-check {
-    font-size: 10px;
-    color: #111;
-    opacity: 0;
-    flex-shrink: 0;
-  }
-
+  .filter-option-check { font-size: 10px; color: #111; opacity: 0; flex-shrink: 0; }
   .filter-option.checked .filter-option-check { opacity: 1; }
 
-  /* Clear link */
   .filter-clear {
     font-size: 11px;
     color: #999;
@@ -292,41 +325,96 @@ const hasActiveFilter = !!(activeIndustry || activeStyle || activeSound);
     padding: 0 4px;
     transition: color 0.15s;
   }
-
   .filter-clear:hover { color: #333; }
 
-  /* Search — same height as filter buttons */
-  .topbar-search {
+  /* ── Banner (right column) — flex: 1 matches 1/3 of grid ── */
+  .topbar-banner {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .banner-video-wrap {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #111;
+  }
+
+  .banner-video-link {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  .banner-video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  /* Shared button style */
+  .banner-btn {
+    position: absolute;
+    bottom: 8px;
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    background: rgba(90, 90, 90, 0.4);
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+    border: none;
+    cursor: pointer;
     display: flex;
     align-items: center;
-    gap: 8px;
-    background: #f5f5f5;
-    border-radius: 8px;
-    padding: 8px 12px;
-    width: 300px;
-    flex-shrink: 0;
+    justify-content: center;
+    color: #fff;
+    text-decoration: none;
+    box-shadow:
+      0px -1px 0px 0px rgba(255,255,255,0.35),
+      1px  0px 0px 0px rgba(255,255,255,0.15),
+      -1px 0px 0px 0px rgba(255,255,255,0.15),
+      0px  1px 0px 0px rgba(255,255,255,0.30),
+      0px  1px 1px 0px rgba(0,0,0,0.20);
+    transition: background 0.15s;
+    z-index: 2;
   }
 
-  .topbar-search-input {
-    flex: 1;
-    background: transparent;
-    border: none;
-    outline: none;
+  .banner-btn:hover { background: rgba(90, 90, 90, 0.65); }
+
+  .banner-mute-btn { left: 8px; }
+
+  /* Arrow button — right side, hidden by default, show on hover */
+  .banner-arrow-btn {
+    right: 8px;
+    opacity: 0;
+    transition: opacity 0.2s, background 0.15s;
+  }
+
+  .banner-video-wrap:hover .banner-arrow-btn { opacity: 1; }
+
+  .banner-title {
     font-size: 13px;
-    font-family: 'Aileron', sans-serif;
-    color: #111;
-    opacity: 0.5;
-    min-width: 0;
+    color: #555;
+    line-height: 1.4;
+    margin: 0;
   }
 
-  .topbar-search-input::placeholder { color: #000; }
-  .topbar-search-input:focus { opacity: 1; }
-  .topbar-search-icon { color: #888; flex-shrink: 0; }
-
+  /* ── Mobile ── */
   @media (max-width: 768px) {
-    .topbar-heading { padding: 20px 16px 16px; }
+    .topbar-block {
+      flex-direction: column;
+      padding: 20px 16px 16px;
+      gap: 20px;
+    }
+
     .topbar-h1 { font-size: 24px; }
-    .topbar-filter { padding: 8px 16px; top: 52px; }
-    .topbar-search { display: none; }
+    .topbar-search { width: 100%; }
+    .topbar-banner { display: none; }
   }
 </style>

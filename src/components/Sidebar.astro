@@ -36,6 +36,34 @@ const isAboutActive = currentPath === '/about';
       <span>.Design</span>
     </a>
 
+    <!-- Search -->
+    <div class="sidebar-search-wrap" id="sidebar-search-wrap">
+      <!-- Default: label + icon -->
+      <button class="sidebar-search" id="sidebar-search-btn">
+        <span>Search</span>
+        <svg width="12" height="12" viewBox="0 0 256 256" fill="currentColor">
+          <path d="M229.66 218.34l-50.06-50.07a88.11 88.11 0 1 0-11.31 11.31l50.06 50.07a8 8 0 0 0 11.31-11.31ZM40 112a72 72 0 1 1 72 72 72.08 72.08 0 0 1-72-72Z"/>
+        </svg>
+      </button>
+      <!-- Active: input form -->
+      <form action="/search" method="get" class="sidebar-search-form" id="sidebar-search-form" style="display:none">
+        <input
+          type="text"
+          name="q"
+          class="sidebar-search-input"
+          id="sidebar-search-input"
+          placeholder="Type and press Enter..."
+          autocomplete="off"
+        />
+        <button type="button" class="sidebar-search-close" id="sidebar-search-close">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <path d="M18 6L6 18M6 6l12 12"/>
+          </svg>
+        </button>
+      </form>
+    </div>
+    <div class="sidebar-search-divider"></div>
+
     <!-- Main nav: Category + Resource sections -->
     <div class="sidebar-sections">
 
@@ -153,6 +181,32 @@ const isAboutActive = currentPath === '/about';
 </aside>
 
 <script>
+  // Sidebar search toggle
+  const searchBtn = document.getElementById('sidebar-search-btn');
+  const searchForm = document.getElementById('sidebar-search-form');
+  const searchInput = document.getElementById('sidebar-search-input') as HTMLInputElement;
+  const searchClose = document.getElementById('sidebar-search-close');
+
+  searchBtn?.addEventListener('click', () => {
+    searchBtn.style.display = 'none';
+    searchForm!.style.display = 'flex';
+    searchInput.focus();
+  });
+
+  searchClose?.addEventListener('click', () => {
+    searchForm!.style.display = 'none';
+    searchBtn!.style.display = 'flex';
+    searchInput.value = '';
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && searchForm!.style.display === 'flex') {
+      searchForm!.style.display = 'none';
+      searchBtn!.style.display = 'flex';
+      searchInput.value = '';
+    }
+  });
+
   // Partner slider
   const slider = document.getElementById('partner-slider');
   const track  = document.getElementById('partner-track');
@@ -243,6 +297,74 @@ const isAboutActive = currentPath === '/about';
   }
 
   .sidebar-logo:hover { opacity: 0.7; }
+
+  /* ── Search ── */
+  .sidebar-search {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    height: 32px;
+    padding: 0 8px;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #000;
+    text-decoration: none;
+    margin-bottom: 4px;
+    transition: background 0.15s, box-shadow 0.15s;
+    flex-shrink: 0;
+  }
+
+  .sidebar-search:hover { color: #111; }
+
+  .sidebar-search svg { opacity: 0.4; flex-shrink: 0; }
+  .sidebar-search:hover svg { opacity: 0.7; }
+
+  .sidebar-search-divider {
+    width: 100%;
+    height: 1px;
+    background: #f0f0f0;
+    margin-bottom: 20px;
+    flex-shrink: 0;
+  }
+
+  /* Search active form */
+  .sidebar-search-form {
+    display: none;
+    align-items: center;
+    gap: 6px;
+    width: 100%;
+    height: 32px;
+    padding: 0 8px;
+    margin-bottom: 4px;
+  }
+
+  .sidebar-search-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    font-size: 13px;
+    font-family: 'Aileron', sans-serif;
+    color: #000;
+    min-width: 0;
+  }
+
+  .sidebar-search-input::placeholder { color: #aaa; }
+
+  .sidebar-search-close {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #aaa;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    transition: color 0.15s;
+  }
+
+  .sidebar-search-close:hover { color: #333; }
 
   /* ── Sections ── */
   .sidebar-sections {
