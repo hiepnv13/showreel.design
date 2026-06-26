@@ -190,7 +190,7 @@ const bannerSlides = [
 
           <!-- Info sections (outside overflow-hidden) -->
           {bannerSlides.map((slide, i) => (
-            <div class={`banner-info ${i === 0 ? '' : 'banner-info-hidden'}`} data-info-index={i}>
+            <div class="banner-info" data-info-index={i} style={i === 0 ? 'display:flex' : 'display:none'}>
               <img src={slide.logo} alt={slide.title} class="banner-logo" loading="lazy" />
               <p class="banner-title">{slide.title}</p>
             </div>
@@ -232,7 +232,6 @@ const bannerSlides = [
   var total = slides.length;
   var current = 0;
   var isMuted = true;
-  var autoTimer;
 
   function goTo(index) {
     var prev = current;
