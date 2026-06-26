@@ -2,7 +2,7 @@
 title: Faust Morte Showreel 2026
 author: Faust Morte
 authorAvatar: /avatars/faust-morte.png
-category: "2D Animation"
+category: Motion Graphics
 publishDate: 2026-04-28
 featured: false
 videoFileName: Faust Morte Showreel 2026.mp4

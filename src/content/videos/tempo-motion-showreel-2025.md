@@ -4,7 +4,7 @@ author: "Tempo motion"
 authorAvatar: /avatars/tempomotions_com.png
 thumbnail: "/placeholder.svg"
 videoFileName: "Tempo motion - showreel 2025.mp4"
-category: "2D Animation"
+category: Motion Graphics
 tags: []
 featured: false
 publishDate: 2025-12-23

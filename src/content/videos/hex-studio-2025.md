@@ -4,7 +4,7 @@ author: "Hex studio"
 authorAvatar: /avatars/www_hex_inc.png
 thumbnail: "/placeholder.svg"
 videoFileName: "Hex studio 2025.mp4"
-category: "2D Animation"
+category: Motion Graphics
 tags: []
 featured: false
 publishDate: 2025-12-25
