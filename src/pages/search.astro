@@ -1,7 +1,6 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import VideoGrid from "../components/VideoGrid.astro";
-import FilterBar from "../components/FilterBar.astro";
 import { searchVideos, sortVideosByDate } from "../utils/videoUtils";
 import type { CollectionEntry } from 'astro:content';
 
@@ -30,12 +29,16 @@ if (query.trim()) {
 
 <Layout title={query ? `"${query}" — Showreel.design` : "Search — Showreel.design"}>
 
-  <FilterBar label={searchPerformed ? `${totalCount} showreel${totalCount !== 1 ? 's' : ''} for "${query}"` : undefined} />
+  {searchPerformed && (
+    <div class="search-results-label">
+      <span>{totalCount} showreel{totalCount !== 1 ? 's' : ''} for "<strong>{query}</strong>"</span>
+    </div>
+  )}
 
   <div class="search-body">
   {!searchPerformed && (
     <div class="empty-state">
-      <p class="empty-hint">Type something in the search bar above.</p>
+      <p class="empty-hint">Use the search in the sidebar to find showreels.</p>
     </div>
   )}
 
@@ -60,6 +63,18 @@ if (query.trim()) {
 </Layout>
 
 <style>
+  .search-results-label {
+    padding: 12px 32px;
+    font-size: 13px;
+    color: #888;
+    border-bottom: 1px solid #f0f0f0;
+  }
+
+  .search-results-label strong {
+    color: #111;
+    font-weight: 500;
+  }
+
   .search-body {
     min-height: calc(100vh - 140px);
     display: flex;
