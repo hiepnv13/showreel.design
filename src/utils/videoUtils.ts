@@ -49,24 +49,10 @@ export async function getVideosByTagSlug(tagSlug: string): Promise<CollectionEnt
   );
 }
 
-// Industry label map
-const INDUSTRY_LABELS: Record<string, string> = {
-  'tech-saas': 'Tech / SaaS',
-  'fashion-luxury': 'Fashion & Luxury',
-  'advertising-commercial': 'Commercial & Advertising',
-  'entertainment-media': 'Entertainment & Media',
-  'finance-banking': 'Finance & Fintech',
-  'automotive': 'Automotive',
-  'sports-fitness': 'Sports & Fitness',
-  'food-beverage': 'Food & Beverage',
-  'healthcare': 'Healthcare',
-  'education': 'Education',
-  'real-estate': 'Real Estate',
-  'other': 'Other',
-};
-
+// Thin wrapper — delegates to the single source of truth in taxonomies.ts
+import { getTaxonomyLabel } from '../config/taxonomies';
 export function getIndustryLabel(slug: string): string {
-  return INDUSTRY_LABELS[slug] ?? slug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+  return getTaxonomyLabel('industries', slug);
 }
 
 // Get all industries that have at least one video (sorted by count desc)

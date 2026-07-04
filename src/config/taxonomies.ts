@@ -1,15 +1,17 @@
 // Taxonomy definitions for showreel categorization
 
 export const TAXONOMIES = {
+  // NOTE: labels here are the single source of truth.
+  // If you change a label here, also update public/admin/config.yml.
   industries: [
-    { value: 'tech-saas', label: 'Tech/SaaS' },
-    { value: 'fashion-luxury', label: 'Fashion/Luxury' },
-    { value: 'advertising-commercial', label: 'Advertising/Commercial' },
-    { value: 'entertainment-media', label: 'Entertainment/Media' },
-    { value: 'finance-banking', label: 'Finance/Banking' },
+    { value: 'tech-saas', label: 'Tech & SaaS' },
+    { value: 'fashion-luxury', label: 'Fashion & Luxury' },
+    { value: 'advertising-commercial', label: 'Advertising & Commercial' },
+    { value: 'entertainment-media', label: 'Entertainment & Media' },
+    { value: 'finance-banking', label: 'Finance & Banking' },
     { value: 'automotive', label: 'Automotive' },
-    { value: 'sports-fitness', label: 'Sports/Fitness' },
-    { value: 'food-beverage', label: 'Food/Beverage' },
+    { value: 'sports-fitness', label: 'Sports & Fitness' },
+    { value: 'food-beverage', label: 'Food & Beverage' },
     { value: 'healthcare', label: 'Healthcare' },
     { value: 'education', label: 'Education' },
     { value: 'real-estate', label: 'Real Estate' },

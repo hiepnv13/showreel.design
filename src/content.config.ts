@@ -1,5 +1,12 @@
 import { defineCollection, z } from 'astro:content';
 import { glob } from 'astro/loaders';
+import { TAXONOMIES } from './config/taxonomies';
+
+// Derive valid values from single source of truth in taxonomies.ts
+const industryValues = TAXONOMIES.industries.map(i => i.value) as [string, ...string[]];
+const styleValues    = TAXONOMIES.styles.map(s => s.value)    as [string, ...string[]];
+const techniqueValues = TAXONOMIES.techniques.map(t => t.value) as [string, ...string[]];
+const soundValues    = TAXONOMIES.soundMusic.map(s => s.value) as [string, ...string[]];
 
 const videosCollection = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/videos' }),
@@ -28,63 +35,10 @@ const videosCollection = defineCollection({
     year: z.number().min(2000).max(2099).optional(),
     sourceUrl: z.string().url().optional(),
 
-    industries: z.array(z.enum([
-      'tech-saas',
-      'fashion-luxury',
-      'advertising-commercial',
-      'entertainment-media',
-      'finance-banking',
-      'automotive',
-      'sports-fitness',
-      'food-beverage',
-      'healthcare',
-      'education',
-      'real-estate',
-      'other'
-    ])).optional().default([]),
-
-    styles: z.array(z.enum([
-      'minimal-clean',
-      'bold-vibrant',
-      '3d-cgi',
-      'hand-drawn',
-      'retro-vintage',
-      'futuristic-tech',
-      'organic-natural',
-      'geometric-abstract',
-      'cinematic-dramatic',
-      'playful-quirky',
-      'elegant-sophisticated',
-      'dark-moody'
-    ])).optional().default([]),
-
-    techniques: z.array(z.enum([
-      '2d-animation',
-      '3d-cgi',
-      'mixed-media',
-      'kinetic-typography',
-      'motion-graphics',
-      'stop-motion',
-      'live-action-vfx',
-      'cel-animation',
-      'liquid-simulation',
-      'particle-effects',
-      'character-animation',
-      'logo-animation'
-    ])).optional().default([]),
-
-    soundMusic: z.array(z.enum([
-      'electronic-synth',
-      'epic-cinematic',
-      'chill-ambient',
-      'jazz-acoustic',
-      'rock-energetic',
-      'orchestral-classical',
-      'hip-hop-urban',
-      'no-sound',
-      'voiceover-heavy',
-      'sound-design-focused'
-    ])).optional().default([]),
+    industries: z.array(z.enum(industryValues)).optional().default([]),
+    styles:     z.array(z.enum(styleValues)).optional().default([]),
+    techniques: z.array(z.enum(techniqueValues)).optional().default([]),
+    soundMusic: z.array(z.enum(soundValues)).optional().default([]),
   }),
 });
 
