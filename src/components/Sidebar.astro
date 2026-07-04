@@ -36,39 +36,12 @@ const isAboutActive = currentPath === '/about';
       <span>.Design</span>
     </a>
 
-    <!-- Search -->
-    <div class="sidebar-search-wrap" id="sidebar-search-wrap">
-      <button class="sidebar-search" id="sidebar-search-btn">
-        <span>Search</span>
-        <svg width="12" height="12" viewBox="0 0 256 256" fill="currentColor">
-          <path d="M229.66 218.34l-50.06-50.07a88.11 88.11 0 1 0-11.31 11.31l50.06 50.07a8 8 0 0 0 11.31-11.31ZM40 112a72 72 0 1 1 72 72 72.08 72.08 0 0 1-72-72Z"/>
-        </svg>
-      </button>
-      <!-- Active search input -->
-      <div class="sidebar-search-form" id="sidebar-search-form" style="display:none">
-        <input
-          type="text"
-          class="sidebar-search-input"
-          id="sidebar-search-input"
-          placeholder="Search showreels..."
-          autocomplete="off"
-        />
-        <span class="sidebar-search-esc">Esc</span>
-      </div>
-    </div>
+    <!-- Search nav item -->
+    <button class="sidebar-item sidebar-item-icon" id="sidebar-search-btn">
+      <img src="/uploads/search-visual.svg" class="nav-icon" alt="" />
+      <span class="nav-label">Search</span>
+    </button>
     <div class="sidebar-search-divider"></div>
-
-<!-- Search panel (desktop) + overlay -->
-<div class="search-overlay" id="search-overlay" style="display:none"></div>
-<div class="search-panel" id="search-panel" style="display:none">
-  <div class="sp-header">
-    <span class="sp-count" id="sp-count">Search showreels</span>
-  </div>
-  <div class="sp-divider"></div>
-  <div class="sp-results" id="sp-results">
-    <p class="sp-hint">Type to search...</p>
-  </div>
-</div>
 
     <!-- Main nav: Category + Resource sections -->
     <div class="sidebar-sections">
@@ -185,129 +158,111 @@ const isAboutActive = currentPath === '/about';
   </div>
 </aside>
 
+<!-- Search modal (global, outside sidebar) -->
+<div class="sm-overlay" id="sm-overlay">
+  <div class="sm-modal" id="sm-modal">
+    <div class="sm-input-row">
+      <img src="/uploads/MagnifyingGlass.svg" class="sm-search-icon" alt="" />
+      <input id="sm-input" type="text" placeholder="Search showreels..." autocomplete="off" />
+      <kbd class="sm-esc-key">Esc</kbd>
+    </div>
+    <div class="sm-divider"></div>
+    <div class="sm-results" id="sm-results">
+      <p class="sm-hint">Type to search...</p>
+    </div>
+  </div>
+</div>
+
 <script is:inline>
-(function() {
 // @ts-nocheck
-var searchBtn   = document.getElementById('sidebar-search-btn');
-var searchForm  = document.getElementById('sidebar-search-form');
-var searchInput = document.getElementById('sidebar-search-input');
-var panel       = document.getElementById('search-panel');
-var overlay     = document.getElementById('search-overlay');
-var spCount     = document.getElementById('sp-count');
-var spResults   = document.getElementById('sp-results');
+// Search modal
+(function() {
+  var btn     = document.getElementById('sidebar-search-btn');
+  var overlay = document.getElementById('sm-overlay');
+  var modal   = document.getElementById('sm-modal');
+  var input   = document.getElementById('sm-input');
+  var results = document.getElementById('sm-results');
 
-var allVideos = null;
-var debounceTimer = null;
-var isMobile = function() { return window.innerWidth <= 768; };
+  var allVideos = null;
+  var debounce  = null;
 
-// Tag label helpers
-var IND = {'tech-saas':'Tech & SaaS','fashion-luxury':'Fashion & Luxury','advertising-commercial':'Advertising & Commercial','entertainment-media':'Entertainment & Media','finance-banking':'Finance & Banking','automotive':'Automotive','sports-fitness':'Sports & Fitness','food-beverage':'Food & Beverage','healthcare':'Healthcare','education':'Education','real-estate':'Real Estate','other':'Other'};
-var STY = {'minimal-clean':'Minimal/Clean','bold-vibrant':'Bold/Vibrant','3d-cgi':'3D/CGI','hand-drawn':'Hand-drawn','retro-vintage':'Retro/Vintage','futuristic-tech':'Futuristic/Tech','organic-natural':'Organic/Natural','geometric-abstract':'Geometric/Abstract','cinematic-dramatic':'Cinematic/Dramatic','playful-quirky':'Playful/Quirky','elegant-sophisticated':'Elegant/Sophisticated','dark-moody':'Dark/Moody'};
-var SND = {'electronic-synth':'Electronic/Synth','epic-cinematic':'Epic/Cinematic','chill-ambient':'Chill/Ambient','jazz-acoustic':'Jazz/Acoustic','rock-energetic':'Rock/Energetic','orchestral-classical':'Orchestral/Classical','hip-hop-urban':'Hip-hop/Urban','voiceover-heavy':'Voiceover','sound-design-focused':'Sound Design'};
-
-function getLabel(map, key) { return map[key] || key; }
-
-function buildTags(v) {
-  var tags = [];
-  if (v.year) tags.push(String(v.year));
-  if (v.category) tags.push(v.category);
-  (v.industries||[]).forEach(function(i){tags.push(getLabel(IND,i));});
-  (v.styles||[]).forEach(function(s){tags.push(getLabel(STY,s));});
-  (v.soundMusic||[]).filter(function(s){return s!=='no-sound';}).forEach(function(s){tags.push(getLabel(SND,s));});
-  return tags.slice(0,5).map(function(t){
-    return '<span class="sr-tag">'+t+'</span>';
-  }).join('');
-}
-
-function renderItem(v) {
-  var initials = (v.author||'').split(' ').slice(0,2).map(function(w){return w[0]||'';}).join('').toUpperCase();
-  var avatar = v.authorAvatar
-    ? '<img src="'+v.authorAvatar+'" class="sr-avatar" alt="" loading="lazy"/>'
-    : '<div class="sr-avatar sr-initials">'+initials+'</div>';
-  return '<a href="/videos/'+v.slug+'" class="sr-item">'+
-    avatar+
-    '<div class="sr-content">'+
-      '<p class="sr-title">'+v.title+'<span class="sr-cat"> '+v.category+'</span></p>'+
-      '<div class="sr-tags">'+buildTags(v)+'</div>'+
-    '</div>'+
-  '</a>';
-}
-
-function renderResults(matches, q) {
-  if (!q.trim()) {
-    spCount.textContent = 'Search showreels';
-    spResults.innerHTML = '<p class="sp-hint">Type to search...</p>';
-    return;
+  function open() {
+    overlay.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    input.focus();
+    if (!allVideos) {
+      fetch('/api/videos.json')
+        .then(function(r) { return r.json(); })
+        .then(function(d) {
+          allVideos = d;
+          render(input.value);
+        })
+        .catch(function() {
+          results.innerHTML = '<p class="sm-hint">Search unavailable.</p>';
+        });
+    }
   }
-  if (matches.length === 0) {
-    spCount.textContent = 'No results for "'+q+'"';
-    spResults.innerHTML = '<p class="sp-hint">Try a different keyword.</p>';
-    return;
-  }
-  spCount.textContent = matches.length + ' result' + (matches.length !== 1 ? 's' : '');
-  spResults.innerHTML = matches.map(renderItem).join('');
-}
 
-function filterAndRender(q) {
-  if (!allVideos) return;
-  var term = q.toLowerCase();
-  var matches = !q.trim() ? [] : allVideos.filter(function(v) {
-    return (v.title||'').toLowerCase().includes(term) ||
-           (v.author||'').toLowerCase().includes(term) ||
-           (v.description||'').toLowerCase().includes(term) ||
-           (v.tags||[]).some(function(t){return t.toLowerCase().includes(term);});
-  });
-  renderResults(matches, q);
-}
-
-function openSearch() {
-  searchBtn.style.display = 'none';
-  searchForm.style.display = 'flex';
-  searchInput.focus();
-  if (!isMobile()) {
-    panel.style.display = 'flex';
-    overlay.style.display = 'block';
+  function close() {
+    overlay.classList.remove('open');
+    document.body.style.overflow = '';
+    input.value = '';
+    results.innerHTML = '<p class="sm-hint">Type to search...</p>';
   }
-  if (!allVideos) {
-    fetch('/api/videos.json').then(function(r){return r.json();}).then(function(d){
-      allVideos = d;
-      filterAndRender(searchInput.value);
-    }).catch(function(){
-      spResults.innerHTML = '<p class="sp-hint">Search unavailable.</p>';
+
+  function initials(name) {
+    return (name || '').split(' ').slice(0, 2).map(function(w) { return w[0] || ''; }).join('').toUpperCase();
+  }
+
+  function renderItem(v) {
+    var avatar = v.authorAvatar
+      ? '<img src="' + v.authorAvatar + '" class="sm-item-avatar" alt="" loading="lazy" />'
+      : '<div class="sm-item-initials">' + initials(v.author) + '</div>';
+    return '<a href="/videos/' + v.slug + '" class="sm-item">' +
+      avatar +
+      '<span class="sm-item-title">' + v.title + '</span>' +
+      '<span class="sm-item-cat">' + (v.category || '') + '</span>' +
+    '</a>';
+  }
+
+  function render(q) {
+    if (!allVideos) return;
+    if (!q.trim()) {
+      results.innerHTML = '<p class="sm-hint">Type to search...</p>';
+      return;
+    }
+    var term = q.toLowerCase();
+    var matches = allVideos.filter(function(v) {
+      return (v.title || '').toLowerCase().includes(term) ||
+             (v.author || '').toLowerCase().includes(term) ||
+             (v.description || '').toLowerCase().includes(term) ||
+             (v.tags || []).some(function(t) { return t.toLowerCase().includes(term); });
     });
+    if (matches.length === 0) {
+      results.innerHTML = '<p class="sm-hint">No results for "' + q + '"</p>';
+      return;
+    }
+    results.innerHTML = matches.map(renderItem).join('');
   }
-}
 
-function closeSearch() {
-  searchBtn.style.display = 'flex';
-  searchForm.style.display = 'none';
-  panel.style.display = 'none';
-  overlay.style.display = 'none';
-  searchInput.value = '';
-  spCount.textContent = 'Search showreels';
-  spResults.innerHTML = '<p class="sp-hint">Type to search...</p>';
-}
+  btn.addEventListener('click', open);
 
-searchBtn.addEventListener('click', openSearch);
-overlay.addEventListener('click', closeSearch);
+  overlay.addEventListener('click', function(e) {
+    if (!modal.contains(e.target)) close();
+  });
 
-searchInput.addEventListener('input', function() {
-  clearTimeout(debounceTimer);
-  debounceTimer = setTimeout(function(){ filterAndRender(searchInput.value); }, 200);
-});
+  input.addEventListener('input', function() {
+    clearTimeout(debounce);
+    debounce = setTimeout(function() { render(input.value); }, 180);
+  });
 
-searchInput.addEventListener('keydown', function(e) {
-  if (e.key === 'Escape') closeSearch();
-  if (e.key === 'Enter') {
-    e.preventDefault();
-    if (searchInput.value.trim()) window.location.href = '/search?q='+encodeURIComponent(searchInput.value.trim());
-  }
-});
-
-document.addEventListener('keydown', function(e) {
-  if (e.key === 'Escape' && searchForm.style.display === 'flex') closeSearch();
-});
-
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') close();
+    if ((e.key === 'k' || e.key === 'K') && (e.metaKey || e.ctrlKey)) {
+      e.preventDefault();
+      overlay.classList.contains('open') ? close() : open();
+    }
+  });
 })();
 </script>
 
@@ -344,7 +299,7 @@ document.addEventListener('keydown', function(e) {
 </script>
 
 <style>
-  /* ── Overlay ── */
+  /* ── Mobile overlay ── */
   .sidebar-overlay {
     display: none;
     position: fixed;
@@ -352,15 +307,10 @@ document.addEventListener('keydown', function(e) {
     background: rgba(0, 0, 0, 0.3);
     z-index: 90;
   }
-
-  .sidebar-overlay.open {
-    display: block;
-  }
+  .sidebar-overlay.open { display: block; }
 
   /* ── Close button (mobile only) ── */
-  .sidebar-close {
-    display: none;
-  }
+  .sidebar-close { display: none; }
 
   /* ── Sidebar ── */
   .sidebar {
@@ -396,138 +346,16 @@ document.addEventListener('keydown', function(e) {
     flex-shrink: 0;
     letter-spacing: -0.3px;
   }
-
   .sidebar-logo:hover { opacity: 0.7; }
 
-  /* ── Search ── */
-  .sidebar-search {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    width: 100%;
-    height: 32px;
-    padding: 0 8px;
-    border-radius: 8px;
-    font-size: 14px;
-    color: #000;
-    text-decoration: none;
-    margin-bottom: 4px;
-    transition: background 0.15s, box-shadow 0.15s;
-    flex-shrink: 0;
-  }
-
-  .sidebar-search:hover { color: #111; }
-
-  .sidebar-search svg { opacity: 0.4; flex-shrink: 0; }
-  .sidebar-search:hover svg { opacity: 0.7; }
-
+  /* ── Search nav item divider ── */
   .sidebar-search-divider {
     width: 100%;
     height: 1px;
     background: #f0f0f0;
+    margin-top: 4px;
     margin-bottom: 20px;
     flex-shrink: 0;
-  }
-
-  /* Search active form */
-  .sidebar-search-form {
-    display: none;
-    align-items: center;
-    gap: 6px;
-    width: 100%;
-    height: 32px;
-    padding: 0 8px;
-    margin-bottom: 4px;
-  }
-
-  .sidebar-search-input {
-    flex: 1;
-    background: transparent;
-    border: none;
-    outline: none;
-    font-size: 13px;
-    font-family: 'Aileron', sans-serif;
-    color: #000;
-    min-width: 0;
-  }
-
-  .sidebar-search-input::placeholder { color: #aaa; }
-
-  .sidebar-search-esc {
-    font-size: 9px;
-    color: #bbb;
-    background: #f0f0f0;
-    border-radius: 3px;
-    padding: 2px 4px;
-    flex-shrink: 0;
-    letter-spacing: 0.3px;
-  }
-
-  /* ── Search overlay — only covers content area, not sidebar/panel ── */
-  .search-overlay {
-    position: fixed;
-    top: 0;
-    left: 569px; /* 209px sidebar + 360px panel */
-    right: 0;
-    bottom: 0;
-    background: rgba(0,0,0,0.15);
-    z-index: 140;
-    display: none;
-  }
-
-  /* ── Search panel (desktop) ── */
-  .search-panel {
-    position: fixed;
-    left: 209px;
-    top: 0;
-    height: 100vh;
-    width: 360px;
-    background: #fff;
-    border-left: 1px solid #e9e9e9;
-    z-index: 150;
-    display: none;
-    flex-direction: column;
-    gap: 12px;
-    padding: 20px;
-    overflow: hidden;
-  }
-
-  .sp-header { flex-shrink: 0; }
-
-  .sp-count {
-    font-size: 24px;
-    color: #000;
-    display: block;
-  }
-
-  .sp-divider {
-    width: 100%;
-    height: 1px;
-    background: #f0f0f0;
-    flex-shrink: 0;
-  }
-
-  .sp-results {
-    flex: 1;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    scrollbar-width: thin;
-    scrollbar-color: #e0e0e0 transparent;
-  }
-
-  .sp-hint {
-    font-size: 13px;
-    color: #bbb;
-    margin: 0;
-    padding: 8px 0;
-  }
-
-  /* Mobile: hide panel, keep form as-is */
-  @media (max-width: 768px) {
-    .search-panel { display: none !important; }
-    .search-overlay { display: none !important; }
   }
 
   /* ── Sections ── */
@@ -593,13 +421,6 @@ document.addEventListener('keydown', function(e) {
       0px  1px 1px 0px rgba(0,0,0,0.20);
   }
 
-  .sidebar-item-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    width: 100%;
-  }
-
   /* Icon nav items */
   .sidebar-item-icon {
     display: flex;
@@ -618,22 +439,18 @@ document.addEventListener('keydown', function(e) {
   .sidebar-item-icon:hover .nav-icon { opacity: 0.7; }
   .sidebar-item-icon.active .nav-icon { opacity: 0.7; }
 
-  /* Badge — hover-only for category items */
+  .nav-label { flex: 1; min-width: 0; }
+
+  /* Badge */
   .badge-hover {
     visibility: hidden;
     opacity: 0;
     transition: opacity 0.15s;
   }
-
   .sidebar-item-icon:hover .badge-hover,
   .sidebar-item-icon.active .badge-hover {
     visibility: visible;
     opacity: 1;
-  }
-
-  .nav-label {
-    flex: 1;
-    min-width: 0;
   }
 
   .sidebar-badge {
@@ -647,15 +464,8 @@ document.addEventListener('keydown', function(e) {
     flex-shrink: 0;
   }
 
-  .badge-hidden {
-    visibility: hidden;
-  }
-
   /* ── Spacer ── */
-  .sidebar-spacer {
-    flex: 1;
-    min-height: 32px;
-  }
+  .sidebar-spacer { flex: 1; min-height: 32px; }
 
   /* ── Footer ── */
   .sidebar-footer {
@@ -667,8 +477,7 @@ document.addEventListener('keydown', function(e) {
     flex-shrink: 0;
   }
 
-
-  /* ── Partner logos ── */
+  /* ── Partner ── */
   .sidebar-partner {
     display: flex;
     flex-direction: column;
@@ -683,69 +492,6 @@ document.addEventListener('keydown', function(e) {
     padding-left: 8px;
   }
 
-  .sidebar-partner-logos {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-  }
-
-  .partner-logo-wrap {
-    position: relative;
-    display: block;
-    flex-shrink: 0;
-  }
-
-  .partner-logo {
-    width: 32px;
-    height: 32px;
-    border-radius: 8px;
-    overflow: hidden;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: opacity 0.15s;
-  }
-
-  .partner-logo-wrap:hover .partner-logo {
-    opacity: 0.85;
-  }
-
-  .partner-logo-img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-  }
-
-  /* Tooltip */
-  .partner-tooltip {
-    position: absolute;
-    bottom: calc(100% + 6px);
-    left: 50%;
-    transform: translateX(-50%);
-    background: #111;
-    color: #fff;
-    font-size: 10px;
-    padding: 4px 8px;
-    border-radius: 4px;
-    white-space: nowrap;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.15s;
-    z-index: 10;
-  }
-
-  .partner-logo-wrap:hover .partner-tooltip {
-    opacity: 1;
-  }
-
-  /* First logo in each row — tooltip aligns left to avoid overflow */
-  .partner-logo-wrap:first-child .partner-tooltip {
-    left: 0;
-    transform: none;
-  }
-
-  /* ── Partner slider ── */
   .partner-slider {
     position: relative;
     width: 100%;
@@ -765,11 +511,7 @@ document.addEventListener('keydown', function(e) {
     position: relative;
   }
 
-  .partner-slide img {
-    width: 100%;
-    height: auto;
-    display: block;
-  }
+  .partner-slide img { width: 100%; height: auto; display: block; }
 
   .slide-tooltip {
     position: absolute;
@@ -788,12 +530,8 @@ document.addEventListener('keydown', function(e) {
     transition: opacity 0.2s ease;
     letter-spacing: 0.1px;
   }
+  .partner-slide:hover .slide-tooltip { opacity: 1; }
 
-  .partner-slide:hover .slide-tooltip {
-    opacity: 1;
-  }
-
-  /* Prev / Next buttons */
   .slider-btn {
     position: absolute;
     top: 50%;
@@ -817,17 +555,9 @@ document.addEventListener('keydown', function(e) {
 
   .slider-prev { left: 6px; }
   .slider-next { right: 6px; }
+  .partner-slider:hover .slider-btn { opacity: 1; }
+  .slider-btn:hover { transform: translateY(-50%) scale(1.1); background: #fff; }
 
-  .partner-slider:hover .slider-btn {
-    opacity: 1;
-  }
-
-  .slider-btn:hover {
-    transform: translateY(-50%) scale(1.1);
-    background: #fff;
-  }
-
-  /* Dots */
   .slider-dots {
     position: absolute;
     bottom: 6px;
@@ -848,24 +578,12 @@ document.addEventListener('keydown', function(e) {
     padding: 0;
     transition: background 0.2s, transform 0.2s;
   }
-
-  .slider-dot.active {
-    background: #fff;
-    transform: scale(1.3);
-  }
+  .slider-dot.active { background: #fff; transform: scale(1.3); }
 
   /* ── Copyright ── */
-  .sidebar-copyright {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-  }
+  .sidebar-copyright { display: flex; flex-direction: column; gap: 4px; }
 
-  .sidebar-copyright-divider {
-    width: 100%;
-    height: 1px;
-    background: #f0f0f0;
-  }
+  .sidebar-copyright-divider { width: 100%; height: 1px; background: #f0f0f0; }
 
   .sidebar-copyright-text {
     font-size: 10px;
@@ -876,7 +594,6 @@ document.addEventListener('keydown', function(e) {
 
   /* ── Mobile ── */
   @media (max-width: 768px) {
-    /* Close button */
     .sidebar-close {
       display: flex;
       align-items: center;
@@ -892,7 +609,6 @@ document.addEventListener('keydown', function(e) {
       z-index: 10;
     }
 
-    /* Sidebar: hidden by default, full-width overlay when open */
     .sidebar {
       width: 100%;
       transform: none;
@@ -910,39 +626,123 @@ document.addEventListener('keydown', function(e) {
       overflow-y: auto;
     }
 
-    /* Push logo down to make room for close button */
-    .sidebar-logo {
-      margin-top: 8px;
-    }
+    .sidebar-logo { margin-top: 8px; }
   }
 </style>
 
 <style is:global>
-/* Search result items — rendered by JS, need global CSS */
-.sr-item {
-  display: flex;
-  gap: 8px;
+/* ── Search modal ── */
+.sm-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 500;
   align-items: flex-start;
+  justify-content: center;
+  padding-top: 80px;
+}
+
+.sm-overlay.open {
+  display: flex;
+}
+
+.sm-modal {
+  width: 560px;
+  max-width: calc(100vw - 32px);
+  background: #fff;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.2), 0 4px 16px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100vh - 160px);
+}
+
+.sm-input-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 18px;
+  flex-shrink: 0;
+}
+
+.sm-search-icon {
+  width: 18px;
+  height: 18px;
+  opacity: 0.35;
+  flex-shrink: 0;
+}
+
+#sm-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 16px;
+  font-family: 'Aileron', sans-serif;
+  color: #111;
+  background: transparent;
+  min-width: 0;
+}
+
+#sm-input::placeholder { color: #bbb; }
+
+.sm-esc-key {
+  font-size: 10px;
+  color: #bbb;
+  background: #f2f2f2;
+  border: none;
+  border-radius: 4px;
+  padding: 3px 7px;
+  font-family: 'Aileron', sans-serif;
+  flex-shrink: 0;
+  cursor: default;
+}
+
+.sm-divider { height: 1px; background: #f0f0f0; flex-shrink: 0; }
+
+.sm-results {
+  overflow-y: auto;
+  overscroll-behavior: contain;
   padding: 8px;
-  background: #f8f8f8;
+  display: flex;
+  flex-direction: column;
+  scrollbar-width: thin;
+  scrollbar-color: #e0e0e0 transparent;
+}
+
+.sm-hint {
+  font-size: 13px;
+  color: #bbb;
+  margin: 8px 0;
+  padding: 8px;
+  text-align: center;
+}
+
+/* Result items */
+.sm-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
   border-radius: 8px;
   text-decoration: none;
   transition: background 0.1s;
   flex-shrink: 0;
 }
-.sr-item:hover { background: #f0f0f0; }
 
-.sr-avatar {
+.sm-item:hover { background: #f5f5f5; }
+
+.sm-item-avatar {
   width: 32px;
   height: 32px;
   border-radius: 8px;
   object-fit: cover;
   flex-shrink: 0;
   border: 1px solid #eee;
-  background: #fff;
 }
 
-.sr-initials {
+.sm-item-initials {
   width: 32px;
   height: 32px;
   border-radius: 8px;
@@ -956,34 +756,30 @@ document.addEventListener('keydown', function(e) {
   flex-shrink: 0;
 }
 
-.sr-content {
+.sm-item-title {
   flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.sr-title {
   font-size: 14px;
-  color: #000;
-  margin: 0;
-  line-height: 1.3;
+  color: #111;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  min-width: 0;
 }
 
-.sr-cat { font-size: 13px; color: #888; }
-
-.sr-tags { display: flex; flex-wrap: wrap; gap: 4px; }
-
-.sr-tag {
-  background: #fff;
-  height: 23px;
-  padding: 0 6px;
-  border-radius: 4px;
-  font-size: 10px;
-  color: #4b5563;
-  display: inline-flex;
-  align-items: center;
+.sm-item-cat {
+  font-size: 12px;
+  color: #aaa;
+  flex-shrink: 0;
   white-space: nowrap;
+}
+
+@media (max-width: 600px) {
+  .sm-overlay { padding-top: 0; align-items: flex-end; }
+  .sm-modal {
+    width: 100%;
+    max-width: 100%;
+    border-radius: 20px 20px 0 0;
+    max-height: 80vh;
+  }
 }
 </style>
