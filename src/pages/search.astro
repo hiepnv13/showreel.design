@@ -1,102 +1,237 @@
 ---
+export const prerender = true;
 import Layout from "../layouts/Layout.astro";
-import VideoGrid from "../components/VideoGrid.astro";
-import { searchVideos, sortVideosByDate } from "../utils/videoUtils";
-import type { CollectionEntry } from 'astro:content';
-
-const url = Astro.url;
-const query = url.searchParams.get('q') || '';
-const pageParam = url.searchParams.get('page') || '1';
-const currentPage = parseInt(pageParam);
-const itemsPerPage = 24;
-
-let videos: CollectionEntry<'videos'>[] = [];
-let searchPerformed = false;
-let totalCount = 0;
-
-if (query.trim()) {
-  const searchResults = await searchVideos(query.trim());
-  // Pass ALL results to VideoGrid — it handles slicing internally
-  videos = sortVideosByDate(searchResults);
-  totalCount = videos.length;
-  searchPerformed = true;
-}
 ---
 
-<Layout title={query ? `"${query}" — Showreel.design` : "Search — Showreel.design"}>
+<Layout title="Search — Showreel.design" description="Search motion design showreels from top studios and creators worldwide.">
 
-  {searchPerformed && (
-    <div class="search-results-label">
-      <span>{totalCount} showreel{totalCount !== 1 ? 's' : ''} for "<strong>{query}</strong>"</span>
-    </div>
-  )}
-
-  <div class="search-body">
-  {!searchPerformed && (
-    <div class="empty-state">
+  <div class="search-page">
+    <div class="search-status" id="search-status"></div>
+    <div class="search-results-grid" id="search-results"></div>
+    <div class="search-pagination" id="search-pagination"></div>
+    <div class="search-empty" id="search-empty" style="display:none">
       <p class="empty-hint">Use the search in the sidebar to find showreels.</p>
     </div>
-  )}
-
-  {searchPerformed && videos.length === 0 && (
-    <div class="empty-state">
-      <p class="empty-query">"{query}"</p>
-      <p class="empty-hint">No results found. Try a different keyword.</p>
-    </div>
-  )}
-
-  {searchPerformed && videos.length > 0 && (
-    <VideoGrid
-      videos={videos}
-      currentPage={currentPage}
-      itemsPerPage={itemsPerPage}
-      baseUrl={`/search?q=${encodeURIComponent(query)}`}
-    />
-  )}
   </div>
 
 </Layout>
 
+<script is:inline>
+// @ts-nocheck
+(function() {
+  var ITEMS_PER_PAGE = 24;
+  var allVideos = [];
+  var filtered = [];
+  var query = '';
+  var currentPage = 1;
+
+  // Read params from URL
+  function readParams() {
+    var params = new URLSearchParams(window.location.search);
+    query = params.get('q') || '';
+    currentPage = Math.max(1, parseInt(params.get('page') || '1'));
+  }
+
+  // Filter videos by query
+  function filterVideos(videos, q) {
+    if (!q.trim()) return [];
+    var term = q.toLowerCase();
+    return videos.filter(function(v) {
+      return (v.title || '').toLowerCase().includes(term) ||
+             (v.author || '').toLowerCase().includes(term) ||
+             (v.description || '').toLowerCase().includes(term) ||
+             (v.tags || []).some(function(t) { return t.toLowerCase().includes(term); });
+    });
+  }
+
+  // Render a single card (matches VideoCard design)
+  function renderCard(v) {
+    var thumb = v.thumbnailUrl || '/placeholder.svg';
+    var avatar = v.authorAvatar
+      ? '<img src="' + v.authorAvatar + '" alt="' + v.author + '" class="sc-avatar" loading="lazy" />'
+      : '<div class="sc-avatar sc-avatar-initials">' + (v.author || '').split(' ').slice(0,2).map(function(w){return w[0]||'';}).join('').toUpperCase() + '</div>';
+    return '<a href="/videos/' + v.slug + '" class="sc-card">' +
+      '<div class="sc-thumb"><img src="' + thumb + '" alt="' + v.title + '" loading="lazy" /></div>' +
+      '<div class="sc-info">' + avatar + '<p class="sc-title">' + v.title + '</p></div>' +
+      '</a>';
+  }
+
+  // Render pagination
+  function renderPagination(total, page) {
+    var totalPages = Math.ceil(total / ITEMS_PER_PAGE);
+    if (totalPages <= 1) return '';
+    var html = '<nav class="sc-pages">';
+    for (var i = 1; i <= totalPages; i++) {
+      var url = '/search?q=' + encodeURIComponent(query) + (i > 1 ? '&page=' + i : '');
+      html += '<a href="' + url + '" class="sc-page' + (i === page ? ' active' : '') + '">' + i + '</a>';
+    }
+    return html + '</nav>';
+  }
+
+  // Render results
+  function render() {
+    var statusEl = document.getElementById('search-status');
+    var resultsEl = document.getElementById('search-results');
+    var paginationEl = document.getElementById('search-pagination');
+    var emptyEl = document.getElementById('search-empty');
+
+    if (!query.trim()) {
+      statusEl.innerHTML = '';
+      resultsEl.innerHTML = '';
+      paginationEl.innerHTML = '';
+      emptyEl.style.display = 'flex';
+      return;
+    }
+
+    emptyEl.style.display = 'none';
+    var start = (currentPage - 1) * ITEMS_PER_PAGE;
+    var page = filtered.slice(start, start + ITEMS_PER_PAGE);
+
+    statusEl.innerHTML = filtered.length + ' showreel' + (filtered.length !== 1 ? 's' : '') +
+      ' for "<strong>' + query + '</strong>"';
+    resultsEl.innerHTML = page.map(renderCard).join('');
+    paginationEl.innerHTML = renderPagination(filtered.length, currentPage);
+  }
+
+  // Init
+  readParams();
+
+  if (query.trim()) {
+    fetch('/api/videos.json')
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        allVideos = data;
+        filtered = filterVideos(allVideos, query);
+        render();
+      })
+      .catch(function() {
+        document.getElementById('search-status').textContent = 'Search unavailable.';
+      });
+  } else {
+    document.getElementById('search-empty').style.display = 'flex';
+  }
+})();
+</script>
+
 <style>
-  .search-results-label {
-    padding: 12px 32px;
+  .search-page {
+    min-height: calc(100vh - 140px);
+    padding: 0 32px 64px;
+  }
+
+  .search-status {
+    padding: 12px 0;
     font-size: 13px;
     color: #888;
     border-bottom: 1px solid #f0f0f0;
+    margin-bottom: 24px;
   }
 
-  .search-results-label strong {
-    color: #111;
-    font-weight: 500;
+  .search-status :global(strong) { color: #111; font-weight: 500; }
+
+  .search-results-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 32px;
   }
 
-  .search-body {
-    min-height: calc(100vh - 140px);
+  /* Cards — matches VideoCard */
+  .sc-card {
     display: flex;
     flex-direction: column;
+    text-decoration: none;
   }
 
-  .empty-state {
+  .sc-thumb {
+    aspect-ratio: 16 / 9;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #d0d0d0;
+  }
+
+  .sc-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: opacity 0.3s;
+  }
+
+  .sc-info {
     display: flex;
-    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 0;
+  }
+
+  .sc-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    object-fit: cover;
+    flex-shrink: 0;
+    border: 1px solid #eee;
+  }
+
+  .sc-avatar-initials {
+    background: #2f2f2f;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 600;
+    display: flex;
     align-items: center;
     justify-content: center;
-    gap: 12px;
-    padding: 120px 24px;
-    text-align: center;
+    flex-shrink: 0;
   }
 
-  .empty-query {
-    font-size: 24px;
-    font-weight: 400;
-    letter-spacing: -0.3px;
-    color: #111;
-  }
-
-  .empty-hint {
+  .sc-title {
     font-size: 13px;
-    color: #bbb;
-    letter-spacing: 0.2px;
+    color: #1b1b1b;
+    margin: 0;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+
+  /* Pagination */
+  .sc-pages {
+    display: flex;
+    gap: 6px;
+    justify-content: center;
+    margin-top: 48px;
+    flex-wrap: wrap;
+  }
+
+  .sc-page {
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    color: #555;
+    text-decoration: none;
+    background: #f5f5f5;
+    transition: background 0.15s;
+  }
+
+  .sc-page:hover { background: #e5e5e5; }
+  .sc-page.active { background: #111; color: #fff; }
+
+  /* Empty state */
+  .search-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 120px 24px;
+  }
+
+  .empty-hint { font-size: 13px; color: #bbb; }
+
+  @media (max-width: 1024px) {
+    .search-results-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  @media (max-width: 640px) {
+    .search-page { padding: 0 16px 48px; }
+    .search-results-grid { grid-template-columns: repeat(2, 1fr); gap: 16px; }
   }
 </style>
-
