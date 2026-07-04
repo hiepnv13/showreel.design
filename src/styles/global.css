@@ -136,25 +136,6 @@
     @apply transition-all duration-300;
   }
 
-  .video-thumbnail {
-    @apply w-full aspect-video object-cover transition-transform duration-300;
-  }
-
-  /* Masonry grid item hover effect */
-  .masonry-item {
-    @apply relative overflow-hidden;
-  }
-
-  .masonry-item img,
-  .masonry-item video {
-    @apply w-full h-full object-cover transition-transform duration-700;
-  }
-
-  .masonry-item:hover img,
-  .masonry-item:hover video {
-    @apply scale-105;
-  }
-
   /* Filter button styles */
   .filter-btn {
     @apply px-3 py-1.5 bg-[#f5f5f5] hover:bg-[#e5e5e5] rounded text-[11px] text-[#4b5563] tracking-[0.275px] transition-colors;
@@ -176,77 +157,9 @@
     @apply shadow-sm hover:shadow-md transform hover:-translate-y-0.5;
   }
 
-  .text-gradient {
-    @apply text-gray-900;
-  }
-
-  .card-elevated {
-    @apply bg-white rounded-2xl shadow-sm border border-gray-100 p-6;
-    @apply hover:shadow-lg hover:border-gray-200 transition-all duration-300;
-  }
-
   .section-container {
     @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
   }
-
-  /* Animation classes for GSAP */
-  .fade-in {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-
-  .slide-up {
-    opacity: 0;
-    transform: translateY(50px);
-  }
-
-  .scale-in {
-    opacity: 0;
-    transform: scale(0.9);
-  }
-
-  /* Preloader styles */
-  .preloader-logo {
-    animation: pulse 2s ease-in-out infinite;
-  }
-
-  @keyframes pulse {
-    0%, 100% {
-      opacity: 1;
-    }
-    50% {
-      opacity: 0.7;
-    }
-  }
 }
 
-@layer utilities {
-  .animation-delay-200 {
-    animation-delay: 200ms;
-  }
-
-  .animation-delay-400 {
-    animation-delay: 400ms;
-  }
-
-  .animation-delay-600 {
-    animation-delay: 600ms;
-  }
-
-  /* GSAP animation utilities */
-  .gsap-fade-in {
-    opacity: 0;
-    visibility: hidden;
-  }
-
-  .gsap-slide-up {
-    opacity: 0;
-    transform: translateY(100px);
-  }
-
-  .gsap-scale-in {
-    opacity: 0;
-    transform: scale(0.8);
-  }
-}
 

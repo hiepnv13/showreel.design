@@ -1,6 +1,5 @@
 ---
 import SmoothScroll from '../components/SmoothScroll.astro';
-import Preloader from '../components/Preloader.astro';
 import Sidebar from '../components/Sidebar.astro';
 import MobileHeader from '../components/MobileHeader.astro';
 import '../styles/global.css';
@@ -49,7 +48,6 @@ const resolvedUrl = canonicalUrl ?? Astro.url.href;
     <meta name="twitter:description" content={description} />
     {ogImage && <meta name="twitter:image" content={ogImage} />}
     <slot name="head" />
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <meta name="color-scheme" content="light" />
     <!-- Google tag (gtag.js) -->
     <script is:inline async src="https://www.googletagmanager.com/gtag/js?id=G-DG3KB7D31H"></script>
@@ -84,7 +82,6 @@ const resolvedUrl = canonicalUrl ?? Astro.url.href;
     </script>
   </head>
   <body>
-    <Preloader />
     <div class="app-layout">
       <Sidebar />
       <div class="app-content">
@@ -101,7 +98,3 @@ const resolvedUrl = canonicalUrl ?? Astro.url.href;
   </body>
 </html>
 
-<script>
-  // Import page transitions
-  import '../scripts/pageTransitions.js';
-</script>
