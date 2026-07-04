@@ -125,8 +125,20 @@ const coursesCollection = defineCollection({
   }),
 });
 
+// Shorts — WIP, not yet in navigation
+const shortsCollection = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/shorts' }),
+  schema: z.object({
+    title: z.string(),
+    author: z.string().optional(),
+    tags: z.array(z.string()).optional().default([]),
+    publishDate: z.date().optional(),
+  }),
+});
+
 export const collections = {
   videos: videosCollection,
   tools: toolsCollection,
   courses: coursesCollection,
+  shorts: shortsCollection,
 };
