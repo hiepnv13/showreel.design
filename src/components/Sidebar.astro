@@ -58,14 +58,17 @@ const isAboutActive = currentPath === '/about';
     </div>
     <div class="sidebar-search-divider"></div>
 
-    <!-- Search popup (fixed, outside sidebar flow) -->
-    <div class="search-popup" id="search-popup" style="display:none">
-      <div class="search-popup-results" id="search-popup-results"></div>
-      <a href="/search" class="search-popup-all" id="search-popup-all" style="display:none">
-        See all results →
-      </a>
-      <p class="search-popup-hint" id="search-popup-hint">Type to search showreels</p>
-    </div>
+<!-- Search panel (desktop) + overlay -->
+<div class="search-overlay" id="search-overlay" style="display:none"></div>
+<div class="search-panel" id="search-panel" style="display:none">
+  <div class="sp-header">
+    <span class="sp-count" id="sp-count">Search showreels</span>
+  </div>
+  <div class="sp-divider"></div>
+  <div class="sp-results" id="sp-results">
+    <p class="sp-hint">Type to search...</p>
+  </div>
+</div>
 
     <!-- Main nav: Category + Resource sections -->
     <div class="sidebar-sections">
@@ -184,138 +187,126 @@ const isAboutActive = currentPath === '/about';
 
 <script is:inline>
 (function() {
-  // @ts-nocheck
-  var searchBtn    = document.getElementById('sidebar-search-btn');
-  var searchForm   = document.getElementById('sidebar-search-form');
-  var searchInput  = document.getElementById('sidebar-search-input');
-  var popup        = document.getElementById('search-popup');
-  var popupResults = document.getElementById('search-popup-results');
-  var popupAll     = document.getElementById('search-popup-all');
-  var popupHint    = document.getElementById('search-popup-hint');
+// @ts-nocheck
+var searchBtn   = document.getElementById('sidebar-search-btn');
+var searchForm  = document.getElementById('sidebar-search-form');
+var searchInput = document.getElementById('sidebar-search-input');
+var panel       = document.getElementById('search-panel');
+var overlay     = document.getElementById('search-overlay');
+var spCount     = document.getElementById('sp-count');
+var spResults   = document.getElementById('sp-results');
 
-  var allVideos = null; // cached
-  var debounceTimer = null;
+var allVideos = null;
+var debounceTimer = null;
+var isMobile = function() { return window.innerWidth <= 768; };
 
-  // Position popup below search input
-  function positionPopup() {
-    var rect = searchForm.getBoundingClientRect();
-    popup.style.top  = (rect.bottom + 6) + 'px';
-    popup.style.left = rect.left + 'px';
-    popup.style.width = Math.max(rect.width, 240) + 'px';
+// Tag label helpers
+var IND = {'tech-saas':'Tech & SaaS','fashion-luxury':'Fashion & Luxury','advertising-commercial':'Advertising & Commercial','entertainment-media':'Entertainment & Media','finance-banking':'Finance & Banking','automotive':'Automotive','sports-fitness':'Sports & Fitness','food-beverage':'Food & Beverage','healthcare':'Healthcare','education':'Education','real-estate':'Real Estate','other':'Other'};
+var STY = {'minimal-clean':'Minimal/Clean','bold-vibrant':'Bold/Vibrant','3d-cgi':'3D/CGI','hand-drawn':'Hand-drawn','retro-vintage':'Retro/Vintage','futuristic-tech':'Futuristic/Tech','organic-natural':'Organic/Natural','geometric-abstract':'Geometric/Abstract','cinematic-dramatic':'Cinematic/Dramatic','playful-quirky':'Playful/Quirky','elegant-sophisticated':'Elegant/Sophisticated','dark-moody':'Dark/Moody'};
+var SND = {'electronic-synth':'Electronic/Synth','epic-cinematic':'Epic/Cinematic','chill-ambient':'Chill/Ambient','jazz-acoustic':'Jazz/Acoustic','rock-energetic':'Rock/Energetic','orchestral-classical':'Orchestral/Classical','hip-hop-urban':'Hip-hop/Urban','voiceover-heavy':'Voiceover','sound-design-focused':'Sound Design'};
+
+function getLabel(map, key) { return map[key] || key; }
+
+function buildTags(v) {
+  var tags = [];
+  if (v.year) tags.push(String(v.year));
+  if (v.category) tags.push(v.category);
+  (v.industries||[]).forEach(function(i){tags.push(getLabel(IND,i));});
+  (v.styles||[]).forEach(function(s){tags.push(getLabel(STY,s));});
+  (v.soundMusic||[]).filter(function(s){return s!=='no-sound';}).forEach(function(s){tags.push(getLabel(SND,s));});
+  return tags.slice(0,5).map(function(t){
+    return '<span class="sr-tag">'+t+'</span>';
+  }).join('');
+}
+
+function renderItem(v) {
+  var initials = (v.author||'').split(' ').slice(0,2).map(function(w){return w[0]||'';}).join('').toUpperCase();
+  var avatar = v.authorAvatar
+    ? '<img src="'+v.authorAvatar+'" class="sr-avatar" alt="" loading="lazy"/>'
+    : '<div class="sr-avatar sr-initials">'+initials+'</div>';
+  return '<a href="/videos/'+v.slug+'" class="sr-item">'+
+    avatar+
+    '<div class="sr-content">'+
+      '<p class="sr-title">'+v.title+'<span class="sr-cat"> '+v.category+'</span></p>'+
+      '<div class="sr-tags">'+buildTags(v)+'</div>'+
+    '</div>'+
+  '</a>';
+}
+
+function renderResults(matches, q) {
+  if (!q.trim()) {
+    spCount.textContent = 'Search showreels';
+    spResults.innerHTML = '<p class="sp-hint">Type to search...</p>';
+    return;
   }
-
-  // Open search
-  function openSearch() {
-    searchBtn.style.display = 'none';
-    searchForm.style.display = 'flex';
-    searchInput.focus();
-    positionPopup();
-    popup.style.display = 'block';
+  if (matches.length === 0) {
+    spCount.textContent = 'No results for "'+q+'"';
+    spResults.innerHTML = '<p class="sp-hint">Try a different keyword.</p>';
+    return;
   }
+  spCount.textContent = matches.length + ' result' + (matches.length !== 1 ? 's' : '');
+  spResults.innerHTML = matches.map(renderItem).join('');
+}
 
-  // Close search
-  function closeSearch() {
-    searchForm.style.display = 'none';
-    searchBtn.style.display = 'flex';
-    popup.style.display = 'none';
-    searchInput.value = '';
-    popupResults.innerHTML = '';
-    popupAll.style.display = 'none';
-    popupHint.style.display = 'block';
+function filterAndRender(q) {
+  if (!allVideos) return;
+  var term = q.toLowerCase();
+  var matches = !q.trim() ? [] : allVideos.filter(function(v) {
+    return (v.title||'').toLowerCase().includes(term) ||
+           (v.author||'').toLowerCase().includes(term) ||
+           (v.description||'').toLowerCase().includes(term) ||
+           (v.tags||[]).some(function(t){return t.toLowerCase().includes(term);});
+  });
+  renderResults(matches, q);
+}
+
+function openSearch() {
+  searchBtn.style.display = 'none';
+  searchForm.style.display = 'flex';
+  searchInput.focus();
+  if (!isMobile()) {
+    panel.style.display = 'flex';
+    overlay.style.display = 'block';
   }
-
-  // Render popup results
-  function renderResults(videos, q) {
-    if (!q.trim()) {
-      popupResults.innerHTML = '';
-      popupAll.style.display = 'none';
-      popupHint.style.display = 'block';
-      return;
-    }
-
-    var term = q.toLowerCase();
-    var matches = videos.filter(function(v) {
-      return (v.title || '').toLowerCase().includes(term) ||
-             (v.author || '').toLowerCase().includes(term) ||
-             (v.description || '').toLowerCase().includes(term) ||
-             (v.tags || []).some(function(t) { return t.toLowerCase().includes(term); });
+  if (!allVideos) {
+    fetch('/api/videos.json').then(function(r){return r.json();}).then(function(d){
+      allVideos = d;
+      filterAndRender(searchInput.value);
+    }).catch(function(){
+      spResults.innerHTML = '<p class="sp-hint">Search unavailable.</p>';
     });
-
-    popupHint.style.display = 'none';
-
-    if (matches.length === 0) {
-      popupResults.innerHTML = '<p class="sp-noresult">No results for "' + q + '"</p>';
-      popupAll.style.display = 'none';
-      return;
-    }
-
-    var top = matches.slice(0, 6);
-    popupResults.innerHTML = top.map(function(v) {
-      var initials = (v.author || '').split(' ').slice(0,2).map(function(w){return w[0]||'';}).join('').toUpperCase();
-      var avatar = v.authorAvatar
-        ? '<img src="' + v.authorAvatar + '" class="sp-avatar" alt="" loading="lazy" />'
-        : '<div class="sp-avatar sp-initials">' + initials + '</div>';
-      return '<a href="/videos/' + v.slug + '" class="sp-item">' +
-        avatar +
-        '<div class="sp-meta"><span class="sp-title">' + v.title + '</span><span class="sp-sub">' + v.category + '</span></div>' +
-        '</a>';
-    }).join('');
-
-    if (matches.length > 6) {
-      popupAll.href = '/search?q=' + encodeURIComponent(q);
-      popupAll.textContent = 'See all ' + matches.length + ' results →';
-      popupAll.style.display = 'block';
-    } else {
-      popupAll.style.display = 'none';
-    }
   }
+}
 
-  // Load JSON + run search
-  function doSearch(q) {
-    if (allVideos) {
-      renderResults(allVideos, q);
-    } else {
-      fetch('/api/videos.json')
-        .then(function(r) { return r.json(); })
-        .then(function(data) {
-          allVideos = data;
-          renderResults(allVideos, q);
-        })
-        .catch(function() {
-          popupResults.innerHTML = '<p class="sp-noresult">Search unavailable</p>';
-        });
-    }
+function closeSearch() {
+  searchBtn.style.display = 'flex';
+  searchForm.style.display = 'none';
+  panel.style.display = 'none';
+  overlay.style.display = 'none';
+  searchInput.value = '';
+  spCount.textContent = 'Search showreels';
+  spResults.innerHTML = '<p class="sp-hint">Type to search...</p>';
+}
+
+searchBtn.addEventListener('click', openSearch);
+overlay.addEventListener('click', closeSearch);
+
+searchInput.addEventListener('input', function() {
+  clearTimeout(debounceTimer);
+  debounceTimer = setTimeout(function(){ filterAndRender(searchInput.value); }, 200);
+});
+
+searchInput.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeSearch();
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    if (searchInput.value.trim()) window.location.href = '/search?q='+encodeURIComponent(searchInput.value.trim());
   }
+});
 
-  // Events
-  searchBtn.addEventListener('click', openSearch);
-
-  searchInput.addEventListener('input', function() {
-    clearTimeout(debounceTimer);
-    debounceTimer = setTimeout(function() { doSearch(searchInput.value); }, 200);
-  });
-
-  searchInput.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') closeSearch();
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      if (searchInput.value.trim()) {
-        window.location.href = '/search?q=' + encodeURIComponent(searchInput.value.trim());
-      }
-    }
-  });
-
-  // Close on outside click
-  document.addEventListener('click', function(e) {
-    if (!searchForm.contains(e.target) && !popup.contains(e.target) && e.target !== searchBtn) {
-      if (searchForm.style.display === 'flex') closeSearch();
-    }
-  });
-
-  // Reposition on scroll/resize
-  window.addEventListener('resize', function() {
-    if (popup.style.display !== 'none') positionPopup();
-  });
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape' && searchForm.style.display === 'flex') closeSearch();
+});
 
 })();
 </script>
@@ -472,48 +463,96 @@ const isAboutActive = currentPath === '/about';
     letter-spacing: 0.3px;
   }
 
-  /* ── Search popup (fixed) ── */
-  .search-popup {
+  /* ── Search overlay ── */
+  .search-overlay {
     position: fixed;
-    z-index: 200;
-    background: #fff;
-    border: 1px solid #e8e8e8;
-    border-radius: 10px;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.06);
-    padding: 6px;
-    min-width: 240px;
-    max-height: 320px;
-    overflow-y: auto;
+    inset: 0;
+    background: rgba(0,0,0,0.15);
+    z-index: 140;
+    display: none;
   }
 
-  .sp-item {
+  /* ── Search panel (desktop) ── */
+  .search-panel {
+    position: fixed;
+    left: 209px;
+    top: 0;
+    height: 100vh;
+    width: 360px;
+    background: #fff;
+    border-left: 1px solid #e9e9e9;
+    z-index: 150;
+    display: none;
+    flex-direction: column;
+    gap: 12px;
+    padding: 20px;
+    overflow: hidden;
+  }
+
+  .sp-header { flex-shrink: 0; }
+
+  .sp-count {
+    font-size: 24px;
+    color: #000;
+    display: block;
+  }
+
+  .sp-divider {
+    width: 100%;
+    height: 1px;
+    background: #f0f0f0;
+    flex-shrink: 0;
+  }
+
+  .sp-results {
+    flex: 1;
+    overflow-y: auto;
     display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 8px 10px;
-    border-radius: 6px;
+    flex-direction: column;
+    gap: 8px;
+    scrollbar-width: thin;
+    scrollbar-color: #e0e0e0 transparent;
+  }
+
+  .sp-hint {
+    font-size: 13px;
+    color: #bbb;
+    margin: 0;
+    padding: 8px 0;
+  }
+
+  /* Result items */
+  .sr-item {
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+    padding: 8px;
+    background: #f8f8f8;
+    border-radius: 8px;
     text-decoration: none;
     transition: background 0.1s;
+    flex-shrink: 0;
   }
 
-  .sp-item:hover { background: #f5f5f5; }
+  .sr-item:hover { background: #f0f0f0; }
 
-  .sp-avatar {
-    width: 28px;
-    height: 28px;
-    border-radius: 6px;
+  .sr-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
     object-fit: cover;
     flex-shrink: 0;
     border: 1px solid #eee;
+    background: #fff;
   }
 
-  .sp-initials {
-    width: 28px;
-    height: 28px;
-    border-radius: 6px;
+  .sr-initials {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
     background: #2f2f2f;
     color: #fff;
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 600;
     display: flex;
     align-items: center;
@@ -521,57 +560,48 @@ const isAboutActive = currentPath === '/about';
     flex-shrink: 0;
   }
 
-  .sp-meta {
+  .sr-content {
+    flex: 1;
+    min-width: 0;
     display: flex;
     flex-direction: column;
-    gap: 1px;
-    min-width: 0;
+    gap: 8px;
   }
 
-  .sp-title {
+  .sr-title {
+    font-size: 14px;
+    color: #000;
+    margin: 0;
+    line-height: 1.3;
+  }
+
+  .sr-cat {
     font-size: 13px;
-    color: #111;
+    color: #888;
+  }
+
+  .sr-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
+  .sr-tag {
+    background: #fff;
+    height: 23px;
+    padding: 0 6px;
+    border-radius: 4px;
+    font-size: 10px;
+    color: #4b5563;
+    display: inline-flex;
+    align-items: center;
     white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    font-weight: 500;
   }
 
-  .sp-sub {
-    font-size: 11px;
-    color: #999;
-    white-space: nowrap;
-  }
-
-  .sp-noresult {
-    font-size: 12px;
-    color: #bbb;
-    text-align: center;
-    padding: 12px;
-    margin: 0;
-  }
-
-  .search-popup-all {
-    display: block;
-    text-align: center;
-    font-size: 12px;
-    color: #555;
-    text-decoration: none;
-    padding: 8px;
-    border-top: 1px solid #f0f0f0;
-    margin-top: 4px;
-    border-radius: 0 0 6px 6px;
-    transition: color 0.15s;
-  }
-
-  .search-popup-all:hover { color: #111; }
-
-  .search-popup-hint {
-    font-size: 12px;
-    color: #bbb;
-    text-align: center;
-    padding: 12px;
-    margin: 0;
+  /* Mobile: hide panel, keep form as-is */
+  @media (max-width: 768px) {
+    .search-panel { display: none !important; }
+    .search-overlay { display: none !important; }
   }
 
   /* ── Sections ── */
