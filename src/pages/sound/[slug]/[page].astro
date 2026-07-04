@@ -1,0 +1,53 @@
+---
+export const prerender = true;
+
+import { getAllSounds, getVideosBySound, sortVideosByDate } from "../../../utils/videoUtils";
+import { getTaxonomyLabel } from "../../../config/taxonomies";
+import Layout from "../../../layouts/Layout.astro";
+import VideoGrid from "../../../components/VideoGrid.astro";
+import TopBar from "../../../components/TopBar.astro";
+import type { GetStaticPaths } from "astro";
+
+export const getStaticPaths: GetStaticPaths = async () => {
+  const sounds = await getAllSounds();
+  const paths: Array<{
+    params: { slug: string; page: string };
+    props: { slug: string; currentPage: number; totalPages: number };
+  }> = [];
+
+  const itemsPerPage = 24;
+  for (const slug of sounds) {
+    const videos = sortVideosByDate(await getVideosBySound(slug));
+    const totalPages = Math.ceil(videos.length / itemsPerPage);
+    for (let i = 2; i <= totalPages; i++) {
+      paths.push({ params: { slug, page: i.toString() }, props: { slug, currentPage: i, totalPages } });
+    }
+  }
+  return paths;
+};
+
+interface Props { slug: string; currentPage: number; totalPages: number; }
+const { slug, currentPage, totalPages } = Astro.props;
+
+const label = getTaxonomyLabel('soundMusic', slug);
+const videos = sortVideosByDate(await getVideosBySound(slug));
+const itemsPerPage = 24;
+
+if (currentPage < 2 || currentPage > totalPages) return Astro.redirect(`/sound/${slug}`);
+---
+
+<Layout
+  title={`${label} Showreels — Page ${currentPage} | Showreel.design`}
+  description={`Curated motion design showreels with ${label} soundtrack.`}
+  canonicalUrl={`https://showreel.design/sound/${slug}/${currentPage}`}
+>
+  <main>
+    <TopBar
+      totalCount={videos.length}
+      allVideos={videos}
+      h1Text={`Discover ${videos.length} Best Showreels with ${label} Music`}
+      h2Text={`Curated motion design showreels featuring ${label} soundtrack.`}
+    />
+    <VideoGrid videos={videos} currentPage={currentPage} itemsPerPage={itemsPerPage} baseUrl={`/sound/${slug}`} />
+  </main>
+</Layout>

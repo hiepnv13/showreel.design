@@ -1,0 +1,68 @@
+---
+export const prerender = true;
+
+import { getAllYears, getVideosByYear, sortVideosByDate } from "../../../utils/videoUtils";
+import Layout from "../../../layouts/Layout.astro";
+import VideoGrid from "../../../components/VideoGrid.astro";
+import TopBar from "../../../components/TopBar.astro";
+import type { GetStaticPaths } from "astro";
+
+export const getStaticPaths: GetStaticPaths = async () => {
+  const years = await getAllYears();
+  const paths: Array<{
+    params: { year: string; page: string };
+    props: { year: number; currentPage: number; totalPages: number };
+  }> = [];
+
+  const itemsPerPage = 24;
+  for (const year of years) {
+    const videos = sortVideosByDate(await getVideosByYear(year));
+    const totalPages = Math.ceil(videos.length / itemsPerPage);
+    for (let i = 2; i <= totalPages; i++) {
+      paths.push({ params: { year: String(year), page: i.toString() }, props: { year, currentPage: i, totalPages } });
+    }
+  }
+  return paths;
+};
+
+interface Props { year: number; currentPage: number; totalPages: number; }
+const { year, currentPage, totalPages } = Astro.props;
+
+const videos = sortVideosByDate(await getVideosByYear(year));
+const itemsPerPage = 24;
+const allYears = await (await import("../../../utils/videoUtils")).getAllYears();
+
+if (currentPage < 2 || currentPage > totalPages) return Astro.redirect(`/year/${year}`);
+---
+
+<Layout
+  title={`${year} Showreels — Page ${currentPage} | Showreel.design`}
+  description={`The best motion design showreels from ${year} — studios and creators worldwide.`}
+  canonicalUrl={`https://showreel.design/year/${year}/${currentPage}`}
+>
+  <main>
+    <TopBar
+      totalCount={videos.length}
+      allVideos={videos}
+      h1Text={`Discover ${videos.length} Best ${year} Showreels`}
+      h2Text={`The best motion design showreels from ${year} — studios and creators worldwide.`}
+    />
+    <div class="year-chips">
+      {allYears.map((y: number) => (
+        <a href={`/year/${y}`} class={`filter-btn${y === year ? ' active' : ''}`}>{y}</a>
+      ))}
+    </div>
+    <VideoGrid videos={videos} currentPage={currentPage} itemsPerPage={itemsPerPage} baseUrl={`/year/${year}`} />
+  </main>
+</Layout>
+
+<style>
+  .year-chips {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 16px 32px;
+    flex-wrap: wrap;
+    border-bottom: 1px solid #f0f0f0;
+  }
+</style>
