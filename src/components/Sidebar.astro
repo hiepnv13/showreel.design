@@ -38,31 +38,34 @@ const isAboutActive = currentPath === '/about';
 
     <!-- Search -->
     <div class="sidebar-search-wrap" id="sidebar-search-wrap">
-      <!-- Default: label + icon -->
       <button class="sidebar-search" id="sidebar-search-btn">
         <span>Search</span>
         <svg width="12" height="12" viewBox="0 0 256 256" fill="currentColor">
           <path d="M229.66 218.34l-50.06-50.07a88.11 88.11 0 1 0-11.31 11.31l50.06 50.07a8 8 0 0 0 11.31-11.31ZM40 112a72 72 0 1 1 72 72 72.08 72.08 0 0 1-72-72Z"/>
         </svg>
       </button>
-      <!-- Active: input form -->
-      <form action="/search" method="get" class="sidebar-search-form" id="sidebar-search-form" style="display:none">
+      <!-- Active search input -->
+      <div class="sidebar-search-form" id="sidebar-search-form" style="display:none">
         <input
           type="text"
-          name="q"
           class="sidebar-search-input"
           id="sidebar-search-input"
-          placeholder="Type and press Enter..."
+          placeholder="Search showreels..."
           autocomplete="off"
         />
-        <button type="button" class="sidebar-search-close" id="sidebar-search-close">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-            <path d="M18 6L6 18M6 6l12 12"/>
-          </svg>
-        </button>
-      </form>
+        <span class="sidebar-search-esc">Esc</span>
+      </div>
     </div>
     <div class="sidebar-search-divider"></div>
+
+    <!-- Search popup (fixed, outside sidebar flow) -->
+    <div class="search-popup" id="search-popup" style="display:none">
+      <div class="search-popup-results" id="search-popup-results"></div>
+      <a href="/search" class="search-popup-all" id="search-popup-all" style="display:none">
+        See all results →
+      </a>
+      <p class="search-popup-hint" id="search-popup-hint">Type to search showreels</p>
+    </div>
 
     <!-- Main nav: Category + Resource sections -->
     <div class="sidebar-sections">
@@ -179,66 +182,174 @@ const isAboutActive = currentPath === '/about';
   </div>
 </aside>
 
-<script>
-  // Sidebar search toggle
-  const searchBtn = document.getElementById('sidebar-search-btn');
-  const searchForm = document.getElementById('sidebar-search-form');
-  const searchInput = document.getElementById('sidebar-search-input') as HTMLInputElement;
-  const searchClose = document.getElementById('sidebar-search-close');
+<script is:inline>
+(function() {
+  // @ts-nocheck
+  var searchBtn    = document.getElementById('sidebar-search-btn');
+  var searchForm   = document.getElementById('sidebar-search-form');
+  var searchInput  = document.getElementById('sidebar-search-input');
+  var popup        = document.getElementById('search-popup');
+  var popupResults = document.getElementById('search-popup-results');
+  var popupAll     = document.getElementById('search-popup-all');
+  var popupHint    = document.getElementById('search-popup-hint');
 
-  searchBtn?.addEventListener('click', () => {
+  var allVideos = null; // cached
+  var debounceTimer = null;
+
+  // Position popup below search input
+  function positionPopup() {
+    var rect = searchForm.getBoundingClientRect();
+    popup.style.top  = (rect.bottom + 6) + 'px';
+    popup.style.left = rect.left + 'px';
+    popup.style.width = Math.max(rect.width, 240) + 'px';
+  }
+
+  // Open search
+  function openSearch() {
     searchBtn.style.display = 'none';
-    searchForm!.style.display = 'flex';
+    searchForm.style.display = 'flex';
     searchInput.focus();
-  });
+    positionPopup();
+    popup.style.display = 'block';
+  }
 
-  searchClose?.addEventListener('click', () => {
-    searchForm!.style.display = 'none';
-    searchBtn!.style.display = 'flex';
+  // Close search
+  function closeSearch() {
+    searchForm.style.display = 'none';
+    searchBtn.style.display = 'flex';
+    popup.style.display = 'none';
     searchInput.value = '';
+    popupResults.innerHTML = '';
+    popupAll.style.display = 'none';
+    popupHint.style.display = 'block';
+  }
+
+  // Render popup results
+  function renderResults(videos, q) {
+    if (!q.trim()) {
+      popupResults.innerHTML = '';
+      popupAll.style.display = 'none';
+      popupHint.style.display = 'block';
+      return;
+    }
+
+    var term = q.toLowerCase();
+    var matches = videos.filter(function(v) {
+      return (v.title || '').toLowerCase().includes(term) ||
+             (v.author || '').toLowerCase().includes(term) ||
+             (v.description || '').toLowerCase().includes(term) ||
+             (v.tags || []).some(function(t) { return t.toLowerCase().includes(term); });
+    });
+
+    popupHint.style.display = 'none';
+
+    if (matches.length === 0) {
+      popupResults.innerHTML = '<p class="sp-noresult">No results for "' + q + '"</p>';
+      popupAll.style.display = 'none';
+      return;
+    }
+
+    var top = matches.slice(0, 6);
+    popupResults.innerHTML = top.map(function(v) {
+      var initials = (v.author || '').split(' ').slice(0,2).map(function(w){return w[0]||'';}).join('').toUpperCase();
+      var avatar = v.authorAvatar
+        ? '<img src="' + v.authorAvatar + '" class="sp-avatar" alt="" loading="lazy" />'
+        : '<div class="sp-avatar sp-initials">' + initials + '</div>';
+      return '<a href="/videos/' + v.slug + '" class="sp-item">' +
+        avatar +
+        '<div class="sp-meta"><span class="sp-title">' + v.title + '</span><span class="sp-sub">' + v.category + '</span></div>' +
+        '</a>';
+    }).join('');
+
+    if (matches.length > 6) {
+      popupAll.href = '/search?q=' + encodeURIComponent(q);
+      popupAll.textContent = 'See all ' + matches.length + ' results →';
+      popupAll.style.display = 'block';
+    } else {
+      popupAll.style.display = 'none';
+    }
+  }
+
+  // Load JSON + run search
+  function doSearch(q) {
+    if (allVideos) {
+      renderResults(allVideos, q);
+    } else {
+      fetch('/api/videos.json')
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+          allVideos = data;
+          renderResults(allVideos, q);
+        })
+        .catch(function() {
+          popupResults.innerHTML = '<p class="sp-noresult">Search unavailable</p>';
+        });
+    }
+  }
+
+  // Events
+  searchBtn.addEventListener('click', openSearch);
+
+  searchInput.addEventListener('input', function() {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(function() { doSearch(searchInput.value); }, 200);
   });
 
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && searchForm!.style.display === 'flex') {
-      searchForm!.style.display = 'none';
-      searchBtn!.style.display = 'flex';
-      searchInput.value = '';
+  searchInput.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeSearch();
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      if (searchInput.value.trim()) {
+        window.location.href = '/search?q=' + encodeURIComponent(searchInput.value.trim());
+      }
     }
   });
 
-  // Partner slider
-  const slider = document.getElementById('partner-slider');
-  const track  = document.getElementById('partner-track');
-  const dots   = document.querySelectorAll('#slider-dots .slider-dot');
-  const prevBtn = document.getElementById('slider-prev');
-  const nextBtn = document.getElementById('slider-next');
-  const total = dots.length;
-  let current = 0;
-  let autoTimer: ReturnType<typeof setInterval>;
+  // Close on outside click
+  document.addEventListener('click', function(e) {
+    if (!searchForm.contains(e.target) && !popup.contains(e.target) && e.target !== searchBtn) {
+      if (searchForm.style.display === 'flex') closeSearch();
+    }
+  });
 
-  function goTo(index: number) {
+  // Reposition on scroll/resize
+  window.addEventListener('resize', function() {
+    if (popup.style.display !== 'none') positionPopup();
+  });
+
+})();
+</script>
+
+<script is:inline>
+// @ts-nocheck
+// Partner slider
+(function() {
+  var slider = document.getElementById('partner-slider');
+  var track  = document.getElementById('partner-track');
+  var dots   = document.querySelectorAll('#slider-dots .slider-dot');
+  var prevBtn = document.getElementById('slider-prev');
+  var nextBtn = document.getElementById('slider-next');
+  var total = dots.length;
+  var current = 0;
+  var autoTimer;
+
+  function goTo(index) {
     current = (index + total) % total;
-    if (track) (track as HTMLElement).style.transform = `translateX(-${current * 100}%)`;
-    dots.forEach((d, i) => d.classList.toggle('active', i === current));
+    if (track) track.style.transform = 'translateX(-' + (current * 100) + '%)';
+    dots.forEach(function(d, i) { d.classList.toggle('active', i === current); });
   }
 
-  function startAuto() {
-    autoTimer = setInterval(() => goTo(current + 1), 5000);
-  }
+  function startAuto() { autoTimer = setInterval(function() { goTo(current + 1); }, 5000); }
+  function stopAuto()  { clearInterval(autoTimer); }
 
-  function stopAuto() {
-    clearInterval(autoTimer);
-  }
-
-  prevBtn?.addEventListener('click', (e) => { e.preventDefault(); stopAuto(); goTo(current - 1); startAuto(); });
-  nextBtn?.addEventListener('click', (e) => { e.preventDefault(); stopAuto(); goTo(current + 1); startAuto(); });
-  dots.forEach(dot => dot.addEventListener('click', () => { stopAuto(); goTo(Number((dot as HTMLElement).dataset.index)); startAuto(); }));
-  slider?.addEventListener('mouseenter', stopAuto);
-  slider?.addEventListener('mouseleave', startAuto);
+  prevBtn && prevBtn.addEventListener('click', function(e) { e.preventDefault(); stopAuto(); goTo(current - 1); startAuto(); });
+  nextBtn && nextBtn.addEventListener('click', function(e) { e.preventDefault(); stopAuto(); goTo(current + 1); startAuto(); });
+  dots.forEach(function(dot) { dot.addEventListener('click', function() { stopAuto(); goTo(Number(dot.dataset.index)); startAuto(); }); });
+  slider && slider.addEventListener('mouseenter', stopAuto);
+  slider && slider.addEventListener('mouseleave', startAuto);
 
   startAuto();
-
-
+})();
 </script>
 
 <style>
@@ -351,19 +462,117 @@ const isAboutActive = currentPath === '/about';
 
   .sidebar-search-input::placeholder { color: #aaa; }
 
-  .sidebar-search-close {
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: #aaa;
-    padding: 0;
+  .sidebar-search-esc {
+    font-size: 9px;
+    color: #bbb;
+    background: #f0f0f0;
+    border-radius: 3px;
+    padding: 2px 4px;
+    flex-shrink: 0;
+    letter-spacing: 0.3px;
+  }
+
+  /* ── Search popup (fixed) ── */
+  .search-popup {
+    position: fixed;
+    z-index: 200;
+    background: #fff;
+    border: 1px solid #e8e8e8;
+    border-radius: 10px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.06);
+    padding: 6px;
+    min-width: 240px;
+    max-height: 320px;
+    overflow-y: auto;
+  }
+
+  .sp-item {
     display: flex;
     align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    border-radius: 6px;
+    text-decoration: none;
+    transition: background 0.1s;
+  }
+
+  .sp-item:hover { background: #f5f5f5; }
+
+  .sp-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    object-fit: cover;
     flex-shrink: 0;
+    border: 1px solid #eee;
+  }
+
+  .sp-initials {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    background: #2f2f2f;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .sp-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    min-width: 0;
+  }
+
+  .sp-title {
+    font-size: 13px;
+    color: #111;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-weight: 500;
+  }
+
+  .sp-sub {
+    font-size: 11px;
+    color: #999;
+    white-space: nowrap;
+  }
+
+  .sp-noresult {
+    font-size: 12px;
+    color: #bbb;
+    text-align: center;
+    padding: 12px;
+    margin: 0;
+  }
+
+  .search-popup-all {
+    display: block;
+    text-align: center;
+    font-size: 12px;
+    color: #555;
+    text-decoration: none;
+    padding: 8px;
+    border-top: 1px solid #f0f0f0;
+    margin-top: 4px;
+    border-radius: 0 0 6px 6px;
     transition: color 0.15s;
   }
 
-  .sidebar-search-close:hover { color: #333; }
+  .search-popup-all:hover { color: #111; }
+
+  .search-popup-hint {
+    font-size: 12px;
+    color: #bbb;
+    text-align: center;
+    padding: 12px;
+    margin: 0;
+  }
 
   /* ── Sections ── */
   .sidebar-sections {
