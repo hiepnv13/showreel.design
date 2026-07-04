@@ -41,7 +41,6 @@ const isAboutActive = currentPath === '/about';
       <img src="/uploads/search-visual.svg" class="nav-icon" alt="" />
       <span class="nav-label">Search</span>
     </button>
-    <div class="sidebar-search-divider"></div>
 
     <!-- Main nav: Category + Resource sections -->
     <div class="sidebar-sections">
@@ -188,7 +187,7 @@ const isAboutActive = currentPath === '/about';
 
   function open() {
     overlay.classList.add('open');
-    document.body.style.overflow = 'hidden';
+    if (window.lenis) window.lenis.stop();
     input.focus();
     if (!allVideos) {
       fetch('/api/videos.json')
@@ -205,7 +204,7 @@ const isAboutActive = currentPath === '/about';
 
   function close() {
     overlay.classList.remove('open');
-    document.body.style.overflow = '';
+    if (window.lenis) window.lenis.start();
     input.value = '';
     results.innerHTML = '<p class="sm-hint">Type to search...</p>';
   }

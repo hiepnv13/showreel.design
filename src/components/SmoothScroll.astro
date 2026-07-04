@@ -19,6 +19,9 @@
 
   requestAnimationFrame(raf);
 
+  // Expose globally so other scripts can stop/start smooth scroll
+  (window as any).lenis = lenis;
+
   // Sync with GSAP ScrollTrigger if available
   if (typeof window !== 'undefined' && (window as any).ScrollTrigger) {
     lenis.on('scroll', (window as any).ScrollTrigger.update);
