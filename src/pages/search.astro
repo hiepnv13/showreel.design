@@ -13,16 +13,12 @@ const itemsPerPage = 24;
 let videos: CollectionEntry<'videos'>[] = [];
 let searchPerformed = false;
 let totalCount = 0;
-let totalPages = 1;
 
 if (query.trim()) {
   const searchResults = await searchVideos(query.trim());
-  const allResults = sortVideosByDate(searchResults);
-  totalCount = allResults.length;
-  totalPages = Math.ceil(totalCount / itemsPerPage);
-
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  videos = allResults.slice(startIndex, startIndex + itemsPerPage);
+  // Pass ALL results to VideoGrid — it handles slicing internally
+  videos = sortVideosByDate(searchResults);
+  totalCount = videos.length;
   searchPerformed = true;
 }
 ---
@@ -52,7 +48,6 @@ if (query.trim()) {
   {searchPerformed && videos.length > 0 && (
     <VideoGrid
       videos={videos}
-      showAllTab={false}
       currentPage={currentPage}
       itemsPerPage={itemsPerPage}
       baseUrl={`/search?q=${encodeURIComponent(query)}`}

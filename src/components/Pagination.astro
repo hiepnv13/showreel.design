@@ -49,11 +49,16 @@ const getVisiblePages = (current: number, total: number) => {
 
 const visiblePages = getVisiblePages(currentPage, totalPages);
 
-// Helper function to generate page URL (path-based)
+// Generate page URL — path-based normally, query-param if baseUrl has ?
 const getPageUrl = (page: number) => {
     if (page === 1) {
         return baseUrl === '/' ? '/' : baseUrl;
     }
+    // Search pages use query params: /search?q=x&page=2
+    if (baseUrl.includes('?')) {
+        return `${baseUrl}&page=${page}`;
+    }
+    // All other pages use path: /category/x/2
     return baseUrl === '/' ? `/page/${page}` : `${baseUrl}/${page}`;
 };
 ---
