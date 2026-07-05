@@ -104,7 +104,8 @@ Hiện có các file **chưa commit** (chưa được backup, mất máy là m�
 - [ ] Đối chiếu và sửa `public/admin/config.yml` cho khớp giá trị (file này của Decap CMS phải sửa tay, nhưng ghi chú rõ trong taxonomies.ts rằng "sửa ở đây thì phải sửa config.yml").
 - [ ] Rà lại các file video markdown xem có giá trị nào lệch chuẩn (chạy build sẽ báo nếu zod từ chối).
 - [ ] Gom luôn: hàm `generateSlug` đang viết 3 lần (`videoUtils.ts:200`, `api/create-video.json.ts:8`, `upload.astro:390`) → giữ 1 bản trong `videoUtils.ts`, các nơi khác import.
-- [ ] Danh mục hiển thị icon ở `Sidebar.astro:82-88` đang hardcode 5 tên — chuyển vào taxonomies.ts.
+- [ ] Danh mục hiển thị icon ở `Sidebar.astro:82-88` đang hardcod
+e 5 tên — chuyển vào taxonomies.ts.
 
 ## 🚀 Bước 6 — Chuyển site về tĩnh hoàn toàn (nhanh + ổn định hơn)
 
