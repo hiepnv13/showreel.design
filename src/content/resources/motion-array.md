@@ -1,6 +1,6 @@
 ---
 name: Motion Array
-type: Tools
+type: Assets
 description: A curated library of professional After Effects templates, Premiere Pro presets, and stock footage. Higher quality bar than generic marketplaces. Also includes a portfolio hosting platform for motion designers.
 pricing: From $24.99 / month
 href: https://motionarray.com

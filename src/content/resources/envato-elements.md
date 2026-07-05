@@ -1,6 +1,6 @@
 ---
 name: Envato Elements
-type: Tools
+type: Assets
 description: Unlimited downloads of After Effects templates, stock footage, music, and design assets. The most cost-effective option for studios and freelancers who need a constant supply of starting points and b-roll.
 pricing: From $16.50 / month
 href: https://elements.envato.com
