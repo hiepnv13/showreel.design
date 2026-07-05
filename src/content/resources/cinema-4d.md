@@ -5,7 +5,7 @@ description: The go-to 3D tool for motion designers. Known for its intuitive int
 pricing: From $94.99 / month
 href: https://www.maxon.net/cinema-4d
 logo: /placeholder.svg
-banner: ''
+banner: 'https://video.showreel.design/resources%20banner/Cinema%204D.png'
 tags:
   - 3D
   - MoGraph
