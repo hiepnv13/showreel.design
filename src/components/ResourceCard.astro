@@ -50,6 +50,7 @@ const pricingLabel = pricing.toLowerCase().startsWith('free') ? 'Free' : 'Paid';
   .resource-card {
     display: flex;
     flex-direction: column;
+    width: 100%;
     border: 1px solid #f0f0f0;
     border-radius: 8px;
     background: #fff;
@@ -112,10 +113,11 @@ const pricingLabel = pricing.toLowerCase().startsWith('free') ? 'Free' : 'Paid';
   }
 
   .card-info {
-    padding: 12px 12px 12px;
+    padding: 12px;
     display: flex;
     flex-direction: column;
     gap: 6px;
+    flex: 1;
   }
 
   .card-row-main {
@@ -177,9 +179,8 @@ const pricingLabel = pricing.toLowerCase().startsWith('free') ? 'Free' : 'Paid';
     line-height: 1.5;
     margin: 0;
     display: -webkit-box;
-    -webkit-line-clamp: 2;
+    -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
-    min-height: 80px;
   }
 </style>
