@@ -1,0 +1,147 @@
+---
+import { getIndustryLabel, generateSlug } from "../utils/videoUtils";
+import { getTaxonomyLabel } from "../config/taxonomies";
+
+interface Props {
+  year?: number;
+  category: string;
+  categorySlug: string;
+  industries?: string[];
+  styles?: string[];
+  soundMusic?: string[];
+  sourceUrl?: string;
+}
+
+const { year, category, categorySlug, industries, styles, soundMusic, sourceUrl } = Astro.props;
+
+function withRef(url: string): string {
+  try {
+    const u = new URL(url);
+    u.searchParams.set('ref', 'showreel.design');
+    return u.toString();
+  } catch {
+    return url;
+  }
+}
+
+const hasIndustries = industries && industries.length > 0;
+const hasStyles = styles && styles.length > 0;
+const hasSoundMusic = soundMusic && soundMusic.length > 0;
+---
+
+<div class="info-details-area">
+  <h3 class="details-label">Project Details</h3>
+  <div class="details-table">
+    <div class="detail-row">
+      <span class="detail-key">Year</span>
+      {year ? (
+        <a href={`/year/${year}`} class="detail-link">{year}</a>
+      ) : (
+        <span class="detail-val">N/A</span>
+      )}
+    </div>
+    <div class="detail-row">
+      <span class="detail-key">Category</span>
+      <a href={`/category/${categorySlug}`} class="detail-link">{category}</a>
+    </div>
+    {hasIndustries && (
+      <div class="detail-row">
+        <span class="detail-key">Industry</span>
+        <span class="detail-val">
+          {industries!.map((ind: string, i: number) => (
+            <>{i > 0 && <span> · </span>}<a href={`/industry/${ind}`} class="detail-link">{getIndustryLabel(ind)}</a></>
+          ))}
+        </span>
+      </div>
+    )}
+    {hasStyles && (
+      <div class="detail-row">
+        <span class="detail-key">Style</span>
+        <span class="detail-val">
+          {styles!.map((s: string, i: number) => (
+            <>{i > 0 && <span> · </span>}<a href={`/style/${s}`} class="detail-link">{getTaxonomyLabel('styles', s)}</a></>
+          ))}
+        </span>
+      </div>
+    )}
+    {hasSoundMusic && (
+      <div class="detail-row">
+        <span class="detail-key">Sound / Music</span>
+        <span class="detail-val">
+          {soundMusic!.filter((s: string) => s !== 'no-sound').map((s: string, i: number) => (
+            <>{i > 0 && <span> · </span>}<a href={`/sound/${s}`} class="detail-link">{getTaxonomyLabel('soundMusic', s)}</a></>
+          ))}
+        </span>
+      </div>
+    )}
+    {sourceUrl && (
+      <div class="detail-row">
+        <span class="detail-key">Link</span>
+        <a
+          href={withRef(sourceUrl)}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="detail-link detail-link-truncate"
+        >
+          {sourceUrl.replace(/^https?:\/\//, '')}
+        </a>
+      </div>
+    )}
+  </div>
+</div>
+
+<style>
+  .details-label {
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #bbb;
+    margin-bottom: 16px;
+  }
+
+  .details-table {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 10px 0;
+    border-bottom: 1px solid #f3f3f3;
+    gap: 16px;
+  }
+
+  .detail-key {
+    font-size: 11px;
+    color: #bbb;
+    flex-shrink: 0;
+    letter-spacing: 0.3px;
+  }
+
+  .detail-val {
+    font-size: 12px;
+    color: #333;
+    text-align: right;
+  }
+
+  .detail-link {
+    font-size: 12px;
+    color: #333;
+    text-decoration: none;
+    border-bottom: 1px solid #ececec;
+    transition: border-color 0.2s;
+  }
+
+  .detail-link:hover { border-color: #333; }
+
+  .detail-link-truncate {
+    max-width: 220px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: block;
+    text-align: right;
+  }
+</style>

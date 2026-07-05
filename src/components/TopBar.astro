@@ -1,5 +1,6 @@
 ---
 import { getTaxonomyLabel } from '../config/taxonomies';
+import { BANNER_SLIDES } from '../config/site';
 
 interface Props {
   totalCount: number;
@@ -62,20 +63,6 @@ const groups = [
 
 const hasActiveFilter = !!(activeIndustry || activeStyle || activeSound);
 
-const bannerSlides = [
-  {
-    video: 'https://video.showreel.design/Banner/Lotie%20MCP.mp4',
-    link:  'https://lottie.link/showreeldesign',
-    logo:  '/uploads/lottiefiles-logo.png',
-    title: 'Meet Lottie Creator: The AI-powered motion tool for designers.',
-  },
-  {
-    video: 'https://video.showreel.design/Banner/Framer3.mp4',
-    link:  'https://framer.link/srd',
-    logo:  '/uploads/Framer.png',
-    title: 'Framer — Build professional websites with AI.',
-  },
-];
 ---
 
 <div class="topbar-wrap">
@@ -132,7 +119,7 @@ const bannerSlides = [
           <!-- Video track wrapper (overflow hidden here) -->
           <div class="banner-track-wrap">
             <div class="banner-track" id="banner-track">
-              {bannerSlides.map((slide, i) => (
+              {BANNER_SLIDES.map((slide, i) => (
                 <div class="banner-slide-video">
                   <a href={slide.link} target="_blank" rel="noopener noreferrer" class="banner-video-link">
                     <video
@@ -182,14 +169,14 @@ const bannerSlides = [
 
             <!-- Dots -->
             <div class="banner-dots" id="banner-dots">
-              {bannerSlides.map((_, i) => (
+              {BANNER_SLIDES.map((_, i) => (
                 <button class={`banner-dot ${i === 0 ? 'active' : ''}`} data-index={i}></button>
               ))}
             </div>
           </div>
 
           <!-- Info sections (outside overflow-hidden) -->
-          {bannerSlides.map((slide, i) => (
+          {BANNER_SLIDES.map((slide, i) => (
             <div class="banner-info" data-info-index={i} style={i === 0 ? 'display:flex' : 'display:none'}>
               <img src={slide.logo} alt={slide.title} class="banner-logo" loading="lazy" />
               <p class="banner-title">{slide.title}</p>

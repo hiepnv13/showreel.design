@@ -1,5 +1,6 @@
 ---
 import { getAllVideos, getAllCategories, generateSlug } from '../utils/videoUtils';
+import { PARTNERS } from '../config/site';
 
 const currentPath = Astro.url.pathname;
 
@@ -112,22 +113,12 @@ const isAboutActive = currentPath === '/about';
         <span class="sidebar-partner-label">Partner</span>
         <div class="partner-slider" id="partner-slider">
           <div class="partner-track" id="partner-track">
-            <a href="https://framer.link/srd" target="_blank" rel="noopener noreferrer" class="partner-slide">
-              <img src="/uploads/Partner_Framer.png" alt="Framer Templates" loading="lazy" />
-              <span class="slide-tooltip">Framer Templates</span>
-            </a>
-            <a href="https://www.lapa.ninja?ref=showreel.design" target="_blank" rel="noopener noreferrer" class="partner-slide">
-              <img src="/uploads/Partner_Lapa.png" alt="Lapa.ninja" loading="lazy" />
-              <span class="slide-tooltip">Lapa.ninja</span>
-            </a>
-            <a href="https://www.landing.love?ref=showreel.design" target="_blank" rel="noopener noreferrer" class="partner-slide">
-              <img src="/uploads/Partner_Landing.png" alt="Landing.love" loading="lazy" />
-              <span class="slide-tooltip">Landing.love</span>
-            </a>
-            <a href="https://mobbin.com/?via=showreeldesign" target="_blank" rel="noopener noreferrer" class="partner-slide">
-              <img src="/uploads/Partner_Mobbin.png" alt="Mobbin" loading="lazy" />
-              <span class="slide-tooltip">Mobbin — UI & UX Library</span>
-            </a>
+            {PARTNERS.map((p) => (
+              <a href={p.href} target="_blank" rel="noopener noreferrer" class="partner-slide">
+                <img src={p.img} alt={p.name} loading="lazy" />
+                <span class="slide-tooltip">{p.name}</span>
+              </a>
+            ))}
           </div>
 
           <button class="slider-btn slider-prev" id="slider-prev" aria-label="Previous">
@@ -142,10 +133,9 @@ const isAboutActive = currentPath === '/about';
           </button>
 
           <div class="slider-dots" id="slider-dots">
-            <button class="slider-dot active" data-index="0"></button>
-            <button class="slider-dot" data-index="1"></button>
-            <button class="slider-dot" data-index="2"></button>
-            <button class="slider-dot" data-index="3"></button>
+            {PARTNERS.map((_, i) => (
+              <button class={`slider-dot ${i === 0 ? 'active' : ''}`} data-index={i}></button>
+            ))}
           </div>
         </div>
       </div>

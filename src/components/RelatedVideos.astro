@@ -1,0 +1,70 @@
+---
+import VideoCard from "./VideoCard.astro";
+
+interface Props {
+  videos: any[];
+}
+
+const { videos } = Astro.props;
+---
+
+{videos.length > 0 && (
+  <section class="related-section">
+    <p class="related-label">Explore more</p>
+    <div class="related-grid">
+      {videos.map((relatedVideo) => (
+        <VideoCard
+          title={relatedVideo.data.title}
+          author={relatedVideo.data.author}
+          authorAvatar={relatedVideo.data.authorAvatar}
+          thumbnail={relatedVideo.data.thumbnail}
+          videoUrl={(relatedVideo.data as any).thumbnailUrl}
+          slug={relatedVideo.id}
+        />
+      ))}
+    </div>
+  </section>
+)}
+
+<style>
+  .related-section {
+    width: 100%;
+    padding: 32px 32px 60px;
+    border-top: 1px solid #f0f0f0;
+  }
+
+  .related-label {
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #bbb;
+    margin-bottom: 20px;
+  }
+
+  .related-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+  }
+
+  @media (max-width: 1023px) {
+    .related-section {
+      padding: 32px 24px 48px;
+    }
+
+    .related-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 640px) {
+    .related-section {
+      padding: 24px 16px 40px;
+    }
+
+    .related-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+  }
+</style>
