@@ -81,7 +81,7 @@ const isAboutActive = currentPath === '/about';
         </nav>
       </div>
 
-      {import.meta.env.CONTEXT === 'production' && (
+      {import.meta.env.CONTEXT !== 'production' && (
       <div class="sidebar-section">
         <p class="sidebar-section-label">Resource</p>
         <nav class="sidebar-nav">
