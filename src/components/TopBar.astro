@@ -108,6 +108,7 @@ const hasActiveFilter = !!(activeIndustry || activeStyle || activeSound);
           </div>
         ))}
         {hasActiveFilter && <a href="/" class="filter-clear">Clear</a>}
+        <slot name="filters" />
       </div>
 
     </div>

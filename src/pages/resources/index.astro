@@ -13,31 +13,31 @@ const totalCount = resources.length;
 
 <Layout
   title="Motion Design Resources — Showreel.design"
-  description="The best tools, courses, and assets for motion designers."
+  description="Discover the ultimate tools, expert-led courses, and premium assets curated for motion designers."
   canonicalUrl="https://showreel.design/resources"
 >
   <TopBar
     totalCount={totalCount}
     allVideos={[]}
-    h1Text={`Discover ${totalCount} Best Resources`}
-    h2Text="The best tools, courses, and assets for motion designers"
-  />
-
-  <div class="filter-bar">
-    <button class="filter-pill active" data-filter="all">All</button>
-    <button class="filter-pill" data-filter="Tools">
-      <img src="/uploads/cursor-edit-02.svg" alt="" width="14" height="14" />
-      Tools
-    </button>
-    <button class="filter-pill" data-filter="Courses">
-      <img src="/uploads/canvas.svg" alt="" width="14" height="14" />
-      Courses
-    </button>
-    <button class="filter-pill" data-filter="Assets">
-      <img src="/uploads/file-01.svg" alt="" width="14" height="14" />
-      Assets
-    </button>
-  </div>
+    h1Text={`${totalCount} Best Motion Design Resources & Tools`}
+    h2Text="Discover the ultimate tools, expert-led courses, and premium assets curated for motion designers"
+  >
+    <Fragment slot="filters">
+      <button class="filter-pill active" data-filter="all">All</button>
+      <button class="filter-pill" data-filter="Tools">
+        <img src="/uploads/cursor-edit-02.svg" alt="" width="14" height="14" />
+        Tools
+      </button>
+      <button class="filter-pill" data-filter="Courses">
+        <img src="/uploads/canvas.svg" alt="" width="14" height="14" />
+        Courses
+      </button>
+      <button class="filter-pill" data-filter="Assets">
+        <img src="/uploads/file-01.svg" alt="" width="14" height="14" />
+        Assets
+      </button>
+    </Fragment>
+  </TopBar>
 
   <main class="resources-main">
     <div class="resources-grid" id="resources-grid">
@@ -82,19 +82,7 @@ const totalCount = resources.length;
 })();
 </script>
 
-<style>
-  .filter-bar {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    padding: 12px 32px;
-    border-bottom: 1px solid #f0f0f0;
-    position: sticky;
-    top: 0;
-    background: #fff;
-    z-index: 10;
-  }
-
+<style is:global>
   .filter-pill {
     display: inline-flex;
     align-items: center;
