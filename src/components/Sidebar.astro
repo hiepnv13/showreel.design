@@ -1,5 +1,6 @@
 ---
 import { getAllVideos, getAllCategories, generateSlug } from '../utils/videoUtils';
+import { getCollection } from 'astro:content';
 import { PARTNERS } from '../config/site';
 
 const currentPath = Astro.url.pathname;
@@ -15,6 +16,10 @@ for (const cat of allCategories) {
 
 const isHome = currentPath === '/' || currentPath.startsWith('/page/');
 const isAboutActive = currentPath === '/about';
+const isResourcesActive = currentPath.startsWith('/resources');
+
+const allResources = await getCollection('resources');
+const resourceCount = allResources.length;
 
 ---
 
@@ -52,7 +57,7 @@ const isAboutActive = currentPath === '/about';
 
       <!-- Category section -->
       <div class="sidebar-section">
-        <p class="sidebar-section-label">Category</p>
+        <p class="sidebar-section-label">Showreels</p>
         <nav class="sidebar-nav">
           <a href="/" class={`sidebar-item sidebar-item-icon ${isHome ? 'active' : ''}`}>
             <img src="/uploads/more-03.svg" class="nav-icon" alt="" />
@@ -83,15 +88,11 @@ const isAboutActive = currentPath === '/about';
 
       {import.meta.env.CONTEXT !== 'production' && (
       <div class="sidebar-section">
-        <p class="sidebar-section-label">Resource</p>
         <nav class="sidebar-nav">
-          <a href="/resources/tools" class={`sidebar-item sidebar-item-icon ${currentPath.startsWith('/resources/tools') ? 'active' : ''}`}>
-            <img src="/uploads/cursor-edit-02.svg" class="nav-icon" alt="" />
-            <span class="nav-label">Tools</span>
-          </a>
-          <a href="/resources/courses" class={`sidebar-item sidebar-item-icon ${currentPath.startsWith('/resources/courses') ? 'active' : ''}`}>
-            <img src="/uploads/canvas.svg" class="nav-icon" alt="" />
-            <span class="nav-label">Courses</span>
+          <a href="/resources" class={`sidebar-item sidebar-item-icon ${isResourcesActive ? 'active' : ''}`}>
+            <img src="/uploads/folder-03.svg" class="nav-icon" alt="" />
+            <span class="nav-label">Resources</span>
+            <span class="sidebar-badge badge-hover">{resourceCount}</span>
           </a>
         </nav>
       </div>

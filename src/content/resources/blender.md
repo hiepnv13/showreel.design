@@ -1,17 +1,15 @@
 ---
 name: Blender
-category: Animation Software
+type: Tools
 description: A free, open-source 3D suite increasingly popular in professional motion design studios. Powerful geometry nodes, Grease Pencil for 2D animation, and a rapidly growing community of contributors.
 pricing: Free
 href: https://www.blender.org
-thumbnail: /placeholder.svg
+logo: /placeholder.svg
+banner: ''
 tags:
-  - label: Free
-    color: green
-  - label: 3D
-    color: purple
-  - label: Open Source
-    color: gray
+  - Free
+  - 3D
+  - Open Source
 featured: false
 order: 3
 ---

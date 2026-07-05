@@ -1,15 +1,14 @@
 ---
 name: ElevenLabs
-category: AI Motion Tools
+type: Tools
 description: Best-in-class AI voice and audio generation. Motion designers use it to create voiceovers and narration for demo reels, client presentations, and social content — without booking studio time.
 pricing: Free — from $5 / month
 href: https://elevenlabs.io
-thumbnail: /placeholder.svg
+logo: /placeholder.svg
+banner: ''
 tags:
-  - label: AI Audio
-    color: orange
-  - label: Voice Generation
-    color: gray
+  - AI Audio
+  - Voice Generation
 featured: false
 order: 3
 ---

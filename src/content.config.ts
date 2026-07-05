@@ -42,38 +42,18 @@ const videosCollection = defineCollection({
   }),
 });
 
-const toolsCollection = defineCollection({
-  loader: glob({ pattern: '**/*.md', base: './src/content/tools' }),
-  schema: z.object({
-    name: z.string(),
-    category: z.enum(['Animation Software', 'Web & UI Animation', 'AI Motion Tools', 'Assets & Resources']),
-    description: z.string(),
-    pricing: z.string(),
-    href: z.string().url(),
-    thumbnail: z.string().optional(),
-    tags: z.array(z.object({
-      label: z.string(),
-      color: z.enum(['blue', 'green', 'orange', 'purple', 'gray']).default('gray'),
-    })).optional().default([]),
-    featured: z.boolean().default(false),
-    order: z.number().optional().default(0),
-  }),
-});
 
-const coursesCollection = defineCollection({
-  loader: glob({ pattern: '**/*.md', base: './src/content/courses' }),
+const resourcesCollection = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/resources' }),
   schema: z.object({
     name: z.string(),
-    platform: z.string(),
-    category: z.enum(['After Effects', 'Cinema 4D', '3D & Blender', 'Character Animation', 'Motion Principles', 'Web Animation']),
+    type: z.enum(['Tools', 'Courses', 'Assets']),
     description: z.string(),
     pricing: z.string(),
     href: z.string().url(),
-    thumbnail: z.string().optional(),
-    tags: z.array(z.object({
-      label: z.string(),
-      color: z.enum(['blue', 'green', 'orange', 'purple', 'gray']).default('gray'),
-    })).optional().default([]),
+    banner: z.string().optional(),
+    logo: z.string().optional(),
+    tags: z.array(z.string()).optional().default([]),
     featured: z.boolean().default(false),
     order: z.number().optional().default(0),
   }),
@@ -92,7 +72,6 @@ const shortsCollection = defineCollection({
 
 export const collections = {
   videos: videosCollection,
-  tools: toolsCollection,
-  courses: coursesCollection,
+  resources: resourcesCollection,
   shorts: shortsCollection,
 };

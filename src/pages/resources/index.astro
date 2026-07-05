@@ -1,160 +1,156 @@
 ---
-import { getCollection } from "astro:content";
-import Layout from "../../layouts/Layout.astro";
-import ToolCard from "../../components/ToolCard.astro";
+import { getCollection } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+import TopBar from '../../components/TopBar.astro';
+import ResourceCard from '../../components/ResourceCard.astro';
 
 export const prerender = true;
 
-const allTools = await getCollection('tools');
-const tools = allTools.sort((a, b) => (a.data.order ?? 0) - (b.data.order ?? 0));
-
-const allCourses = await getCollection('courses');
-const courses = allCourses.sort((a, b) => (a.data.order ?? 0) - (b.data.order ?? 0));
-
-const sections = [
-  {
-    label: 'Tools',
-    href: '/resources/tools',
-    items: tools.slice(0, 4),
-    total: tools.length,
-    available: true,
-  },
-  {
-    label: 'Courses',
-    href: '/resources/courses',
-    items: courses.slice(0, 4),
-    total: courses.length,
-    available: true,
-  },
-];
+const allResources = await getCollection('resources');
+const resources = allResources.sort((a, b) => (a.data.order ?? 0) - (b.data.order ?? 0));
+const totalCount = resources.length;
 ---
 
 <Layout
   title="Motion Design Resources — Showreel.design"
-  description="Curated tools, courses, templates, and more for motion designers and studios worldwide."
+  description="The best tools, courses, and assets for motion designers."
   canonicalUrl="https://showreel.design/resources"
 >
+  <TopBar
+    totalCount={totalCount}
+    allVideos={[]}
+    h1Text={`Discover ${totalCount} Best Resources`}
+    h2Text="The best tools, courses, and assets for motion designers"
+  />
 
-  <main class="w-full bg-white px-4 sm:px-8 pb-16">
+  <div class="filter-bar">
+    <button class="filter-pill active" data-filter="all">All</button>
+    <button class="filter-pill" data-filter="Tools">
+      <img src="/uploads/cursor-edit-02.svg" alt="" width="14" height="14" />
+      Tools
+    </button>
+    <button class="filter-pill" data-filter="Courses">
+      <img src="/uploads/canvas.svg" alt="" width="14" height="14" />
+      Courses
+    </button>
+    <button class="filter-pill" data-filter="Assets">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+        <polyline points="14 2 14 8 20 8"/>
+      </svg>
+      Assets
+    </button>
+  </div>
 
-    {sections.map((section) => (
-      <div class="resource-section">
-
-        <!-- Section header -->
-        <div class="resource-section-header">
-          <div class="resource-section-left">
-            <p class="resource-section-label">{section.label}</p>
-            {section.total > 4 && (
-              <span class="resource-section-count">{section.total} total</span>
-            )}
-          </div>
-          {section.available && (
-            <a href={section.href} class="resource-view-all">
-              View all {section.label}
-              <svg viewBox="0 0 16 16" fill="none">
-                <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-            </a>
-          )}
+  <main class="resources-main">
+    <div class="resources-grid" id="resources-grid">
+      {resources.map((r) => (
+        <div class="card-wrap" data-type={r.data.type}>
+          <ResourceCard
+            name={r.data.name}
+            type={r.data.type}
+            description={r.data.description}
+            pricing={r.data.pricing}
+            href={r.data.href}
+            banner={r.data.banner}
+            logo={r.data.logo}
+            tags={r.data.tags}
+          />
         </div>
-
-        <!-- Cards grid -->
-        {section.items.length > 0 ? (
-          <div class="resource-grid">
-            {section.items.map((tool: any) => (
-              <ToolCard
-                name={tool.data.name}
-                pricing={tool.data.pricing}
-                href={tool.data.href}
-                thumbnail={tool.data.thumbnail}
-                tags={tool.data.tags}
-              />
-            ))}
-          </div>
-        ) : (
-          <div class="resource-empty">
-            <p>Coming soon.</p>
-          </div>
-        )}
-
-      </div>
-    ))}
-
+      ))}
+    </div>
   </main>
-
 </Layout>
 
+<script is:inline>
+(function () {
+  var pills = document.querySelectorAll('.filter-pill');
+  var cards = document.querySelectorAll('#resources-grid .card-wrap');
+
+  pills.forEach(function (pill) {
+    pill.addEventListener('click', function () {
+      pills.forEach(function (p) { p.classList.remove('active'); });
+      pill.classList.add('active');
+
+      var filter = pill.getAttribute('data-filter');
+      cards.forEach(function (card) {
+        if (filter === 'all' || card.getAttribute('data-type') === filter) {
+          card.style.display = '';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    });
+  });
+})();
+</script>
+
 <style>
-  .resource-section {
-    margin-bottom: 56px;
-  }
-
-  .resource-section-header {
+  .filter-bar {
     display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    padding: 20px 0 16px;
-    border-bottom: 1px solid #f0f0f0;
-    margin-bottom: 20px;
-  }
-
-  .resource-section-left {
-    display: flex;
-    align-items: baseline;
-    gap: 10px;
-  }
-
-  .resource-section-label {
-    font-size: 13px;
-    font-weight: 500;
-    color: #111;
-  }
-
-  .resource-section-count {
-    font-size: 10px;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    color: #ccc;
-  }
-
-  .resource-view-all {
-    display: inline-flex;
     align-items: center;
     gap: 6px;
+    padding: 12px 32px;
+    border-bottom: 1px solid #f0f0f0;
+    position: sticky;
+    top: 0;
+    background: #fff;
+    z-index: 10;
+  }
+
+  .filter-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 8px 10px;
+    border: none;
+    border-radius: 8px;
     font-size: 12px;
-    color: #888;
-    text-decoration: none;
-    transition: color 0.2s, gap 0.2s;
+    font-family: 'Aileron', sans-serif;
+    cursor: pointer;
+    background: #f5f5f5;
+    color: #4b5563;
+    transition: background 0.15s, color 0.15s;
+    white-space: nowrap;
   }
 
-  .resource-view-all:hover {
-    color: #111;
-    gap: 10px;
+  .filter-pill:hover {
+    background: #e5e5e5;
   }
 
-  .resource-view-all svg {
-    width: 14px;
-    height: 14px;
-    flex-shrink: 0;
+  .filter-pill.active {
+    background: #222;
+    color: #fff;
   }
 
-  .resource-grid {
+  .filter-pill img {
+    opacity: 0.6;
+  }
+
+  .filter-pill.active img {
+    filter: invert(1);
+    opacity: 1;
+  }
+
+  .resources-main {
+    padding: 24px 32px 48px;
+  }
+
+  .resources-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 16px 12px;
-  }
-
-  .resource-empty {
-    padding: 40px 0;
-    font-size: 13px;
-    color: #ccc;
+    gap: 20px;
   }
 
   @media (max-width: 1024px) {
-    .resource-grid { grid-template-columns: repeat(3, 1fr); }
+    .resources-grid { grid-template-columns: repeat(3, 1fr); }
+    .filter-bar { padding: 12px 20px; }
+    .resources-main { padding: 20px 20px 40px; }
   }
 
   @media (max-width: 640px) {
-    .resource-grid { grid-template-columns: repeat(2, 1fr); gap: 12px 8px; }
+    .resources-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .filter-bar { padding: 10px 16px; }
+    .resources-main { padding: 16px 16px 32px; }
   }
 </style>
