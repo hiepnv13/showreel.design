@@ -84,6 +84,11 @@ const hasActiveFilter = !!(activeIndustry || activeStyle || activeSound);
 
       <!-- Bottom: filter groups — align bottom -->
       <div class="topbar-filters">
+        <button class="filter-group-btn topbar-search-btn" id="topbar-search-btn">
+          <img src="/uploads/search.svg" width="13" height="13" alt="" style="opacity:0.6" />
+          Search
+        </button>
+        <div class="topbar-filter-divider"></div>
         {groups.map(group => (
           <div class="filter-group" data-group={group.key}>
             <button class={`filter-group-btn ${group.active ? 'active' : ''}`} data-group-btn={group.key}>
@@ -196,6 +201,14 @@ const hasActiveFilter = !!(activeIndustry || activeStyle || activeSound);
 
 <script is:inline>
 (function() {
+  // Topbar search → global modal function (exposed by Sidebar script)
+  var topbarSearchBtn = document.getElementById('topbar-search-btn');
+  if (topbarSearchBtn) {
+    topbarSearchBtn.addEventListener('click', function() {
+      if (window.openSearchModal) window.openSearchModal();
+    });
+  }
+
   // Dropdown toggle
   document.querySelectorAll('[data-group-btn]').forEach(function(btn) {
     btn.addEventListener('click', function(e) {
@@ -324,6 +337,16 @@ const hasActiveFilter = !!(activeIndustry || activeStyle || activeSound);
     align-items: center;
     gap: 6px;
     flex-wrap: wrap;
+  }
+
+  /* Search + divider */
+  .topbar-filter-divider {
+    width: 1px;
+    height: 18px;
+    background: #f0f0f0;
+    margin: 0 8px;
+    flex-shrink: 0;
+    align-self: center;
   }
 
   /* Filter groups */
