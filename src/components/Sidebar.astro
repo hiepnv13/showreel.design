@@ -84,13 +84,9 @@ const resourceCount = allResources.length;
               </a>
             );
           })}
-          <a href="/logo-animation" class={`sidebar-item sidebar-item-icon ${isLogoAnimActive ? 'active' : ''}`}>
-            <img src="/uploads/logo-anim.svg" class="nav-icon" alt="" />
-            <span class="nav-label">Logo Animation</span>
-          </a>
         </nav>
       </div>
- <div class="sidebar-search-divider"></div>
+      <div class="sidebar-search-divider"></div>
       {import.meta.env.CONTEXT !== 'production' && (
       <div class="sidebar-section">
         <nav class="sidebar-nav">
@@ -98,6 +94,10 @@ const resourceCount = allResources.length;
             <img src="/uploads/folder-03.svg" class="nav-icon" alt="" />
             <span class="nav-label">Resources</span>
             <span class="sidebar-badge badge-hover">{resourceCount}</span>
+          </a>
+          <a href="/logo-animation" class={`sidebar-item sidebar-item-icon ${isLogoAnimActive ? 'active' : ''}`}>
+            <img src="/uploads/bookmark-01.svg" class="nav-icon" alt="" />
+            <span class="nav-label">Logo Animation</span>
           </a>
         </nav>
       </div>

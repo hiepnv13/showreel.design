@@ -2,6 +2,7 @@
 export const prerender = true;
 
 import Layout from '../../layouts/Layout.astro';
+import TopBar from '../../components/TopBar.astro';
 import LogoCard from '../../components/LogoCard.astro';
 import shorts from '../../data/shorts.json';
 
@@ -20,39 +21,109 @@ const items = (shorts as string[]).map(file => ({
   videoUrl: `${LOGO_BASE}/${encodeURIComponent(file)}`,
   ...parseFilename(file),
 }));
+
+const totalCount = items.length;
 ---
 
 <Layout
   title="Logo Animation — Showreel.design"
-  description="A curated collection of logo animations from top studios and motion designers worldwide."
+  description={`Discover ${totalCount} curated logo animations from the world's best branding and motion studios — from Pentagram to Lippincott.`}
   canonicalUrl="https://showreel.design/logo-animation"
 >
-  <div class="la-header">
-    <h1 class="la-title">Logo Animation</h1>
-    <p class="la-count">{items.length} animations</p>
-  </div>
+  <TopBar
+    totalCount={totalCount}
+    allVideos={[]}
+    h1Text={`Discover ${totalCount} Logo Animations`}
+    h2Text="Curated logo animations from the world's best branding and motion studios."
+  />
 
+  <!-- Grid -->
   <div class="masonry" id="masonry-grid">
-    {items.map(item => (
-      <LogoCard
-        file={item.file}
-        brand={item.brand}
-        agency={item.agency}
-        videoUrl={item.videoUrl}
-      />
+    {items.map((item, i) => (
+      <div class="card-trigger" data-index={i}>
+        <LogoCard
+          file={item.file}
+          brand={item.brand}
+          agency={item.agency}
+          videoUrl={item.videoUrl}
+        />
+      </div>
     ))}
   </div>
+
+  <!-- Shorts overlay — sits over content area only (sidebar stays visible) -->
+  <div id="shorts-overlay" class="shorts-overlay" aria-hidden="true">
+
+    <!-- Close -->
+    <button id="shorts-close" class="shorts-close" aria-label="Close">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <path d="M18 6L6 18M6 6l12 12"/>
+      </svg>
+    </button>
+
+    <!-- Up / Down navigation -->
+    <div class="shorts-nav">
+      <button id="shorts-prev" class="shorts-nav-btn" aria-label="Previous">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 15l-6-6-6 6"/>
+        </svg>
+      </button>
+      <button id="shorts-next" class="shorts-nav-btn" aria-label="Next">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M6 9l6 6 6-6"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Scroll container -->
+    <div class="shorts-scroll" id="shorts-scroll">
+      {items.map((item, i) => (
+        <div class="shorts-slide" data-index={i}>
+          <div class="shorts-video-wrap">
+            <video
+              class="shorts-video"
+              data-src={item.videoUrl}
+              muted
+              loop
+              playsinline
+              preload="none"
+            ></video>
+          </div>
+          <div class="shorts-meta">
+            <p class="shorts-brand">{item.brand}</p>
+            {item.agency && <p class="shorts-agency">{item.agency}</p>}
+          </div>
+        </div>
+      ))}
+    </div>
+
+    <!-- Scroll hint -->
+    <div class="shorts-hint" id="shorts-hint">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 5v14M5 12l7 7 7-7"/>
+      </svg>
+      Scroll to browse
+    </div>
+
+  </div>
+
 </Layout>
 
+<!-- Grid play/pause + skeleton -->
 <script is:inline>
 // @ts-nocheck
-// Play videos only when in viewport — performance for 100+ clips
 (function () {
-  var videos = document.querySelectorAll('.logo-video');
+  var gridVideos = document.querySelectorAll('#masonry-grid .logo-video');
+  if (!gridVideos.length) return;
 
-  if (!videos.length) return;
+  gridVideos.forEach(function (vid) {
+    vid.addEventListener('canplay', function () {
+      var card = vid.closest('.logo-card');
+      if (card) card.classList.remove('loading');
+    }, { once: true });
+  });
 
-  var observer = new IntersectionObserver(function (entries) {
+  var gridObserver = new IntersectionObserver(function (entries) {
     entries.forEach(function (entry) {
       var vid = entry.target;
       if (entry.isIntersecting) {
@@ -64,49 +135,287 @@ const items = (shorts as string[]).map(file => ({
     });
   }, { threshold: 0.1 });
 
-  videos.forEach(function (v) { observer.observe(v); });
+  gridVideos.forEach(function (v) { gridObserver.observe(v); });
+})();
+</script>
+
+<!-- Shorts viewer -->
+<script is:inline>
+// @ts-nocheck
+(function () {
+  var overlay     = document.getElementById('shorts-overlay');
+  var scrollEl    = document.getElementById('shorts-scroll');
+  var closeBtn    = document.getElementById('shorts-close');
+  var prevBtn     = document.getElementById('shorts-prev');
+  var nextBtn     = document.getElementById('shorts-next');
+  var hintEl      = document.getElementById('shorts-hint');
+  var slides      = document.querySelectorAll('.shorts-slide');
+  var shortVideos = document.querySelectorAll('.shorts-video');
+  var triggers    = document.querySelectorAll('.card-trigger');
+  var total       = slides.length;
+  var currentIdx  = 0;
+  var hintTimer   = null;
+
+  // ── Lazy load current ±1 ──
+  function loadAround(idx) {
+    [-1, 0, 1].forEach(function (offset) {
+      var i = idx + offset;
+      if (i < 0 || i >= total) return;
+      var vid = shortVideos[i];
+      if (vid && !vid.getAttribute('src') && vid.dataset.src) {
+        vid.setAttribute('src', vid.dataset.src);
+      }
+    });
+  }
+
+  // ── Scroll to index ──
+  function goTo(idx, animated) {
+    if (idx < 0 || idx >= total) return;
+    loadAround(idx);
+    scrollEl.scrollTo({
+      top: slides[idx].offsetTop,
+      behavior: animated ? 'smooth' : 'instant'
+    });
+  }
+
+  // ── Open overlay ──
+  function openAt(idx) {
+    currentIdx = idx;
+    overlay.classList.add('open');
+    overlay.setAttribute('aria-hidden', 'false');
+    if (window.lenis) window.lenis.stop();
+
+    goTo(idx, false);
+
+    hintEl.style.opacity = '1';
+    clearTimeout(hintTimer);
+    hintTimer = setTimeout(function () { hintEl.style.opacity = '0'; }, 2000);
+  }
+
+  // ── Close overlay ──
+  function close() {
+    overlay.classList.remove('open');
+    overlay.setAttribute('aria-hidden', 'true');
+    if (window.lenis) window.lenis.start();
+    shortVideos.forEach(function (v) { v.pause(); v.currentTime = 0; });
+  }
+
+  // ── Block Lenis from receiving wheel events inside overlay ──
+  scrollEl.addEventListener('wheel', function (e) {
+    e.stopPropagation();
+  }, { passive: true });
+
+  // ── IntersectionObserver: track current, play/pause, lazy-load ──
+  var slideObserver = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      if (!entry.isIntersecting) {
+        var vid = shortVideos[Number(entry.target.dataset.index)];
+        if (vid) { vid.pause(); vid.currentTime = 0; }
+        return;
+      }
+      var idx = Number(entry.target.dataset.index);
+      currentIdx = idx;
+      loadAround(idx);
+      var vid = shortVideos[idx];
+      if (vid && vid.getAttribute('src')) vid.play().catch(function () {});
+    });
+  }, { root: scrollEl, threshold: 0.8 });
+
+  slides.forEach(function (s) { slideObserver.observe(s); });
+
+  // ── Grid cards click → open ──
+  triggers.forEach(function (trigger) {
+    trigger.addEventListener('click', function () {
+      openAt(Number(trigger.dataset.index));
+    });
+  });
+
+  // ── Nav buttons ──
+  prevBtn.addEventListener('click', function () { goTo(currentIdx - 1, true); });
+  nextBtn.addEventListener('click', function () { goTo(currentIdx + 1, true); });
+
+  // ── Close ──
+  closeBtn.addEventListener('click', close);
+
+  // ── Keyboard ──
+  document.addEventListener('keydown', function (e) {
+    if (!overlay.classList.contains('open')) return;
+    if (e.key === 'Escape')    close();
+    if (e.key === 'ArrowDown') goTo(currentIdx + 1, true);
+    if (e.key === 'ArrowUp')   goTo(currentIdx - 1, true);
+  });
+
 })();
 </script>
 
 <style>
-  .la-header {
-    display: flex;
-    align-items: baseline;
-    gap: 12px;
-    padding: 24px 32px 16px;
-    border-bottom: 1px solid #f0f0f0;
-  }
-
-  .la-title {
-    font-size: 20px;
-    font-weight: 400;
-    color: #111;
-    margin: 0;
-    letter-spacing: -0.3px;
-  }
-
-  .la-count {
-    font-size: 12px;
-    color: #bbb;
-    margin: 0;
-  }
-
+  /* ── Grid ── */
   .masonry {
     columns: 4;
     column-gap: 12px;
     padding: 20px 32px 48px;
   }
 
-  @media (max-width: 1280px) {
-    .masonry { columns: 3; }
+  .card-trigger {
+    cursor: pointer;
+    break-inside: avoid;
   }
+
+  @media (max-width: 1280px) { .masonry { columns: 3; } }
+  @media (max-width: 768px)  { .masonry { columns: 2; padding: 16px 16px 40px; } }
+  @media (max-width: 480px)  { .masonry { columns: 1; } }
+
+  /* ── Shorts overlay — content area only, sidebar stays ── */
+  .shorts-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 209px;   /* sidebar width */
+    right: 0;
+    bottom: 0;
+    background: #0a0a0a;
+    z-index: 200;
+    flex-direction: column;
+  }
+
+  .shorts-overlay.open { display: flex; }
 
   @media (max-width: 768px) {
-    .masonry { columns: 2; padding: 16px 16px 40px; }
-    .la-header { padding: 16px 16px 12px; }
+    .shorts-overlay { left: 0; }
   }
 
-  @media (max-width: 480px) {
-    .masonry { columns: 1; }
+  /* Close button */
+  .shorts-close {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.08);
+    border: none;
+    cursor: pointer;
+    color: rgba(255,255,255,0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    transition: background 0.15s;
+  }
+
+  .shorts-close:hover { background: rgba(255,255,255,0.16); }
+
+  /* Up / Down nav — right side, vertically centered */
+  .shorts-nav {
+    position: absolute;
+    right: 24px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    z-index: 10;
+  }
+
+  .shorts-nav-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.08);
+    border: none;
+    cursor: pointer;
+    color: rgba(255,255,255,0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s, color 0.15s;
+  }
+
+  .shorts-nav-btn:hover {
+    background: rgba(255,255,255,0.18);
+    color: #fff;
+  }
+
+  /* Scroll container */
+  .shorts-scroll {
+    flex: 1;
+    overflow-y: scroll;
+    scroll-snap-type: y mandatory;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .shorts-scroll::-webkit-scrollbar { display: none; }
+
+  /* Each slide */
+  .shorts-slide {
+    height: 100vh;
+    scroll-snap-align: start;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    padding: 48px 80px 48px 24px; /* right padding for nav buttons */
+  }
+
+  /* Video */
+  .shorts-video-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    max-width: min(600px, 80vw);
+    max-height: 68vh;
+    width: 100%;
+  }
+
+  .shorts-video {
+    max-width: 100%;
+    max-height: 68vh;
+    width: auto;
+    height: auto;
+    border-radius: 8px;
+    display: block;
+    background: #1a1a1a;
+  }
+
+  /* Meta */
+  .shorts-meta {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .shorts-brand {
+    font-size: 20px;
+    color: #fff;
+    margin: 0;
+    letter-spacing: -0.3px;
+  }
+
+  .shorts-agency {
+    font-size: 13px;
+    color: rgba(255,255,255,0.4);
+    margin: 0;
+  }
+
+  /* Hint */
+  .shorts-hint {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    color: rgba(255,255,255,0.3);
+    font-family: 'Aileron', sans-serif;
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 0.4s;
+    z-index: 10;
+    pointer-events: none;
   }
 </style>
