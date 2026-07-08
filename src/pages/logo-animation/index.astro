@@ -8,11 +8,11 @@ import shorts from '../../data/shorts.json';
 const LOGO_BASE = 'https://video.showreel.design/showreeldesign/Logo%20Animation';
 
 function parseFilename(file: string) {
-  const base = file.replace(/\.mp4$/i, '');
-  const [brandSlug = '', agencySlug = ''] = base.split('--');
-  const toLabel = (s: string) =>
-    s.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
-  return { brand: toLabel(brandSlug), agency: toLabel(agencySlug) };
+  const base = file.replace(/\.(mp4|webm|mov)$/i, '');
+  const parts = base.split('--');
+  const brand = parts[0]?.trim() ?? '';
+  const agency = parts[1]?.trim() ?? '';
+  return { brand, agency };
 }
 
 const items = (shorts as string[]).map(file => ({
