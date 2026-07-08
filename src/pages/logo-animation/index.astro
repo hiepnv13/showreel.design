@@ -1,0 +1,112 @@
+---
+export const prerender = true;
+
+import Layout from '../../layouts/Layout.astro';
+import LogoCard from '../../components/LogoCard.astro';
+import shorts from '../../data/shorts.json';
+
+const LOGO_BASE = 'https://video.showreel.design/showreeldesign/Logo%20Animation';
+
+function parseFilename(file: string) {
+  const base = file.replace(/\.mp4$/i, '');
+  const [brandSlug = '', agencySlug = ''] = base.split('--');
+  const toLabel = (s: string) =>
+    s.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+  return { brand: toLabel(brandSlug), agency: toLabel(agencySlug) };
+}
+
+const items = (shorts as string[]).map(file => ({
+  file,
+  videoUrl: `${LOGO_BASE}/${encodeURIComponent(file)}`,
+  ...parseFilename(file),
+}));
+---
+
+<Layout
+  title="Logo Animation — Showreel.design"
+  description="A curated collection of logo animations from top studios and motion designers worldwide."
+  canonicalUrl="https://showreel.design/logo-animation"
+>
+  <div class="la-header">
+    <h1 class="la-title">Logo Animation</h1>
+    <p class="la-count">{items.length} animations</p>
+  </div>
+
+  <div class="masonry" id="masonry-grid">
+    {items.map(item => (
+      <LogoCard
+        file={item.file}
+        brand={item.brand}
+        agency={item.agency}
+        videoUrl={item.videoUrl}
+      />
+    ))}
+  </div>
+</Layout>
+
+<script is:inline>
+// @ts-nocheck
+// Play videos only when in viewport — performance for 100+ clips
+(function () {
+  var videos = document.querySelectorAll('.logo-video');
+
+  if (!videos.length) return;
+
+  var observer = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      var vid = entry.target;
+      if (entry.isIntersecting) {
+        vid.play().catch(function () {});
+      } else {
+        vid.pause();
+        vid.currentTime = 0;
+      }
+    });
+  }, { threshold: 0.1 });
+
+  videos.forEach(function (v) { observer.observe(v); });
+})();
+</script>
+
+<style>
+  .la-header {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    padding: 24px 32px 16px;
+    border-bottom: 1px solid #f0f0f0;
+  }
+
+  .la-title {
+    font-size: 20px;
+    font-weight: 400;
+    color: #111;
+    margin: 0;
+    letter-spacing: -0.3px;
+  }
+
+  .la-count {
+    font-size: 12px;
+    color: #bbb;
+    margin: 0;
+  }
+
+  .masonry {
+    columns: 4;
+    column-gap: 12px;
+    padding: 20px 32px 48px;
+  }
+
+  @media (max-width: 1280px) {
+    .masonry { columns: 3; }
+  }
+
+  @media (max-width: 768px) {
+    .masonry { columns: 2; padding: 16px 16px 40px; }
+    .la-header { padding: 16px 16px 12px; }
+  }
+
+  @media (max-width: 480px) {
+    .masonry { columns: 1; }
+  }
+</style>

@@ -17,6 +17,7 @@ for (const cat of allCategories) {
 const isHome = currentPath === '/' || currentPath.startsWith('/page/');
 const isAboutActive = currentPath === '/about';
 const isResourcesActive = currentPath.startsWith('/resources');
+const isLogoAnimActive = currentPath.startsWith('/logo-animation');
 
 const allResources = await getCollection('resources');
 const resourceCount = allResources.length;
@@ -83,6 +84,10 @@ const resourceCount = allResources.length;
               </a>
             );
           })}
+          <a href="/logo-animation" class={`sidebar-item sidebar-item-icon ${isLogoAnimActive ? 'active' : ''}`}>
+            <img src="/uploads/logo-anim.svg" class="nav-icon" alt="" />
+            <span class="nav-label">Logo Animation</span>
+          </a>
         </nav>
       </div>
  <div class="sidebar-search-divider"></div>
@@ -109,7 +114,7 @@ const resourceCount = allResources.length;
 
       <!-- Follow Us on X -->
       <a href="https://x.com/showreeldesign" target="_blank" rel="noopener noreferrer" class="sidebar-item">Follow Us on X</a>
-
+<div class="sidebar-search-divider"></div>
       <!-- Partner banner slider -->
       <div class="sidebar-partner">
         <span class="sidebar-partner-label">Partner</span>
@@ -351,8 +356,8 @@ const resourceCount = allResources.length;
     width: 100%;
     height: 1px;
     background: #f0f0f0;
-    margin-top: 4px;
-    margin-bottom: 20px;
+    margin-top: 8px;
+    margin-bottom: 8px;
     flex-shrink: 0;
   }
 
@@ -360,7 +365,7 @@ const resourceCount = allResources.length;
   .sidebar-sections {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 8px;
   }
 
   .sidebar-section {
@@ -375,6 +380,8 @@ const resourceCount = allResources.length;
     line-height: 1.191;
     margin: 0;
     padding: 0 8px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
   }
 
   /* ── Nav items ── */
@@ -484,11 +491,13 @@ const resourceCount = allResources.length;
   }
 
   .sidebar-partner-label {
-    font-size: 13px;
-    color: #000;
-    opacity: 0.4;
+    font-size: 12px;
+    color: #a4a4a4;
     line-height: 1.191;
-    padding-left: 8px;
+    margin: 0;
+    padding: 0 8px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
   }
 
   .partner-slider {

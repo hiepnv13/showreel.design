@@ -1,0 +1,82 @@
+---
+interface Props {
+  file: string;
+  brand: string;
+  agency: string;
+  videoUrl: string;
+}
+
+const { brand, agency, videoUrl } = Astro.props;
+---
+
+<div class="logo-card">
+  <video
+    class="logo-video"
+    src={videoUrl}
+    muted
+    loop
+    playsinline
+    preload="none"
+  ></video>
+  <div class="logo-chips">
+    <span class="logo-chip">{brand}</span>
+    {agency && <span class="logo-chip logo-chip-agency">{agency}</span>}
+  </div>
+</div>
+
+<style>
+  .logo-card {
+    position: relative;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #111;
+    cursor: pointer;
+    break-inside: avoid;
+    margin-bottom: 12px;
+    display: block;
+  }
+
+  .logo-video {
+    width: 100%;
+    height: auto;
+    display: block;
+    transition: opacity 0.3s;
+  }
+
+  .logo-chips {
+    position: absolute;
+    bottom: 8px;
+    left: 8px;
+    display: flex;
+    gap: 4px;
+    opacity: 0;
+    transition: opacity 0.2s;
+    pointer-events: none;
+  }
+
+  .logo-card:hover .logo-chips {
+    opacity: 1;
+  }
+
+  .logo-chip {
+    height: 24px;
+    padding: 0 8px;
+    border-radius: 8px;
+    background: rgba(20, 20, 20, 0.7);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    color: #fff;
+    font-size: 11px;
+    font-family: 'Aileron', sans-serif;
+    display: inline-flex;
+    align-items: center;
+    white-space: nowrap;
+    box-shadow:
+      0px -1px 0px 0px rgba(255,255,255,0.1),
+      0px 1px 1px 0px rgba(0,0,0,0.3);
+  }
+
+  .logo-chip-agency {
+    color: rgba(255,255,255,0.6);
+  }
+</style>
