@@ -165,33 +165,40 @@ const resourceCount = allResources.length;
 
 <script is:inline>
 // @ts-nocheck
-// Search modal
+// Search modal — searches showreels, logo animations, resources
 (function() {
   var overlay = document.getElementById('sm-overlay');
   var modal   = document.getElementById('sm-modal');
   var input   = document.getElementById('sm-input');
   var results = document.getElementById('sm-results');
 
-  var allVideos = null;
-  var debounce  = null;
+  var data     = null; // { videos, logos, resources }
+  var debounce = null;
 
+  // ── Fetch all 3 sources ──
+  function fetchAll() {
+    return Promise.all([
+      fetch('/api/videos.json').then(function(r) { return r.json(); }),
+      fetch('/api/logo-animations.json').then(function(r) { return r.json(); }),
+      fetch('/api/resources.json').then(function(r) { return r.json(); }),
+    ]).then(function(all) {
+      data = { videos: all[0], logos: all[1], resources: all[2] };
+    }).catch(function() {
+      results.innerHTML = '<p class="sm-hint">Search unavailable.</p>';
+    });
+  }
+
+  // ── Open ──
   function open() {
     overlay.classList.add('open');
     if (window.lenis) window.lenis.stop();
     input.focus();
-    if (!allVideos) {
-      fetch('/api/videos.json')
-        .then(function(r) { return r.json(); })
-        .then(function(d) {
-          allVideos = d;
-          render(input.value);
-        })
-        .catch(function() {
-          results.innerHTML = '<p class="sm-hint">Search unavailable.</p>';
-        });
+    if (!data) {
+      fetchAll().then(function() { render(input.value); });
     }
   }
 
+  // ── Close ──
   function close() {
     overlay.classList.remove('open');
     if (window.lenis) window.lenis.start();
@@ -199,11 +206,17 @@ const resourceCount = allResources.length;
     results.innerHTML = '<p class="sm-hint">Type to search...</p>';
   }
 
+  // ── Helpers ──
   function initials(name) {
     return (name || '').split(' ').slice(0, 2).map(function(w) { return w[0] || ''; }).join('').toUpperCase();
   }
 
-  function renderItem(v) {
+  function inc(str, term) {
+    return (str || '').toLowerCase().includes(term);
+  }
+
+  // ── Render functions ──
+  function renderShowreel(v) {
     var avatar = v.authorAvatar
       ? '<img src="' + v.authorAvatar + '" class="sm-item-avatar" alt="" loading="lazy" />'
       : '<div class="sm-item-initials">' + initials(v.author) + '</div>';
@@ -214,24 +227,62 @@ const resourceCount = allResources.length;
     '</a>';
   }
 
+  function renderLogo(l) {
+    var letter = (l.brand || 'L').charAt(0).toUpperCase();
+    return '<a href="/logo-animation" class="sm-item">' +
+      '<div class="sm-item-initials">' + letter + '</div>' +
+      '<span class="sm-item-title">' + (l.brand || '') + '</span>' +
+      '<span class="sm-item-cat">' + (l.agency || '') + '</span>' +
+    '</a>';
+  }
+
+  function renderResource(r) {
+    var icon = r.logo
+      ? '<img src="' + r.logo + '" class="sm-item-avatar" alt="" loading="lazy" />'
+      : '<div class="sm-item-initials">' + (r.name || 'R').charAt(0).toUpperCase() + '</div>';
+    return '<a href="' + r.href + '" target="_blank" rel="noopener noreferrer" class="sm-item">' +
+      icon +
+      '<span class="sm-item-title">' + r.name + '</span>' +
+      '<span class="sm-item-cat">' + r.type + '</span>' +
+    '</a>';
+  }
+
+  function renderGroup(label, items) {
+    if (!items.length) return '';
+    return '<div class="sm-group">' +
+      '<p class="sm-group-label">' + label + '</p>' +
+      items.join('') +
+    '</div>';
+  }
+
+  // ── Main render ──
   function render(q) {
-    if (!allVideos) return;
+    if (!data) return;
     if (!q.trim()) {
       results.innerHTML = '<p class="sm-hint">Type to search...</p>';
       return;
     }
     var term = q.toLowerCase();
-    var matches = allVideos.filter(function(v) {
-      return (v.title || '').toLowerCase().includes(term) ||
-             (v.author || '').toLowerCase().includes(term) ||
-             (v.description || '').toLowerCase().includes(term) ||
-             (v.tags || []).some(function(t) { return t.toLowerCase().includes(term); });
-    });
-    if (matches.length === 0) {
-      results.innerHTML = '<p class="sm-hint">No results for "' + q + '"</p>';
-      return;
-    }
-    results.innerHTML = matches.map(renderItem).join('');
+
+    var videos = data.videos.filter(function(v) {
+      return inc(v.title, term) || inc(v.author, term) || inc(v.description, term) ||
+             (v.tags || []).some(function(t) { return inc(t, term); });
+    }).slice(0, 6).map(renderShowreel);
+
+    var logos = data.logos.filter(function(l) {
+      return inc(l.brand, term) || inc(l.agency, term);
+    }).slice(0, 4).map(renderLogo);
+
+    var resources = data.resources.filter(function(r) {
+      return inc(r.name, term) || inc(r.description, term) || inc(r.type, term) ||
+             (r.tags || []).some(function(t) { return inc(t, term); });
+    }).slice(0, 4).map(renderResource);
+
+    var html = renderGroup('Showreels', videos) +
+               renderGroup('Logo Animation', logos) +
+               renderGroup('Resources', resources);
+
+    results.innerHTML = html || '<p class="sm-hint">No results for "' + q + '"</p>';
   }
 
   window.openSearchModal = open;
@@ -240,7 +291,6 @@ const resourceCount = allResources.length;
     if (!modal.contains(e.target)) close();
   });
 
-  // Block wheel events from reaching Lenis (listens at window level)
   modal.addEventListener('wheel', function(e) { e.stopPropagation(); }, { passive: true });
 
   input.addEventListener('input', function() {
@@ -708,6 +758,26 @@ const resourceCount = allResources.length;
   flex-direction: column;
   scrollbar-width: thin;
   scrollbar-color: #e0e0e0 transparent;
+}
+
+.sm-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.sm-group + .sm-group {
+  margin-top: 4px;
+  padding-top: 4px;
+  border-top: 1px solid #f5f5f5;
+}
+
+.sm-group-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: #bbb;
+  padding: 6px 10px 4px;
+  margin: 0;
 }
 
 .sm-hint {
