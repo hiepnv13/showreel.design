@@ -1,0 +1,52 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+# ── Trailing slash: redirect mọi URL có slash về không có slash ──
+[[redirects]]
+  from = "/*/"
+  to = "/:splat"
+  status = 301
+  force = true
+
+# ── Old URLs đã xóa sau refactor ──
+[[redirects]]
+  from = "/resources/courses"
+  to = "/resources"
+  status = 301
+
+[[redirects]]
+  from = "/resources/tools"
+  to = "/resources"
+  status = 301
+
+[[redirects]]
+  from = "/category/2d-animation"
+  to = "/"
+  status = 301
+
+[[redirects]]
+  from = "/privacy"
+  to = "/"
+  status = 301
+
+# ── Pagination pages không còn tồn tại ──
+[[redirects]]
+  from = "/style/:slug/2"
+  to = "/style/:slug"
+  status = 301
+
+[[redirects]]
+  from = "/style/:slug/3"
+  to = "/style/:slug"
+  status = 301
+
+[[redirects]]
+  from = "/sound/:slug/2"
+  to = "/sound/:slug"
+  status = 301
+
+[[redirects]]
+  from = "/industry/:slug/3"
+  to = "/industry/:slug"
+  status = 301
