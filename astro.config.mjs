@@ -7,5 +7,4 @@ export default defineConfig({
   site: 'https://showreel.design',
   integrations: [tailwind(), sitemap()],
   output: 'static',
-  trailingSlash: 'never',
 });
