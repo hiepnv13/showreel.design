@@ -115,6 +115,23 @@ export function generateThumbnailUrl(fileName: string): string {
 }
 
 /**
+ * Generate launch video URL
+ * Videos stored in /launch folder
+ */
+export function generateLaunchVideoUrl(fileName: string): string {
+  return `${R2_CONFIG.BASE_URL}/launch/${encodeURIComponent(fileName)}`;
+}
+
+/**
+ * Generate launch video thumbnail URL
+ * Thumbnails stored in /Thumbnails with prefix thumbnail_launch_
+ */
+export function generateLaunchThumbnailUrl(fileName: string): string {
+  const baseName = fileName.replace(/\.[^/.]+$/, '');
+  return `${R2_CONFIG.BASE_URL}/Thumbnails/${encodeURIComponent(`thumbnail_launch_${baseName}.mp4`)}`;
+}
+
+/**
  * Verify if video URL is accessible
  * @param url - Video URL to check
  * @returns Promise<boolean>

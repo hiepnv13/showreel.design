@@ -59,6 +59,25 @@ const resourcesCollection = defineCollection({
   }),
 });
 
+const launchCollection = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/launch' }),
+  schema: z.object({
+    title: z.string(),
+    brand: z.string(),
+    studio: z.string().optional(),
+    videoFileName: z.string(),
+    year: z.number().min(2000).max(2099).optional(),
+    description: z.string(),
+    sourceUrl: z.string().url().optional(),
+    publishDate: z.date(),
+    industries: z.array(z.enum(industryValues)).optional().default([]),
+    styles:     z.array(z.enum(styleValues)).optional().default([]),
+    tags: z.array(z.string()).optional().default([]),
+    featured: z.boolean().default(false),
+    quality: z.enum(['4k', '1080p', '720p', 'preview']).default('1080p'),
+  }),
+});
+
 // Shorts — WIP, not yet in navigation
 const shortsCollection = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/shorts' }),
@@ -72,6 +91,7 @@ const shortsCollection = defineCollection({
 
 export const collections = {
   videos: videosCollection,
+  launch: launchCollection,
   resources: resourcesCollection,
   shorts: shortsCollection,
 };

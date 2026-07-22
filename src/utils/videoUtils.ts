@@ -1,5 +1,5 @@
 import { getCollection, type CollectionEntry } from 'astro:content';
-import { generateVideoUrl, generatePreviewUrl, generateVideoSources, generateThumbnailUrl } from '../config/r2';
+import { generateVideoUrl, generatePreviewUrl, generateVideoSources, generateThumbnailUrl, generateLaunchVideoUrl, generateLaunchThumbnailUrl } from '../config/r2';
 
 // Get all videos from content collection
 export async function getAllVideos(): Promise<CollectionEntry<'videos'>[]> {
@@ -180,6 +180,57 @@ export async function getRelatedVideos(
   const categoryVideos = await getVideosByCategory(category);
   const relatedVideos = categoryVideos.filter(video => video.id !== currentSlug);
   return sortVideosByDate(relatedVideos).slice(0, limit);
+}
+
+// ── Launch Video Utils ────────────────────────────────────────
+
+export async function getAllLaunchVideos(): Promise<CollectionEntry<'launch'>[]> {
+  const videos = await getCollection('launch');
+  return videos.map((video: any) => ({
+    ...video,
+    data: {
+      ...video.data,
+      videoUrl:      generateLaunchVideoUrl(video.data.videoFileName),
+      thumbnailUrl:  generateLaunchThumbnailUrl(video.data.videoFileName),
+    },
+  }));
+}
+
+export async function getLaunchVideoBySlug(slug: string): Promise<CollectionEntry<'launch'> | undefined> {
+  const all = await getAllLaunchVideos();
+  return all.find(v => v.id === slug);
+}
+
+export function sortLaunchVideosByDate(videos: CollectionEntry<'launch'>[]): CollectionEntry<'launch'>[] {
+  return videos.sort((a, b) =>
+    new Date(b.data.publishDate).getTime() - new Date(a.data.publishDate).getTime()
+  );
+}
+
+// Derive unique studio list (dynamic filter) sorted by frequency
+export async function getAllStudios(): Promise<string[]> {
+  const videos = await getCollection('launch');
+  const counts: Record<string, number> = {};
+  videos.forEach((v: CollectionEntry<'launch'>) => {
+    const s = v.data.studio?.trim();
+    if (s) counts[s] = (counts[s] ?? 0) + 1;
+  });
+  return Object.keys(counts).sort((a, b) => counts[b] - counts[a]);
+}
+
+export async function getLaunchVideosByStudio(studio: string): Promise<CollectionEntry<'launch'>[]> {
+  const all = await getAllLaunchVideos();
+  return all.filter(v => v.data.studio?.trim() === studio);
+}
+
+export async function getLaunchVideosByIndustry(slug: string): Promise<CollectionEntry<'launch'>[]> {
+  const all = await getAllLaunchVideos();
+  return all.filter(v => (v.data.industries ?? []).includes(slug as any));
+}
+
+export async function getLaunchVideosByStyle(slug: string): Promise<CollectionEntry<'launch'>[]> {
+  const all = await getAllLaunchVideos();
+  return all.filter(v => (v.data.styles ?? []).includes(slug as any));
 }
 
 // Generate slug from text

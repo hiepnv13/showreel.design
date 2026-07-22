@@ -13,6 +13,132 @@ slug:
   sanitize_replacement: "-"
 
 collections:
+  - name: "launch"
+    label: "Launch Videos"
+    label_singular: "Launch Video"
+    folder: "src/content/launch"
+    create: true
+    identifier_field: title
+    sortable_fields: ["title", "brand", "publishDate"]
+    view_filters:
+      - label: "Featured"
+        field: featured
+        pattern: true
+    fields:
+      - label: "Title"
+        name: title
+        widget: string
+        hint: "Tên campaign / video"
+
+      - label: "Brand"
+        name: brand
+        widget: string
+        hint: "Tên thương hiệu (Nike, Framer...)"
+
+      - label: "Studio / Agency"
+        name: studio
+        widget: string
+        required: false
+        hint: "Studio thực hiện (Buck, Nomad...)"
+
+      - label: "Video File Name"
+        name: videoFileName
+        widget: string
+        hint: "Tên file trên R2 — ví dụ: Agent28.mp4"
+
+      - label: "Publish Date"
+        name: publishDate
+        widget: datetime
+        date_format: "YYYY-MM-DD"
+        time_format: false
+        default: ""
+
+      - label: "Featured"
+        name: featured
+        widget: boolean
+        default: false
+
+      - label: "Year"
+        name: year
+        widget: number
+        required: false
+        value_type: int
+        min: 2000
+        max: 2099
+
+      - label: "Quality"
+        name: quality
+        widget: select
+        default: "1080p"
+        options:
+          - { label: "4K", value: "4k" }
+          - { label: "1080p", value: "1080p" }
+          - { label: "720p", value: "720p" }
+          - { label: "Preview", value: "preview" }
+
+      - label: "Source URL"
+        name: sourceUrl
+        widget: string
+        required: false
+        hint: "Link đến trang chính thức của brand/video"
+
+      - label: "Description"
+        name: description
+        widget: text
+        hint: "Mô tả ngắn về video"
+
+      - label: "Tags"
+        name: tags
+        widget: list
+        default: []
+        hint: "Nhập từng tag rồi Enter"
+
+      - label: "Industries"
+        name: industries
+        widget: select
+        multiple: true
+        required: false
+        default: []
+        options:
+          - { label: "Tech / SaaS", value: "tech-saas" }
+          - { label: "Fashion / Luxury", value: "fashion-luxury" }
+          - { label: "Advertising / Commercial", value: "advertising-commercial" }
+          - { label: "Entertainment / Media", value: "entertainment-media" }
+          - { label: "Finance / Banking", value: "finance-banking" }
+          - { label: "Automotive", value: "automotive" }
+          - { label: "Sports / Fitness", value: "sports-fitness" }
+          - { label: "Food & Beverage", value: "food-beverage" }
+          - { label: "Healthcare", value: "healthcare" }
+          - { label: "Education", value: "education" }
+          - { label: "Real Estate", value: "real-estate" }
+          - { label: "Other", value: "other" }
+
+      - label: "Styles"
+        name: styles
+        widget: select
+        multiple: true
+        required: false
+        default: []
+        options:
+          - { label: "Minimal / Clean", value: "minimal-clean" }
+          - { label: "Bold / Vibrant", value: "bold-vibrant" }
+          - { label: "3D / CGI", value: "3d-cgi" }
+          - { label: "Hand Drawn", value: "hand-drawn" }
+          - { label: "Retro / Vintage", value: "retro-vintage" }
+          - { label: "Futuristic / Tech", value: "futuristic-tech" }
+          - { label: "Organic / Natural", value: "organic-natural" }
+          - { label: "Geometric / Abstract", value: "geometric-abstract" }
+          - { label: "Cinematic / Dramatic", value: "cinematic-dramatic" }
+          - { label: "Playful / Quirky", value: "playful-quirky" }
+          - { label: "Elegant / Sophisticated", value: "elegant-sophisticated" }
+          - { label: "Dark / Moody", value: "dark-moody" }
+
+      - label: "Notes (Markdown)"
+        name: body
+        widget: markdown
+        required: false
+        hint: "Optional"
+
   - name: "videos"
     label: "Videos"
     label_singular: "Video"
