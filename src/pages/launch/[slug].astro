@@ -1,0 +1,296 @@
+---
+export const prerender = true;
+
+import { type CollectionEntry } from 'astro:content';
+import { getAllLaunchVideos, getLaunchVideoBySlug, sortLaunchVideosByDate, getIndustryLabel, generateSlug } from '../../utils/videoUtils';
+import { getTaxonomyLabel } from '../../config/taxonomies';
+import Layout from '../../layouts/Layout.astro';
+import FilterBar from '../../components/FilterBar.astro';
+import VideoPlayer from '../../components/VideoPlayer.astro';
+import VideoCard from '../../components/VideoCard.astro';
+import type { GetStaticPaths } from 'astro';
+
+export const getStaticPaths: GetStaticPaths = async () => {
+  const videos = await getAllLaunchVideos();
+  return videos.map(v => ({ params: { slug: v.id }, props: { video: v } }));
+};
+
+interface Props {
+  video: CollectionEntry<'launch'> & {
+    data: CollectionEntry<'launch'>['data'] & { videoUrl: string; thumbnailUrl: string };
+  };
+}
+
+const { video } = Astro.props as Props;
+
+// Related: same studio, excluding self (fallback: recent)
+const all = sortLaunchVideosByDate(await getAllLaunchVideos());
+const related = all
+  .filter(v => v.id !== video.id && (v.data.studio === video.data.studio || !video.data.studio))
+  .slice(0, 6);
+
+const breadcrumb = [
+  { label: 'Launch', href: '/launch' },
+  { label: video.data.title, href: '' },
+];
+
+function withRef(url: string): string {
+  try {
+    const u = new URL(url);
+    u.searchParams.set('ref', 'showreel.design');
+    return u.toString();
+  } catch { return url; }
+}
+
+const hasIndustries = (video.data.industries ?? []).length > 0;
+const hasStyles     = (video.data.styles ?? []).length > 0;
+const hasTags       = (video.data.tags ?? []).length > 0;
+
+const metaTitle       = `${video.data.title} — ${video.data.brand} | Showreel.design`;
+const metaDescription = video.data.description?.slice(0, 160) ?? `${video.data.brand} launch video. Curated on Showreel.design.`;
+const metaImage       = (video.data as any).thumbnailUrl ?? undefined;
+const canonicalUrl    = `https://showreel.design/launch/${video.id}`;
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'VideoObject',
+  name: video.data.title,
+  description: video.data.description || metaDescription,
+  thumbnailUrl: metaImage,
+  uploadDate: video.data.publishDate?.toISOString?.() ?? `${video.data.year}-01-01`,
+  publisher: { '@type': 'Organization', name: 'Showreel.design', url: 'https://showreel.design' },
+  url: canonicalUrl,
+  ...(((video.data as any).videoUrl) ? { contentUrl: (video.data as any).videoUrl } : {}),
+};
+---
+
+<Layout title={metaTitle} description={metaDescription} ogImage={metaImage} ogType="article" canonicalUrl={canonicalUrl}>
+  <Fragment slot="head">
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+  </Fragment>
+
+  <FilterBar breadcrumb={breadcrumb} />
+
+  <VideoPlayer
+    videoUrl={(video.data as any).videoUrl}
+    videoFileName={video.data.videoFileName}
+    title={video.data.title}
+    author={video.data.brand}
+    category="Launch"
+    year={video.data.year}
+    industries={video.data.industries}
+    styles={video.data.styles}
+    tags={video.data.tags}
+    sourceUrl={video.data.sourceUrl}
+  />
+
+  <div class="video-info">
+    <div class="info-header">
+
+      <!-- Left: title + brand + description -->
+      <div class="info-title-area">
+        <h1 class="info-title">{video.data.title}</h1>
+        <p class="info-by">
+          {video.data.sourceUrl ? (
+            <a href={withRef(video.data.sourceUrl!)} target="_blank" rel="noopener noreferrer" class="info-author-link">{video.data.brand}</a>
+          ) : (
+            <span class="info-author-link" style="border-color:transparent;cursor:default;">{video.data.brand}</span>
+          )}
+        </p>
+        <p class="info-desc">{video.data.description}</p>
+      </div>
+
+      <!-- Right: project details -->
+      <div class="info-details-area">
+        <h3 class="details-label">Project Details</h3>
+        <div class="details-table">
+
+          <div class="detail-row">
+            <span class="detail-key">Brand</span>
+            <span class="detail-val">{video.data.brand}</span>
+          </div>
+
+          {video.data.studio && (
+            <div class="detail-row">
+              <span class="detail-key">Studio</span>
+              <span class="detail-val">{video.data.studio}</span>
+            </div>
+          )}
+
+          <div class="detail-row">
+            <span class="detail-key">Year</span>
+            <span class="detail-val">{video.data.year ?? 'N/A'}</span>
+          </div>
+
+          {hasIndustries && (
+            <div class="detail-row">
+              <span class="detail-key">Industry</span>
+              <span class="detail-val">
+                {video.data.industries!.map((ind: string, i: number) => (
+                  <>{i > 0 && <span> · </span>}<span>{getIndustryLabel(ind)}</span></>
+                ))}
+              </span>
+            </div>
+          )}
+
+          {hasStyles && (
+            <div class="detail-row">
+              <span class="detail-key">Style</span>
+              <span class="detail-val">
+                {video.data.styles!.map((s: string, i: number) => (
+                  <>{i > 0 && <span> · </span>}<span>{getTaxonomyLabel('styles', s)}</span></>
+                ))}
+              </span>
+            </div>
+          )}
+
+          {video.data.sourceUrl && (
+            <div class="detail-row">
+              <span class="detail-key">Link</span>
+              <a href={withRef(video.data.sourceUrl!)} target="_blank" rel="noopener noreferrer"
+                class="detail-link detail-link-truncate">
+                {video.data.sourceUrl.replace(/^https?:\/\//, '')}
+              </a>
+            </div>
+          )}
+
+        </div>
+      </div>
+    </div>
+
+    {hasTags && (
+      <div class="info-tags">
+        <span class="tags-label">Tags</span>
+        <div class="tags-list">
+          {video.data.tags!.map((tag: string) => (
+            <span class="tag-pill">{tag}</span>
+          ))}
+        </div>
+      </div>
+    )}
+  </div>
+
+  <!-- Related launch videos -->
+  {related.length > 0 && (
+    <section class="related-section">
+      <p class="related-label">More launches</p>
+      <div class="related-grid">
+        {related.map(v => (
+          <VideoCard
+            title={v.data.title}
+            author={v.data.brand}
+            thumbnail={(v.data as any).thumbnailUrl}
+            videoUrl={(v.data as any).thumbnailUrl}
+            href={`/launch/${v.id}`}
+            industries={v.data.industries ?? []}
+            styles={v.data.styles ?? []}
+          />
+        ))}
+      </div>
+    </section>
+  )}
+
+</Layout>
+
+<style>
+  .video-info {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 64px 80px 40px;
+  }
+
+  .info-header {
+    display: grid;
+    grid-template-columns: 1fr 360px;
+    gap: 80px;
+    padding-bottom: 48px;
+  }
+
+  .info-title {
+    font-size: 34px;
+    line-height: 1.2;
+    letter-spacing: -0.5px;
+    color: #111;
+    margin-bottom: 12px;
+  }
+
+  .info-by { font-size: 13px; color: #aaa; margin-bottom: 24px; }
+
+  .info-author-link {
+    color: #555;
+    text-decoration: none;
+    border-bottom: 1px solid #e0e0e0;
+    transition: border-color 0.2s, color 0.2s;
+  }
+  .info-author-link:hover { color: #111; border-color: #111; }
+
+  .info-desc { font-size: 15px; line-height: 1.75; color: #888; }
+
+  .details-label {
+    font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: #bbb; margin-bottom: 16px;
+  }
+
+  .details-table { display: flex; flex-direction: column; }
+
+  .detail-row {
+    display: flex; justify-content: space-between; align-items: baseline;
+    padding: 10px 0; border-bottom: 1px solid #f3f3f3; gap: 16px;
+  }
+
+  .detail-key { font-size: 11px; color: #bbb; flex-shrink: 0; letter-spacing: 0.3px; }
+
+  .detail-val { font-size: 12px; color: #333; text-align: right; }
+
+  .detail-link {
+    font-size: 12px; color: #333; text-decoration: none;
+    border-bottom: 1px solid #ececec; transition: border-color 0.2s;
+  }
+  .detail-link:hover { border-color: #333; }
+
+  .detail-link-truncate {
+    max-width: 220px; overflow: hidden; text-overflow: ellipsis;
+    white-space: nowrap; display: block; text-align: right;
+  }
+
+  .info-tags {
+    display: flex; align-items: center; gap: 20px;
+    padding: 28px 0; border-bottom: 1px solid #f0f0f0;
+  }
+
+  .tags-label {
+    font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: #bbb; flex-shrink: 0;
+  }
+
+  .tags-list { display: flex; flex-wrap: wrap; gap: 8px; }
+
+  .tag-pill {
+    font-size: 11px; letter-spacing: 0.3px; color: #777;
+    background: #f5f5f5; padding: 5px 12px; border-radius: 2px;
+  }
+
+  .related-section {
+    width: 100%; padding: 32px 32px 60px; border-top: 1px solid #f0f0f0;
+  }
+
+  .related-label {
+    font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: #bbb; margin-bottom: 20px;
+  }
+
+  .related-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
+  }
+
+  @media (max-width: 1023px) {
+    .video-info { padding: 40px 24px 32px; }
+    .info-header { grid-template-columns: 1fr; gap: 40px; }
+    .related-section { padding: 32px 24px 48px; }
+    .related-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  @media (max-width: 640px) {
+    .video-info { padding: 24px 16px 20px; }
+    .info-title { font-size: 22px; }
+    .related-section { padding: 24px 16px 40px; }
+    .related-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  }
+</style>

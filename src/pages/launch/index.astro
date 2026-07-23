@@ -1,0 +1,126 @@
+---
+export const prerender = true;
+
+import Layout from '../../layouts/Layout.astro';
+import TopBar from '../../components/TopBar.astro';
+import VideoGrid from '../../components/VideoGrid.astro';
+import { getAllLaunchVideos, sortLaunchVideosByDate } from '../../utils/videoUtils';
+
+const allVideos = await getAllLaunchVideos();
+const videos    = sortLaunchVideosByDate(allVideos);
+const total     = videos.length;
+
+// Map to VideoGrid-compatible shape
+const gridVideos = videos.map(v => ({
+  ...v,
+  data: {
+    ...v.data,
+    author:       v.data.brand,
+    authorAvatar: undefined,
+    thumbnail:    (v.data as any).thumbnailUrl ?? '',
+  },
+}));
+
+// Derive studios for filter dropdown
+const studioCounts: Record<string, number> = {};
+videos.forEach(v => {
+  const s = v.data.studio?.trim();
+  if (s) studioCounts[s] = (studioCounts[s] ?? 0) + 1;
+});
+const studios = Object.keys(studioCounts).sort((a, b) => studioCounts[b] - studioCounts[a]);
+---
+
+<Layout
+  title="Launch Videos — Showreel.design"
+  description={`Discover ${total} curated product and brand launch videos from the world's best motion studios.`}
+  canonicalUrl="https://showreel.design/launch"
+>
+  <TopBar
+    totalCount={total}
+    allVideos={gridVideos}
+    h1Text={`Discover ${total} Launch Videos`}
+    h2Text="Curated product and brand launch videos from the world's best motion studios."
+  >
+    {studios.length > 0 && (
+      <Fragment slot="filters">
+        <div class="filter-group" id="studio-filter-group">
+          <button class="filter-group-btn" id="studio-filter-btn">
+            <span class="filter-group-label" id="studio-filter-label">Studio</span>
+            <svg class="filter-group-caret" width="12" height="12" viewBox="0 0 12 12" fill="none">
+              <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+          <div class="filter-group-panel" id="studio-filter-panel">
+            <p class="filter-group-title">Made by...</p>
+            <button class="filter-option checked" data-studio="">
+              <span class="filter-option-label">All studios</span>
+              <span class="filter-option-check">✓</span>
+            </button>
+            {studios.map(s => (
+              <button class="filter-option" data-studio={s}>
+                <span class="filter-option-label">{s}</span>
+                <span class="filter-option-check">✓</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      </Fragment>
+    )}
+  </TopBar>
+
+  <div id="launch-grid-container">
+    <VideoGrid
+      videos={gridVideos}
+      currentPage={1}
+      itemsPerPage={24}
+      baseUrl="/launch"
+      basePath="/launch"
+    />
+  </div>
+</Layout>
+
+<script is:inline>
+// @ts-nocheck
+(function () {
+  var btn     = document.getElementById('studio-filter-btn');
+  var panel   = document.getElementById('studio-filter-panel');
+  var label   = document.getElementById('studio-filter-label');
+  var options = document.querySelectorAll('#studio-filter-panel .filter-option');
+  var cards   = document.querySelectorAll('#launch-grid-container .video-card');
+  var active  = '';
+
+  if (!btn || !panel) return;
+
+  btn.addEventListener('click', function (e) {
+    e.stopPropagation();
+    var isOpen = panel.classList.toggle('open');
+    btn.classList.toggle('panel-open', isOpen);
+  });
+
+  document.addEventListener('click', function () {
+    panel.classList.remove('open');
+    btn.classList.remove('panel-open');
+  });
+
+  // Map card → studio from data attribute we need to add
+  // Studio filter works via card's parent data attribute
+  options.forEach(function (opt) {
+    opt.addEventListener('click', function (e) {
+      e.stopPropagation();
+      active = opt.dataset.studio;
+      label.textContent = active || 'Studio';
+      options.forEach(function (o) {
+        o.classList.toggle('checked', o.dataset.studio === active);
+      });
+      btn.classList.toggle('active', !!active);
+      // Filter: show all if no active, else match data-studio attribute
+      cards.forEach(function (card) {
+        var cardStudio = card.getAttribute('data-studio') || '';
+        card.style.display = (!active || cardStudio === active) ? '' : 'none';
+      });
+      panel.classList.remove('open');
+      btn.classList.remove('panel-open');
+    });
+  });
+})();
+</script>

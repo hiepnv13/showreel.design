@@ -18,11 +18,14 @@ for (const cat of allCategories) {
 const isHome = currentPath === '/' || currentPath.startsWith('/page/');
 const isAboutActive = currentPath === '/about';
 const isResourcesActive = currentPath.startsWith('/resources');
-const isLogoAnimActive = currentPath.startsWith('/logo-animation');
+const isLogoAnimActive  = currentPath.startsWith('/logo-animation');
+const isLaunchActive    = currentPath.startsWith('/launch');
 
 const allResources = await getCollection('resources');
 const resourceCount = allResources.length;
 const logoAnimCount = (shorts as string[]).length;
+const allLaunch = await getCollection('launch');
+const launchCount = allLaunch.length;
 
 ---
 
@@ -79,17 +82,33 @@ const logoAnimCount = (shorts as string[]).length;
         </nav>
       </div>
       <div class="sidebar-search-divider"></div>
+
+      <!-- Motion section -->
+      <div class="sidebar-section">
+        <p class="sidebar-section-label">Motion</p>
+        <nav class="sidebar-nav">
+          <a href="/logo-animation" class={`sidebar-item sidebar-item-icon ${isLogoAnimActive ? 'active' : ''}`}>
+            <img src="/uploads/bookmark-01.svg" class="nav-icon" alt="" />
+            <span class="nav-label">Logo</span>
+            <span class="sidebar-badge badge-hover">{logoAnimCount}</span>
+          </a>
+          <a href="/launch" class={`sidebar-item sidebar-item-icon ${isLaunchActive ? 'active' : ''}`}>
+            <img src="/uploads/rocket.svg" class="nav-icon" alt="" />
+            <span class="nav-label">Launch</span>
+            <span class="sidebar-badge badge-hover">{launchCount}</span>
+          </a>
+        </nav>
+      </div>
+
+      <div class="sidebar-search-divider"></div>
+
+      <!-- Resources section -->
       <div class="sidebar-section">
         <nav class="sidebar-nav">
           <a href="/resources" class={`sidebar-item sidebar-item-icon ${isResourcesActive ? 'active' : ''}`}>
             <img src="/uploads/folder-03.svg" class="nav-icon" alt="" />
             <span class="nav-label">Resources</span>
             <span class="sidebar-badge badge-hover">{resourceCount}</span>
-          </a>
-          <a href="/logo-animation" class={`sidebar-item sidebar-item-icon ${isLogoAnimActive ? 'active' : ''}`}>
-            <img src="/uploads/bookmark-01.svg" class="nav-icon" alt="" />
-            <span class="nav-label">Logo Animation</span>
-            <span class="sidebar-badge badge-hover">{logoAnimCount}</span>
           </a>
         </nav>
       </div>
@@ -176,14 +195,15 @@ const logoAnimCount = (shorts as string[]).length;
   var data     = null; // { videos, logos, resources }
   var debounce = null;
 
-  // ── Fetch all 3 sources ──
+  // ── Fetch all sources ──
   function fetchAll() {
     return Promise.all([
       fetch('/api/videos.json').then(function(r) { return r.json(); }),
       fetch('/api/logo-animations.json').then(function(r) { return r.json(); }),
       fetch('/api/resources.json').then(function(r) { return r.json(); }),
+      fetch('/api/launch.json').then(function(r) { return r.json(); }),
     ]).then(function(all) {
-      data = { videos: all[0], logos: all[1], resources: all[2] };
+      data = { videos: all[0], logos: all[1], resources: all[2], launches: all[3] };
     }).catch(function() {
       results.innerHTML = '<p class="sm-hint">Search unavailable.</p>';
     });
@@ -248,6 +268,17 @@ const logoAnimCount = (shorts as string[]).length;
     '</a>';
   }
 
+  function renderLaunch(l) {
+    var thumb = l.thumbnailUrl
+      ? '<img src="' + l.thumbnailUrl + '" class="sm-item-avatar" alt="" loading="lazy" />'
+      : '<div class="sm-item-initials">' + (l.brand || 'L').charAt(0).toUpperCase() + '</div>';
+    return '<a href="/launch/' + l.slug + '" class="sm-item">' +
+      thumb +
+      '<span class="sm-item-title">' + l.title + '</span>' +
+      '<span class="sm-item-cat">' + (l.brand || '') + '</span>' +
+    '</a>';
+  }
+
   function renderGroup(label, items) {
     if (!items.length) return '';
     return '<div class="sm-group">' +
@@ -279,9 +310,13 @@ const logoAnimCount = (shorts as string[]).length;
              (r.tags || []).some(function(t) { return inc(t, term); });
     }).slice(0, 4).map(renderResource);
 
-    var html = renderGroup('Showreels', videos);
-    // TODO: re-enable when logo animation & resource search UX is ready
-    // html += renderGroup('Logo Animation', logos) + renderGroup('Resources', resources);
+    var launches = (data.launches || []).filter(function(l) {
+      return inc(l.title, term) || inc(l.brand, term) || inc(l.studio, term) ||
+             (l.tags || []).some(function(t) { return inc(t, term); });
+    }).slice(0, 4).map(renderLaunch);
+
+    var html = renderGroup('Showreels', videos) +
+               renderGroup('Launch', launches);
 
     results.innerHTML = html || '<p class="sm-hint">No results for "' + q + '"</p>';
   }

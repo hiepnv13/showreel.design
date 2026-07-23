@@ -8,12 +8,13 @@ export interface Props {
   thumbnail: string;
   videoUrl?: string;
   slug?: string;
+  href?: string;
   industries?: string[];
   styles?: string[];
   soundMusic?: string[];
 }
 
-const { title, author, authorAvatar, thumbnail, videoUrl, slug, industries = [], styles = [], soundMusic = [] } = Astro.props;
+const { title, author, authorAvatar, thumbnail, videoUrl, slug, href, industries = [], styles = [], soundMusic = [] } = Astro.props;
 
 const taxonomyTags = [...industries, ...styles, ...soundMusic].join(' ');
 
@@ -32,7 +33,7 @@ const chips = [
 ].filter(Boolean) as string[];
 ---
 
-<a href={slug ? `/videos/${slug}` : '#'} class="video-card group cursor-pointer block" data-video-url={videoUrl} data-video-taxonomies={taxonomyTags}>
+<a href={href ?? (slug ? `/videos/${slug}` : '#')} class="video-card group cursor-pointer block" data-video-url={videoUrl} data-video-taxonomies={taxonomyTags}>
 
   <!-- Thumbnail frame: 16:9, no bg, no padding -->
   <div class="card-frame">

@@ -8,6 +8,7 @@ interface Props {
     currentPage?: number;
     itemsPerPage?: number;
     baseUrl?: string;
+    basePath?: string;
 }
 
 const {
@@ -15,6 +16,7 @@ const {
     currentPage = 1,
     itemsPerPage = 24,
     baseUrl = "/",
+    basePath,
 } = Astro.props;
 
 const allVideos = propsVideos || sortVideosByDate(await getAllVideos());
@@ -34,7 +36,8 @@ const displayVideos = allVideos.slice(startIndex, startIndex + itemsPerPage);
                     authorAvatar={video.data.authorAvatar}
                     thumbnail={video.data.thumbnail}
                     videoUrl={video.data.thumbnailUrl}
-                    slug={video.id}
+                    slug={basePath ? undefined : video.id}
+                    href={basePath ? `${basePath}/${video.id}` : undefined}
                     industries={video.data.industries ?? []}
                     styles={video.data.styles ?? []}
                     soundMusic={video.data.soundMusic ?? []}
