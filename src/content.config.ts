@@ -65,6 +65,7 @@ const launchCollection = defineCollection({
     title: z.string(),
     brand: z.string(),
     studio: z.string().optional(),
+    authorAvatar: z.string().optional(),
     videoFileName: z.string(),
     year: z.number().min(2000).max(2099).optional(),
     description: z.string(),
