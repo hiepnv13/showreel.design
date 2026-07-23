@@ -41,6 +41,12 @@ collections:
         required: false
         hint: "Studio thực hiện (Buck, Nomad...)"
 
+      - label: "Brand / Studio Logo URL"
+        name: authorAvatar
+        widget: string
+        required: false
+        hint: "URL logo 32px của brand hoặc studio (favicon từ R2)"
+
       - label: "Video File Name"
         name: videoFileName
         widget: string
