@@ -9,6 +9,7 @@ export const SITE = {
 };
 
 export const PARTNERS = [
+  { href: 'https://peekpaper.com/', img: '/uploads/Partner_Peekpaper.png', name: 'Peek Paper — The Web\'s Daily Paper' },
   { href: 'https://framer.link/srd', img: '/uploads/Partner_Framer.png', name: 'Framer Templates' },
   { href: 'https://www.lapa.ninja?ref=showreel.design', img: '/uploads/Partner_Lapa.png', name: 'Lapa.ninja' },
   { href: 'https://www.landing.love?ref=showreel.design', img: '/uploads/Partner_Landing.png', name: 'Landing.love' },
