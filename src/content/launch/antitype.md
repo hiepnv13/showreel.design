@@ -1,7 +1,7 @@
 ---
 title: Antitype
 brand: Antitype
-studio: " Sébastien Deconinck"
+studio: Sébastien Deconinck
 videoFileName: Antitype.mp4
 publishDate: 2026-07-23
 featured: false
