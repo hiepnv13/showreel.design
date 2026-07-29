@@ -5,6 +5,7 @@ import Layout from '../../layouts/Layout.astro';
 import TopBar from '../../components/TopBar.astro';
 import LogoCard from '../../components/LogoCard.astro';
 import shorts from '../../data/shorts.json';
+import { OG_BASE } from '../../config/site';
 
 const LOGO_BASE = 'https://video.showreel.design/Logo%20Animation';
 
@@ -29,6 +30,7 @@ const totalCount = items.length;
   title="Logo Animation — Showreel.design"
   description={`Discover ${totalCount} curated logo animations from the world's best branding and motion studios — from Pentagram to Lippincott.`}
   canonicalUrl="https://showreel.design/logo-animation"
+  ogImage={`${OG_BASE}/og-logo-animation.jpg`}
 >
   <TopBar
     totalCount={totalCount}

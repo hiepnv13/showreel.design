@@ -1,3 +1,10 @@
+export const OG_BASE = 'https://video.showreel.design/og';
+
+export function getOgImage(path: string): string {
+  const slug = path === '/' ? 'home' : path.replace(/\//g, '-').replace(/^-/, '');
+  return `${OG_BASE}/og-${slug}.jpg`;
+}
+
 export const SITE = {
   name: 'Showreel.design',
   url: 'https://showreel.design',

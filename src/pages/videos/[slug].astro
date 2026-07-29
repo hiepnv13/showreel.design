@@ -2,6 +2,7 @@
 import { getCollection, type CollectionEntry } from "astro:content";
 import { getAllVideos, getRelatedVideos, generateSlug } from "../../utils/videoUtils";
 import Layout from "../../layouts/Layout.astro";
+import { OG_BASE } from "../../config/site";
 import FilterBar from "../../components/FilterBar.astro";
 import VideoPlayer from "../../components/VideoPlayer.astro";
 import ProjectDetails from "../../components/ProjectDetails.astro";
@@ -55,7 +56,7 @@ const metaTitle = `${video.data.title} — ${video.data.author} | Showreel.desig
 const metaDescription = video.data.description
   ? video.data.description.slice(0, 160)
   : `${video.data.author} — ${video.data.category} showreel. Curated on Showreel.design.`;
-const metaImage = video.data.thumbnailUrl || undefined;
+const metaImage = `${OG_BASE}/og-home.jpg`;
 const canonicalUrl = `https://showreel.design/videos/${video.id}`;
 
 const jsonLd = {

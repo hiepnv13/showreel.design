@@ -3,6 +3,7 @@ import Layout from "../layouts/Layout.astro";
 import VideoGrid from "../components/VideoGrid.astro";
 import TopBar from "../components/TopBar.astro";
 import { getAllVideos, sortVideosByDate } from "../utils/videoUtils";
+import { OG_BASE } from '../config/site';
 
 export const prerender = true;
 
@@ -11,7 +12,7 @@ const videos = sortVideosByDate(allVideos);
 const itemsPerPage = 24;
 ---
 
-<Layout title="Showreel.design — Discover the Best Showreels">
+<Layout title="Showreel.design — Discover the Best Showreels" ogImage={`${OG_BASE}/og-home.jpg`}>
   <main>
     <TopBar
       totalCount={videos.length}
