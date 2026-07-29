@@ -6,6 +6,7 @@ import Layout from "../../layouts/Layout.astro";
 import VideoGrid from "../../components/VideoGrid.astro";
 import TopBar from "../../components/TopBar.astro";
 import type { GetStaticPaths } from "astro";
+import { OG_BASE } from "../../config/site";
 
 export const getStaticPaths: GetStaticPaths = async () => {
   const industries = await getAllIndustries();
@@ -27,6 +28,7 @@ const itemsPerPage = 24;
   title={`${label} Showreels — Showreel.design`}
   description={`Curated ${label} motion design reels from top studios and creators worldwide.`}
   canonicalUrl={`https://showreel.design/industry/${slug}`}
+  ogImage={`${OG_BASE}/og-industry-${slug}.jpg`}
 >
   <main>
     <TopBar

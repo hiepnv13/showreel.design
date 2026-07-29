@@ -3,6 +3,7 @@ import { getCollection } from 'astro:content';
 import Layout from '../../layouts/Layout.astro';
 import TopBar from '../../components/TopBar.astro';
 import ResourceCard from '../../components/ResourceCard.astro';
+import { OG_BASE } from '../../config/site';
 
 export const prerender = true;
 
@@ -15,6 +16,7 @@ const totalCount = resources.length;
   title="Motion Design Resources — Showreel.design"
   description="Discover the ultimate tools, expert-led courses, and premium assets curated for motion designers."
   canonicalUrl="https://showreel.design/resources"
+  ogImage={`${OG_BASE}/og-resources.jpg`}
 >
   <TopBar
     totalCount={totalCount}

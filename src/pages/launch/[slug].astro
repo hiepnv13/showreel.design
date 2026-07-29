@@ -5,6 +5,7 @@ import { type CollectionEntry } from 'astro:content';
 import { getAllLaunchVideos, getLaunchVideoBySlug, sortLaunchVideosByDate, getIndustryLabel, generateSlug } from '../../utils/videoUtils';
 import { getTaxonomyLabel } from '../../config/taxonomies';
 import Layout from '../../layouts/Layout.astro';
+import { OG_BASE } from '../../config/site';
 import FilterBar from '../../components/FilterBar.astro';
 import VideoPlayer from '../../components/VideoPlayer.astro';
 import VideoCard from '../../components/VideoCard.astro';
@@ -48,7 +49,7 @@ const hasTags       = (video.data.tags ?? []).length > 0;
 
 const metaTitle       = `${video.data.title} — ${video.data.brand} | Showreel.design`;
 const metaDescription = video.data.description?.slice(0, 160) ?? `${video.data.brand} launch video. Curated on Showreel.design.`;
-const metaImage       = (video.data as any).thumbnailUrl ?? undefined;
+const metaImage       = `${OG_BASE}/og-launch.jpg`;
 const canonicalUrl    = `https://showreel.design/launch/${video.id}`;
 
 const jsonLd = {
