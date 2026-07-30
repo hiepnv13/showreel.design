@@ -4,7 +4,7 @@ author: JayKats
 category: 3D / CGI
 publishDate: 2026-07-27
 featured: false
-videoFileName: JayKats Showreel 2026.mp4
+videoFileName: " JayKats Showreel 2026.mp4"
 thumbnail: /placeholder.svg
 description: JayKats is a Creative Lead and 3D Motion Director based in Athens,
   Greece, specializing in CGI product visualization and motion design. With
