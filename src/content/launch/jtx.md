@@ -1,6 +1,7 @@
 ---
 title: JTX
 brand: JTX
+authorAvatarMode: auto
 videoFileName: JTX.mp4
 publishDate: 2026-07-25
 featured: false
