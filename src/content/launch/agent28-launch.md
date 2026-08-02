@@ -2,6 +2,7 @@
 title: Agent28 Launch
 brand: Agent28
 studio: Motionfly
+authorAvatarMode: auto
 videoFileName: Agent28.mp4
 publishDate: 2026-07-23
 featured: false
