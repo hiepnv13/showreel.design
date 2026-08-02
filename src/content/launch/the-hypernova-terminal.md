@@ -1,6 +1,7 @@
 ---
 title: The Hypernova Terminal
 brand: Hypernova
+authorAvatarMode: auto
 videoFileName: The Hypernova Terminal.mp4
 publishDate: 2026-07-25
 featured: false
