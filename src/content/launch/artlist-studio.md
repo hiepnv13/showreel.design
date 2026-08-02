@@ -2,6 +2,7 @@
 title: Artlist Studio
 brand: Artlist
 studio: Artlist
+authorAvatarMode: auto
 videoFileName: Artlist Studio.mp4
 publishDate: 2026-07-23
 featured: false
