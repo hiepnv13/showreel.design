@@ -2,6 +2,7 @@
 title: X Android app
 brand: X
 studio: Nikita Bier
+authorAvatarMode: auto
 videoFileName: X Android app.mp4
 publishDate: 2026-07-25
 featured: false
