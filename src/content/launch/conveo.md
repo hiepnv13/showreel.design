@@ -2,6 +2,7 @@
 title: Conveo
 brand: Conveo
 studio: Agio
+authorAvatarMode: auto
 videoFileName: Conveo.mp4
 publishDate: 2026-07-23
 featured: false
