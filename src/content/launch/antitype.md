@@ -2,6 +2,7 @@
 title: Antitype
 brand: Antitype
 studio: Sébastien Deconinck
+authorAvatarMode: auto
 videoFileName: Antitype.mp4
 publishDate: 2026-07-23
 featured: false
