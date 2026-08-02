@@ -2,6 +2,7 @@
 title: Iconly Pro
 brand: piqostudio
 studio: piqostudio
+authorAvatarMode: auto
 videoFileName: Iconly Pro.mp4
 publishDate: 2026-07-25
 featured: false
