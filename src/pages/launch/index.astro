@@ -16,7 +16,9 @@ const gridVideos = videos.map(v => ({
   data: {
     ...v.data,
     author:       v.data.brand,
-    authorAvatar: v.data.authorAvatar ?? undefined,
+    authorAvatarMode: v.data.authorAvatarMode ?? undefined,
+    authorAvatar:     v.data.authorAvatar ?? undefined,
+    sourceUrl:        v.data.sourceUrl ?? undefined,
     thumbnail:    (v.data as any).thumbnailUrl ?? '',
   },
 }));

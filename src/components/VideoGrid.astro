@@ -33,7 +33,9 @@ const displayVideos = allVideos.slice(startIndex, startIndex + itemsPerPage);
                 <VideoCard
                     title={video.data.title}
                     author={video.data.author}
+                    authorAvatarMode={video.data.authorAvatarMode}
                     authorAvatar={video.data.authorAvatar}
+                    sourceUrl={video.data.sourceUrl}
                     thumbnail={video.data.thumbnail}
                     videoUrl={video.data.thumbnailUrl}
                     slug={basePath ? undefined : video.id}

@@ -4,7 +4,9 @@ import { getTaxonomyLabel } from '../config/taxonomies';
 export interface Props {
   title: string;
   author: string;
+  authorAvatarMode?: 'initials' | 'manual' | 'auto';
   authorAvatar?: string;
+  sourceUrl?: string;
   thumbnail: string;
   videoUrl?: string;
   slug?: string;
@@ -14,7 +16,28 @@ export interface Props {
   soundMusic?: string[];
 }
 
-const { title, author, authorAvatar, thumbnail, videoUrl, slug, href, industries = [], styles = [], soundMusic = [] } = Astro.props;
+const { title, author, authorAvatarMode, authorAvatar, sourceUrl, thumbnail, videoUrl, slug, href, industries = [], styles = [], soundMusic = [] } = Astro.props;
+
+function getFaviconUrl(url: string): string | undefined {
+  try {
+    const { hostname } = new URL(url);
+    return `https://www.google.com/s2/favicons?domain=${hostname}&sz=64`;
+  } catch {
+    return undefined;
+  }
+}
+
+// Priority logic:
+// - mode="auto"    → favicon từ sourceUrl
+// - mode="manual"  → dùng authorAvatar
+// - mode="initials"→ initials
+// - no mode set    → backward compat: dùng authorAvatar nếu có, còn lại initials
+const avatarSrc = (() => {
+  if (authorAvatarMode === 'auto') return sourceUrl ? getFaviconUrl(sourceUrl) : undefined;
+  if (authorAvatarMode === 'manual') return authorAvatar;
+  if (authorAvatarMode === 'initials') return undefined;
+  return authorAvatar || undefined;
+})();
 
 const taxonomyTags = [...industries, ...styles, ...soundMusic].join(' ');
 
@@ -69,8 +92,8 @@ const chips = [
 
   <!-- Card info: logo + video title -->
   <div class="card-info">
-    {authorAvatar ? (
-      <img class="card-avatar" src={authorAvatar} alt={author} loading="lazy" />
+    {avatarSrc ? (
+      <img class="card-avatar" src={avatarSrc} alt={author} loading="lazy" />
     ) : (
       <div class="card-avatar card-avatar-initials">{initials}</div>
     )}

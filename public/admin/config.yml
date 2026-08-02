@@ -41,11 +41,22 @@ collections:
         required: false
         hint: "Studio thực hiện (Buck, Nomad...)"
 
-      - label: "Brand / Studio Logo URL"
+      - label: "Author Logo"
+        name: authorAvatarMode
+        widget: select
+        required: false
+        default: "initials"
+        hint: "Cách hiển thị logo tác giả trên card"
+        options:
+          - { label: "Initials (chữ cái đầu)", value: "initials" }
+          - { label: "Pick from URL (favicon tự động)", value: "auto" }
+          - { label: "Manual (paste URL bên dưới)", value: "manual" }
+
+      - label: "Logo URL (chỉ dùng khi chọn Manual)"
         name: authorAvatar
         widget: string
         required: false
-        hint: "URL logo 32px của brand hoặc studio (favicon từ R2)"
+        hint: "Paste URL ảnh logo — chỉ áp dụng khi Author Logo = Manual"
 
       - label: "Video File Name"
         name: videoFileName
@@ -168,10 +179,22 @@ collections:
         name: author
         widget: string
 
-      - label: "Author Avatar"
+      - label: "Author Logo"
+        name: authorAvatarMode
+        widget: select
+        required: false
+        default: "initials"
+        hint: "Cách hiển thị logo tác giả trên card"
+        options:
+          - { label: "Initials (chữ cái đầu)", value: "initials" }
+          - { label: "Pick from URL (favicon tự động)", value: "auto" }
+          - { label: "Manual (upload ảnh bên dưới)", value: "manual" }
+
+      - label: "Author Avatar (chỉ dùng khi chọn Manual)"
         name: authorAvatar
         widget: image
         required: false
+        hint: "Upload logo — chỉ áp dụng khi Author Logo = Manual"
         media_library:
           config:
             multiple: false

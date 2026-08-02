@@ -180,6 +180,9 @@ const jsonLd = {
           <VideoCard
             title={v.data.title}
             author={v.data.brand}
+            authorAvatarMode={v.data.authorAvatarMode}
+            authorAvatar={v.data.authorAvatar}
+            sourceUrl={v.data.sourceUrl}
             thumbnail={(v.data as any).thumbnailUrl}
             videoUrl={(v.data as any).thumbnailUrl}
             href={`/launch/${v.id}`}

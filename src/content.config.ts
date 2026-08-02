@@ -13,6 +13,7 @@ const videosCollection = defineCollection({
   schema: z.object({
     title: z.string(),
     author: z.string(),
+    authorAvatarMode: z.enum(['initials', 'manual', 'auto']).optional(),
     authorAvatar: z.string().optional(),
     thumbnail: z.string(),
     videoFileName: z.string().refine(
@@ -65,6 +66,7 @@ const launchCollection = defineCollection({
     title: z.string(),
     brand: z.string(),
     studio: z.string().optional(),
+    authorAvatarMode: z.enum(['initials', 'manual', 'auto']).optional(),
     authorAvatar: z.string().optional(),
     videoFileName: z.string(),
     year: z.number().min(2000).max(2099).optional(),
