@@ -2,6 +2,7 @@
 title: Canva Code 2
 brand: Canva
 studio: Canva
+authorAvatarMode: auto
 videoFileName: Canva Code 2.mp4
 publishDate: 2026-07-23
 featured: false
