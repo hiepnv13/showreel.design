@@ -1,7 +1,8 @@
 ---
 title: Spotify for Artists
 brand: Spotify
-videoFileName: " Spotify for Artists.mp4"
+authorAvatarMode: auto
+videoFileName: Spotify for Artists.mp4
 publishDate: 2026-07-25
 featured: false
 year: 2025
