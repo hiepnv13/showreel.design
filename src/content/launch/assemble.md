@@ -2,6 +2,7 @@
 title: Assemble
 brand: Assemble
 studio: Bitmap Studio
+authorAvatarMode: auto
 videoFileName: Assemble.mp4
 publishDate: 2026-07-23
 featured: false
