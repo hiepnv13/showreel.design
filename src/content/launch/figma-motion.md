@@ -1,6 +1,7 @@
 ---
 title: Figma Motion
 brand: Figma
+authorAvatarMode: auto
 videoFileName: Figma Motion.mp4
 publishDate: 2026-07-23
 featured: false
