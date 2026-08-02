@@ -2,6 +2,7 @@
 title: Brew
 brand: Brew
 studio: Anyway
+authorAvatarMode: auto
 videoFileName: Brew by Anyway.mp4
 publishDate: 2026-07-23
 featured: false
