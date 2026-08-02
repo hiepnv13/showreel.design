@@ -1,6 +1,7 @@
 ---
 title: Cordex
 brand: OpenAi
+authorAvatarMode: auto
 videoFileName: Cordex.mp4
 publishDate: 2026-07-23
 featured: false
