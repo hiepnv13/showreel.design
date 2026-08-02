@@ -2,6 +2,7 @@
 title: Jurni AI
 brand: Jurni AI
 studio: Alex Socoloff
+authorAvatarMode: auto
 videoFileName: Jurni AI by Alex Socoloff .mp4
 publishDate: 2026-07-25
 featured: false
