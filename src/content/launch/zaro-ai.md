@@ -1,6 +1,7 @@
 ---
 title: Zaro Ai
 brand: Zaro Ai
+authorAvatarMode: auto
 videoFileName: Zaro Ai.mp4
 publishDate: 2026-07-25
 featured: false
