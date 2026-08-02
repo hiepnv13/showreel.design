@@ -1,6 +1,7 @@
 ---
 title: Tavus Magic Canvas
 brand: Tavus
+authorAvatarMode: auto
 videoFileName: Tavus Magic Canvas.mp4
 publishDate: 2026-07-25
 featured: false
