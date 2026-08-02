@@ -1,6 +1,7 @@
 ---
 title: Codex Micro
 brand: Worklouder
+authorAvatarMode: auto
 videoFileName: Codex Micro.mp4
 publishDate: 2026-07-23
 featured: false
