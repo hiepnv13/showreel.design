@@ -14,6 +14,7 @@ description: Not Real is an award-winning creative studio specializing in
   Microsoft, Google, and Spotify. Driven by strong production skills and a
   global team mindset, Not Real translates emerging visual trends into
   impactful, versatile communications.
+year: 2025
 quality: 1080p
 sourceUrl: https://notreal.tv/
 tags: []
