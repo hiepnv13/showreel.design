@@ -5,7 +5,7 @@ authorAvatarMode: auto
 category: Motion Graphics
 publishDate: 2026-08-12
 featured: false
-videoFileName: Microsoft - 2021-2025 - Reel by NotReal.mp4
+videoFileName: Microsoft by NotReal.mp4
 thumbnail: /placeholder.svg
 description: Not Real is an award-winning creative studio specializing in
   high-end visual content, 3D/CG animation, and motion design. Under the
