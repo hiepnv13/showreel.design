@@ -5,6 +5,7 @@ authorAvatarMode: auto
 category: Motion Graphics
 publishDate: 2026-08-12
 featured: false
+published: true
 videoFileName: Art Graft Reel 2026.mp4
 thumbnail: /placeholder.svg
 description: Art&Graft is an independent creative studio based in Bankside,
