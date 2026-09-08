@@ -221,6 +221,12 @@ collections:
         widget: boolean
         default: false
 
+      - label: "Published"
+        name: published
+        widget: boolean
+        default: false
+        hint: "Bật để hiện lên site. Draft = tắt"
+
       - label: "Video File Name"
         name: videoFileName
         widget: string

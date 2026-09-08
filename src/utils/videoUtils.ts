@@ -3,7 +3,7 @@ import { generateVideoUrl, generatePreviewUrl, generateVideoSources, generateThu
 
 // Get all videos from content collection
 export async function getAllVideos(): Promise<CollectionEntry<'videos'>[]> {
-  const videos = await getCollection('videos');
+  const videos = await getCollection('videos', ({ data }) => data.published !== false);
   return videos.map((video: any) => ({
     ...video,
     // Generate video URLs from fileName

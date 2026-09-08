@@ -29,6 +29,7 @@ const videosCollection = defineCollection({
     category: z.string(),
     tags: z.array(z.string()),
     featured: z.boolean().default(false),
+    published: z.boolean().default(true),
     publishDate: z.date(),
     description: z.string(),
     quality: z.enum(['4k', '1080p', '720p', 'preview']).default('1080p'),
