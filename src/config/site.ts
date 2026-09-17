@@ -25,10 +25,16 @@ export const PARTNERS = [
 
 export const BANNER_SLIDES = [
   {
-    video: 'https://video.showreel.design/Banner/Lotie%20MCP.mp4',
+    video: 'https://video.showreel.design/Banner/Elevenlab.mp4',
+    link:  'https://try.elevenlabs.io/srdesign',
+    logo:  'https://video.showreel.design/resource%20logo/Eleven%20Lab.png',
+    title: 'Reception by ElevenLabs',
+  },
+  {
+    video: 'https://video.showreel.design/Thumbnails/thumbnail_videos_Wednesday%20Studio%20Showreel.mp4',
     link:  'https://lottie.link/showreeldesign',
-    logo:  '/uploads/lottiefiles-logo.png',
-    title: 'Meet Lottie Creator: The AI-powered motion tool for designers.',
+    logo:  '/uploads/favicon_wednesdaystudio_co_64x64.png',
+    title: 'Wednesday Studio Showreel',
   },
   {
     video: 'https://video.showreel.design/Banner/Framer3.mp4',
