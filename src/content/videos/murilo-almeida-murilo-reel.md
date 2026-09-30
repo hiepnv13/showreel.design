@@ -5,7 +5,7 @@ authorAvatarMode: auto
 category: Branding & Identity
 publishDate: 2026-09-30
 featured: false
-published: false
+published: true
 videoFileName: murilo-almeida-murilo-reel.mp4
 thumbnail: /placeholder.svg
 description: >
