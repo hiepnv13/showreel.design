@@ -25,9 +25,12 @@ const totalPages = Math.ceil(allVideos.length / itemsPerPage);
 const startIndex = (currentPage - 1) * itemsPerPage;
 const displayVideos = allVideos.slice(startIndex, startIndex + itemsPerPage);
 
-// Ô quảng cáo chiếm vị trí thứ 6 trong lưới (ô cuối hàng 2 trên desktop 3 cột)
-const AD_POSITION = 5;
-const showAd = displayVideos.length > AD_POSITION;
+// Mỗi vị trí dùng ad unit riêng để AdSense báo cáo CTR tách biệt từng vị trí
+const GRID_ADS = [
+    { position: 5, slot: "3104050688", layoutKey: "-70+ed+2x-11-88" },
+    { position: 11, slot: "4002199383", layoutKey: "-72+ed+2x-11-88" },
+];
+const visibleAds = GRID_ADS.filter((ad) => displayVideos.length > ad.position);
 ---
 
 <main class="w-full bg-white video-grid px-4 sm:px-8 pt-8 pb-10">
@@ -35,16 +38,16 @@ const showAd = displayVideos.length > AD_POSITION;
         {
             displayVideos.map((video: any, index: number) => (
                 <>
-                    {index === AD_POSITION && (
+                    {GRID_ADS.filter((ad) => ad.position === index).map((ad) => (
                         <ins
                             class="adsbygoogle grid-ad"
                             style="display:block"
                             data-ad-format="fluid"
-                            data-ad-layout-key="-6y+ed+2o-1d-6b"
+                            data-ad-layout-key={ad.layoutKey}
                             data-ad-client="ca-pub-8636547799688984"
-                            data-ad-slot="3104050688"
+                            data-ad-slot={ad.slot}
                         />
-                    )}
+                    ))}
                     <VideoCard
                         title={video.data.title}
                         author={video.data.author}
@@ -72,11 +75,11 @@ const showAd = displayVideos.length > AD_POSITION;
     />
 </main>
 
-{showAd && (
-    <script is:inline>
-        (adsbygoogle = window.adsbygoogle || []).push({});
-    </script>
-)}
+{
+    visibleAds.map(() => (
+        <script is:inline>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+    ))
+}
 
 <style>
     /* Khi AdSense không có quảng cáo để hiển thị, thu ô lại để lưới không bị thủng */
