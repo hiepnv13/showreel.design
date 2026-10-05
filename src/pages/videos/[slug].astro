@@ -154,7 +154,7 @@ const jsonLd = {
     </div>
 
     <!-- Right sidebar: Explore More -->
-    <aside class="detail-sidebar">
+    <aside class="detail-sidebar" data-lenis-prevent>
       <ExploreSidebar
         categoryLabel={video.data.category}
         firstStyle={firstStyle}
@@ -172,7 +172,7 @@ const jsonLd = {
   /* ── Page layout ── */
   .detail-layout {
     display: grid;
-    grid-template-columns: 1fr 300px;
+    grid-template-columns: 1fr 340px;
     align-items: start;
   }
 
@@ -280,7 +280,7 @@ const jsonLd = {
   /* ── Responsive ── */
   @media (max-width: 1279px) {
     .detail-layout {
-      grid-template-columns: 1fr 260px;
+      grid-template-columns: 1fr 300px;
     }
 
     .info-header {

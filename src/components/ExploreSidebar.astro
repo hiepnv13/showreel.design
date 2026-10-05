@@ -129,8 +129,14 @@ const hasSidebar = byCategory.length > 0 || hasStyle || hasSound;
   .explore-tabs {
     display: flex;
     gap: 6px;
-    flex-wrap: wrap;
+    overflow-x: auto;
     margin-bottom: 20px;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .explore-tabs::-webkit-scrollbar {
+    display: none;
   }
 
   .etab {
@@ -143,6 +149,7 @@ const hasSidebar = byCategory.length > 0 || hasStyle || hasSound;
     cursor: pointer;
     transition: background 0.15s, color 0.15s, border-color 0.15s;
     white-space: nowrap;
+    flex-shrink: 0;
   }
 
   .etab.active {
