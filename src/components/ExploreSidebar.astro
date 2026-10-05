@@ -1,0 +1,168 @@
+---
+import VideoCard from "./VideoCard.astro";
+import { getTaxonomyLabel } from "../config/taxonomies";
+
+interface Props {
+  categoryLabel: string;
+  firstStyle?: string;
+  firstSound?: string;
+  byCategory: any[];
+  byStyle: any[];
+  bySound: any[];
+}
+
+const { categoryLabel, firstStyle, firstSound, byCategory, byStyle, bySound } = Astro.props;
+
+const styleLabel = firstStyle ? getTaxonomyLabel('styles', firstStyle) : undefined;
+const soundLabel = firstSound ? getTaxonomyLabel('soundMusic', firstSound) : undefined;
+
+const hasStyle = !!(styleLabel && byStyle.length > 0);
+const hasSound = !!(soundLabel && bySound.length > 0);
+const hasSidebar = byCategory.length > 0 || hasStyle || hasSound;
+---
+
+{hasSidebar && (
+  <div class="explore-wrap">
+    <p class="explore-label">Explore More</p>
+
+    <div class="explore-tabs" role="tablist">
+      <button class="etab active" data-etab="cat" role="tab" aria-selected="true">
+        {categoryLabel}
+      </button>
+      {hasStyle && (
+        <button class="etab" data-etab="style" role="tab" aria-selected="false">
+          {styleLabel}
+        </button>
+      )}
+      {hasSound && (
+        <button class="etab" data-etab="sound" role="tab" aria-selected="false">
+          {soundLabel}
+        </button>
+      )}
+    </div>
+
+    <div class="epanel" data-epanel="cat">
+      {byCategory.map((v: any) => (
+        <VideoCard
+          title={v.data.title}
+          author={v.data.author}
+          authorAvatarMode={v.data.authorAvatarMode}
+          authorAvatar={v.data.authorAvatar}
+          sourceUrl={v.data.sourceUrl}
+          thumbnail={v.data.thumbnail}
+          videoUrl={(v.data as any).thumbnailUrl}
+          slug={v.id}
+          sidebar={true}
+        />
+      ))}
+    </div>
+
+    {hasStyle && (
+      <div class="epanel epanel-hidden" data-epanel="style">
+        {byStyle.map((v: any) => (
+          <VideoCard
+            title={v.data.title}
+            author={v.data.author}
+            authorAvatarMode={v.data.authorAvatarMode}
+            authorAvatar={v.data.authorAvatar}
+            sourceUrl={v.data.sourceUrl}
+            thumbnail={v.data.thumbnail}
+            videoUrl={(v.data as any).thumbnailUrl}
+            slug={v.id}
+            sidebar={true}
+          />
+        ))}
+      </div>
+    )}
+
+    {hasSound && (
+      <div class="epanel epanel-hidden" data-epanel="sound">
+        {bySound.map((v: any) => (
+          <VideoCard
+            title={v.data.title}
+            author={v.data.author}
+            authorAvatarMode={v.data.authorAvatarMode}
+            authorAvatar={v.data.authorAvatar}
+            sourceUrl={v.data.sourceUrl}
+            thumbnail={v.data.thumbnail}
+            videoUrl={(v.data as any).thumbnailUrl}
+            slug={v.id}
+            sidebar={true}
+          />
+        ))}
+      </div>
+    )}
+  </div>
+)}
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const tabs = document.querySelectorAll<HTMLButtonElement>('.etab');
+    const panels = document.querySelectorAll<HTMLElement>('.epanel');
+
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        const target = (tab as HTMLElement).dataset.etab;
+        tabs.forEach(t => { t.classList.remove('active'); t.setAttribute('aria-selected', 'false'); });
+        panels.forEach(p => p.classList.add('epanel-hidden'));
+        tab.classList.add('active');
+        tab.setAttribute('aria-selected', 'true');
+        document.querySelector<HTMLElement>(`[data-epanel="${target}"]`)?.classList.remove('epanel-hidden');
+      });
+    });
+  });
+</script>
+
+<style>
+  .explore-wrap {
+    padding: 24px 20px 40px;
+  }
+
+  .explore-label {
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #bbb;
+    margin-bottom: 14px;
+  }
+
+  .explore-tabs {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+  }
+
+  .etab {
+    font-size: 11px;
+    padding: 5px 10px;
+    border-radius: 4px;
+    border: 1px solid #e8e8e8;
+    background: transparent;
+    color: #888;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+    white-space: nowrap;
+  }
+
+  .etab.active {
+    background: #111;
+    color: #fff;
+    border-color: #111;
+  }
+
+  .etab:not(.active):hover {
+    border-color: #999;
+    color: #444;
+  }
+
+  .epanel {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .epanel-hidden {
+    display: none;
+  }
+</style>

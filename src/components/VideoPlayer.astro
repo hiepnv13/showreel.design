@@ -175,7 +175,8 @@ const hasTags = tags && tags.length > 0;
 
   .video-player-container {
     width: 100%;
-    height: calc(100vh - 140px);
+    aspect-ratio: 16 / 9;
+    max-height: 75vh;
     background: #000;
     position: relative;
     display: flex;
@@ -595,8 +596,7 @@ const hasTags = tags && tags.length > 0;
 
   @media (max-width: 1023px) {
     .video-player-container {
-      height: 56vw;
-      min-height: 260px;
+      max-height: none;
     }
   }
 
@@ -613,11 +613,6 @@ const hasTags = tags && tags.length > 0;
     .c-tags-row .c-val { width: 160px; }
 
     .volume-container { display: none; }
-
-    .video-player-container {
-      height: 56vw;
-      min-height: 220px;
-    }
 
     .vp-title-text {
       font-size: 14px;

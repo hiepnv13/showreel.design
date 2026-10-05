@@ -14,9 +14,10 @@ export interface Props {
   industries?: string[];
   styles?: string[];
   soundMusic?: string[];
+  sidebar?: boolean;
 }
 
-const { title, author, authorAvatarMode, authorAvatar, sourceUrl, thumbnail, videoUrl, slug, href, industries = [], styles = [], soundMusic = [] } = Astro.props;
+const { title, author, authorAvatarMode, authorAvatar, sourceUrl, thumbnail, videoUrl, slug, href, industries = [], styles = [], soundMusic = [], sidebar = false } = Astro.props;
 
 function getFaviconUrl(url: string): string | undefined {
   try {
@@ -56,7 +57,7 @@ const chips = [
 ].filter(Boolean) as string[];
 ---
 
-<a href={href ?? (slug ? `/videos/${slug}` : '#')} class="video-card group cursor-pointer block" data-video-url={videoUrl} data-video-taxonomies={taxonomyTags}>
+<a href={href ?? (slug ? `/videos/${slug}` : '#')} class="video-card group cursor-pointer block" data-video-url={videoUrl} data-video-taxonomies={taxonomyTags} data-sidebar={sidebar ? 'true' : undefined}>
 
   <!-- Thumbnail frame: 16:9, no bg, no padding -->
   <div class="card-frame">
@@ -175,9 +176,43 @@ const chips = [
       currentlyPlayingVideos.delete(video);
     }
 
+    // Sidebar cards: load immediately, show frame ~9.5s, play only on hover
+    function setupSidebarCard(card) {
+      const video = card.querySelector('.video-element');
+      if (!video) return;
+
+      const dataSrc = video.getAttribute('data-src');
+      if (dataSrc) {
+        const source = video.querySelector('source');
+        if (source) source.src = dataSrc;
+        video.src = dataSrc;
+      }
+      video.preload = 'metadata';
+      video.load();
+
+      video.addEventListener('loadedmetadata', () => {
+        video.currentTime = video.duration > 0 ? Math.min(9.5, video.duration - 0.1) : 0;
+        video.pause();
+        video.style.opacity = '1';
+        card.querySelector('.card-frame')?.classList.add('card-loaded');
+      }, { once: true });
+
+      if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        card.addEventListener('mouseenter', () => { video.play().catch(() => {}); });
+        card.addEventListener('mouseleave', () => {
+          video.pause();
+          if (video.duration > 0) video.currentTime = Math.min(9.5, video.duration - 0.1);
+        });
+      }
+    }
+
+    document.querySelectorAll('.video-card[data-sidebar="true"]').forEach(card => {
+      setupSidebarCard(card);
+    });
+
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
-    document.querySelectorAll('.video-card').forEach(card => {
+    document.querySelectorAll('.video-card:not([data-sidebar="true"])').forEach(card => {
       loadObserver.observe(card);
     });
 

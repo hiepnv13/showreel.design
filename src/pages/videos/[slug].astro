@@ -1,23 +1,21 @@
 ---
-import { getCollection, type CollectionEntry } from "astro:content";
-import { getAllVideos, getRelatedVideos, generateSlug } from "../../utils/videoUtils";
+import { type CollectionEntry } from "astro:content";
+import { getAllVideos, getRelatedVideos, getVideosByStyle, getVideosBySound, generateSlug } from "../../utils/videoUtils";
 import Layout from "../../layouts/Layout.astro";
 import { OG_BASE } from "../../config/site";
 import FilterBar from "../../components/FilterBar.astro";
 import VideoPlayer from "../../components/VideoPlayer.astro";
 import ProjectDetails from "../../components/ProjectDetails.astro";
-import RelatedVideos from "../../components/RelatedVideos.astro";
-import type { GetStaticPaths } from "astro";
-
+import ExploreSidebar from "../../components/ExploreSidebar.astro";
 export const prerender = true;
 
-export const getStaticPaths: GetStaticPaths = async () => {
+export async function getStaticPaths() {
   const videos = await getAllVideos();
   return videos.map((video) => ({
     params: { slug: video.id },
-    props: { video },
+    props: { video: video as Props['video'] },
   }));
-};
+}
 
 interface Props {
   video: CollectionEntry<"videos"> & {
@@ -33,7 +31,18 @@ interface Props {
 
 const { video }: Props = Astro.props;
 
-const relatedVideos = await getRelatedVideos(video.id, video.data.category, 6);
+// Related videos: 3 groups fetched at build time
+const relatedByCategory = await getRelatedVideos(video.id, video.data.category, 6);
+
+const firstStyle = video.data.styles?.[0];
+const relatedByStyle = firstStyle
+  ? (await getVideosByStyle(firstStyle)).filter((v: any) => v.id !== video.id).slice(0, 6)
+  : [];
+
+const firstSound = (video.data.soundMusic as string[] | undefined)?.find((s) => s !== 'no-sound');
+const relatedBySound = firstSound
+  ? (await getVideosBySound(firstSound)).filter((v: any) => v.id !== video.id).slice(0, 6)
+  : [];
 
 const breadcrumb = [
   { label: video.data.category, href: `/category/${generateSlug(video.data.category)}` },
@@ -88,87 +97,128 @@ const jsonLd = {
 
   <FilterBar breadcrumb={breadcrumb} />
 
-  <VideoPlayer
-    videoUrl={video.data.videoUrl}
-    videoFileName={video.data.videoFileName}
-    title={video.data.title}
-    author={video.data.author}
-    category={video.data.category}
-    year={video.data.year}
-    industries={video.data.industries}
-    styles={video.data.styles}
-    soundMusic={video.data.soundMusic}
-    tags={video.data.tags}
-    sourceUrl={video.data.sourceUrl}
-  />
+  <div class="detail-layout">
 
-  <div class="video-info">
-    <div class="info-header">
-      <div class="info-title-area">
-        <h1 class="info-title">{video.data.title}</h1>
-        <p class="info-by">
-          {video.data.sourceUrl ? (
-            <a href={withRef(video.data.sourceUrl!)} target="_blank" rel="noopener noreferrer" class="info-author-link">{video.data.author}</a>
-          ) : (
-            <span class="info-author-link" style="border-color:transparent;cursor:default;">{video.data.author}</span>
-          )}
-        </p>
-        <p class="info-desc">{video.data.description}</p>
-      </div>
-
-      <ProjectDetails
-        year={video.data.year}
+    <!-- Center: video player + info -->
+    <div class="detail-main">
+      <VideoPlayer
+        videoUrl={video.data.videoUrl}
+        videoFileName={video.data.videoFileName}
+        title={video.data.title}
+        author={video.data.author}
         category={video.data.category}
-        categorySlug={generateSlug(video.data.category)}
+        year={video.data.year}
         industries={video.data.industries}
         styles={video.data.styles}
         soundMusic={video.data.soundMusic}
+        tags={video.data.tags}
         sourceUrl={video.data.sourceUrl}
       />
+
+      <div class="video-info">
+        <div class="info-header">
+          <div class="info-title-area">
+            <h1 class="info-title">{video.data.title}</h1>
+            <p class="info-by">
+              {video.data.sourceUrl ? (
+                <a href={withRef(video.data.sourceUrl!)} target="_blank" rel="noopener noreferrer" class="info-author-link">{video.data.author}</a>
+              ) : (
+                <span class="info-author-link" style="border-color:transparent;cursor:default;">{video.data.author}</span>
+              )}
+            </p>
+            <p class="info-desc">{video.data.description}</p>
+          </div>
+
+          <ProjectDetails
+            year={video.data.year}
+            category={video.data.category}
+            categorySlug={generateSlug(video.data.category)}
+            industries={video.data.industries}
+            styles={video.data.styles}
+            soundMusic={video.data.soundMusic}
+            sourceUrl={video.data.sourceUrl}
+          />
+        </div>
+
+        {hasTags && (
+          <div class="info-tags">
+            <span class="tags-label">Tags</span>
+            <div class="tags-list">
+              {video.data.tags.map((tag: string) => (
+                <a href={`/tag/${generateSlug(tag)}`} class="tag-pill">{tag}</a>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
     </div>
 
-    {hasTags && (
-      <div class="info-tags">
-        <span class="tags-label">Tags</span>
-        <div class="tags-list">
-          {video.data.tags.map((tag: string) => (
-            <a href={`/tag/${generateSlug(tag)}`} class="tag-pill">{tag}</a>
-          ))}
-        </div>
-      </div>
-    )}
+    <!-- Right sidebar: Explore More -->
+    <aside class="detail-sidebar">
+      <ExploreSidebar
+        categoryLabel={video.data.category}
+        firstStyle={firstStyle}
+        firstSound={firstSound}
+        byCategory={relatedByCategory}
+        byStyle={relatedByStyle as any[]}
+        bySound={relatedBySound as any[]}
+      />
+    </aside>
+
   </div>
-
-  <RelatedVideos videos={relatedVideos} />
-
 </Layout>
 
 <style>
+  /* ── Page layout ── */
+  .detail-layout {
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    align-items: start;
+  }
+
+  .detail-main {
+    min-width: 0;
+  }
+
+  .detail-sidebar {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    border-left: 1px solid #f0f0f0;
+    /* Thin scrollbar */
+    scrollbar-width: thin;
+    scrollbar-color: #e0e0e0 transparent;
+  }
+
+  .detail-sidebar::-webkit-scrollbar { width: 4px; }
+  .detail-sidebar::-webkit-scrollbar-track { background: transparent; }
+  .detail-sidebar::-webkit-scrollbar-thumb { background: #e0e0e0; border-radius: 2px; }
+
+  /* ── Info section ── */
   .video-info {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 64px 80px 40px;
+    padding: 48px 40px 40px;
   }
 
   .info-header {
     display: grid;
-    grid-template-columns: 1fr 360px;
-    gap: 80px;
-    padding-bottom: 48px;
+    grid-template-columns: 1fr 280px;
+    gap: 48px;
+    padding-bottom: 32px;
   }
 
   .info-title {
-    font-size: 34px;
+    font-size: 28px;
     line-height: 1.2;
     letter-spacing: -0.5px;
     color: #111;
-    margin-bottom: 12px;
+    margin-bottom: 10px;
   }
 
   .info-by {
     font-size: 13px;
     color: #aaa;
-    margin-bottom: 24px;
+    margin-bottom: 20px;
   }
 
   .info-author-link {
@@ -184,7 +234,7 @@ const jsonLd = {
   }
 
   .info-desc {
-    font-size: 15px;
+    font-size: 14px;
     line-height: 1.75;
     color: #888;
   }
@@ -193,8 +243,8 @@ const jsonLd = {
     display: flex;
     align-items: center;
     gap: 20px;
-    padding: 28px 0;
-    border-bottom: 1px solid #f0f0f0;
+    padding: 24px 0;
+    border-top: 1px solid #f0f0f0;
   }
 
   .tags-label {
@@ -227,14 +277,37 @@ const jsonLd = {
     color: #111;
   }
 
+  /* ── Responsive ── */
+  @media (max-width: 1279px) {
+    .detail-layout {
+      grid-template-columns: 1fr 260px;
+    }
+
+    .info-header {
+      grid-template-columns: 1fr 240px;
+      gap: 36px;
+    }
+  }
+
   @media (max-width: 1023px) {
+    .detail-layout {
+      grid-template-columns: 1fr;
+    }
+
+    .detail-sidebar {
+      position: static;
+      height: auto;
+      border-left: none;
+      border-top: 1px solid #f0f0f0;
+    }
+
     .video-info {
-      padding: 40px 24px 32px;
+      padding: 36px 24px 28px;
     }
 
     .info-header {
       grid-template-columns: 1fr;
-      gap: 40px;
+      gap: 36px;
     }
   }
 
@@ -245,6 +318,10 @@ const jsonLd = {
 
     .info-title {
       font-size: 22px;
+    }
+
+    .info-header {
+      gap: 28px;
     }
   }
 </style>
