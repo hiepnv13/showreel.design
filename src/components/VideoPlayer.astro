@@ -14,9 +14,10 @@ interface Props {
   soundMusic?: string[];
   tags?: string[];
   sourceUrl?: string;
+  posterUrl?: string;
 }
 
-const { videoUrl, videoFileName, title, author, category, year, industries, styles, soundMusic, tags, sourceUrl } = Astro.props;
+const { videoUrl, videoFileName, title, author, category, year, industries, styles, soundMusic, tags, sourceUrl, posterUrl } = Astro.props;
 
 function formatTaxonomyValue(values: string[] | undefined): string {
   if (!values || values.length === 0) return "";
@@ -47,6 +48,7 @@ const hasTags = tags && tags.length > 0;
       autoplay
       muted
       playsinline
+      poster={posterUrl}
     >
       <source src={videoUrl} type="video/mp4" />
       <source src={`/videos/${encodeURIComponent(videoFileName)}`} type="video/mp4" />

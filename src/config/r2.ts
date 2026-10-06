@@ -115,6 +115,15 @@ export function generateThumbnailUrl(fileName: string): string {
 }
 
 /**
+ * Generate poster image URL from filename
+ * Posters stored in /Posters folder: poster_videos_{baseName}.jpg
+ */
+export function generatePosterUrl(fileName: string): string {
+  const baseName = fileName.replace(/\.[^/.]+$/, '');
+  return `${R2_CONFIG.BASE_URL}/Posters/${encodeURIComponent(`poster_videos_${baseName}.jpg`)}`;
+}
+
+/**
  * Generate launch video URL
  * Videos stored in /launch folder
  */

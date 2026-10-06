@@ -9,6 +9,7 @@ export interface Props {
   sourceUrl?: string;
   thumbnail: string;
   videoUrl?: string;
+  posterUrl?: string;
   slug?: string;
   href?: string;
   industries?: string[];
@@ -17,7 +18,7 @@ export interface Props {
   sidebar?: boolean;
 }
 
-const { title, author, authorAvatarMode, authorAvatar, sourceUrl, thumbnail, videoUrl, slug, href, industries = [], styles = [], soundMusic = [], sidebar = false } = Astro.props;
+const { title, author, authorAvatarMode, authorAvatar, sourceUrl, thumbnail, videoUrl, posterUrl, slug, href, industries = [], styles = [], soundMusic = [], sidebar = false } = Astro.props;
 
 function getFaviconUrl(url: string): string | undefined {
   try {
@@ -62,16 +63,28 @@ const chips = [
   <!-- Thumbnail frame: 16:9, no bg, no padding -->
   <div class="card-frame">
     {videoUrl ? (
-      <video
-        class="video-element w-full h-full object-cover opacity-0 transition-opacity duration-500"
-        muted
-        loop
-        playsinline
-        preload="none"
-        data-src={videoUrl}
-      >
-        <source data-src={videoUrl} type="video/mp4" />
-      </video>
+      <>
+        {posterUrl && (
+          <img
+            src={posterUrl}
+            alt={title}
+            class="card-poster"
+            loading="lazy"
+            width="640"
+            height="360"
+          />
+        )}
+        <video
+          class="video-element w-full h-full object-cover opacity-0 transition-opacity duration-500"
+          muted
+          loop
+          playsinline
+          preload="none"
+          data-src={videoUrl}
+        >
+          <source data-src={videoUrl} type="video/mp4" />
+        </video>
+      </>
     ) : (
       <img
         src={thumbnail}
@@ -176,33 +189,52 @@ const chips = [
       currentlyPlayingVideos.delete(video);
     }
 
-    // Sidebar cards: load immediately, show frame ~9.5s, play only on hover
+    // Sidebar cards: show poster, defer video load until hover
     function setupSidebarCard(card) {
       const video = card.querySelector('.video-element');
       if (!video) return;
+      const poster = card.querySelector('.card-poster');
 
-      const dataSrc = video.getAttribute('data-src');
-      if (dataSrc) {
-        const source = video.querySelector('source');
-        if (source) source.src = dataSrc;
-        video.src = dataSrc;
-      }
-      video.preload = 'metadata';
-      video.load();
-
-      video.addEventListener('loadedmetadata', () => {
-        video.currentTime = video.duration > 0 ? Math.min(9.5, video.duration - 0.1) : 0;
-        video.pause();
-        video.style.opacity = '1';
+      if (poster) {
         card.querySelector('.card-frame')?.classList.add('card-loaded');
-      }, { once: true });
+      }
+
+      let videoReady = false;
+
+      function showVideo() {
+        video.style.opacity = '1';
+        if (poster) poster.style.opacity = '0';
+        video.play().catch(() => {});
+      }
+
+      function onHover() {
+        if (videoReady) {
+          showVideo();
+          return;
+        }
+        const dataSrc = video.getAttribute('data-src');
+        if (dataSrc) {
+          const source = video.querySelector('source');
+          if (source) source.src = dataSrc;
+          video.src = dataSrc;
+        }
+        video.preload = 'auto';
+        video.load();
+        video.addEventListener('canplay', () => {
+          videoReady = true;
+          showVideo();
+        }, { once: true });
+      }
+
+      function onLeave() {
+        video.pause();
+        video.style.opacity = '0';
+        if (poster) poster.style.opacity = '1';
+      }
 
       if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-        card.addEventListener('mouseenter', () => { video.play().catch(() => {}); });
-        card.addEventListener('mouseleave', () => {
-          video.pause();
-          if (video.duration > 0) video.currentTime = Math.min(9.5, video.duration - 0.1);
-        });
+        card.addEventListener('mouseenter', onHover);
+        card.addEventListener('mouseleave', onLeave);
       }
     }
 
@@ -234,6 +266,26 @@ const chips = [
     border-radius: 8px;
     overflow: hidden;
     background: #d0d0d0;
+  }
+
+  .card-poster {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 1;
+    transition: opacity 0.3s ease;
+  }
+
+  .card-frame.card-loaded .card-poster {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  [data-sidebar="true"] .card-frame.card-loaded .card-poster {
+    opacity: 1;
+    pointer-events: auto;
   }
 
   /* Shimmer loading state */

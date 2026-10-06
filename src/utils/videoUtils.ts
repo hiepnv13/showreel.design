@@ -1,5 +1,5 @@
 import { getCollection, type CollectionEntry } from 'astro:content';
-import { generateVideoUrl, generatePreviewUrl, generateVideoSources, generateThumbnailUrl, generateLaunchVideoUrl, generateLaunchThumbnailUrl } from '../config/r2';
+import { generateVideoUrl, generatePreviewUrl, generateVideoSources, generateThumbnailUrl, generatePosterUrl, generateLaunchVideoUrl, generateLaunchThumbnailUrl } from '../config/r2';
 
 // Get all videos from content collection
 export async function getAllVideos(): Promise<CollectionEntry<'videos'>[]> {
@@ -11,6 +11,7 @@ export async function getAllVideos(): Promise<CollectionEntry<'videos'>[]> {
       ...video.data,
       videoUrl: generateVideoUrl(video.data.videoFileName, video.data.quality),
       thumbnailUrl: generateThumbnailUrl(video.data.videoFileName),
+      posterUrl: generatePosterUrl(video.data.videoFileName),
       previewUrl: generatePreviewUrl(video.data.videoFileName),
       videoSources: generateVideoSources(video.data.videoFileName, video.data.quality)
     }

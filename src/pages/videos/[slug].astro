@@ -22,6 +22,7 @@ interface Props {
     data: CollectionEntry<"videos">["data"] & {
       videoUrl: string;
       thumbnailUrl: string;
+      posterUrl: string;
       previewUrl: string;
       videoSources: { src: string; type: string }[];
       videoFileName: string;
@@ -113,6 +114,7 @@ const jsonLd = {
         soundMusic={video.data.soundMusic}
         tags={video.data.tags}
         sourceUrl={video.data.sourceUrl}
+        posterUrl={video.data.posterUrl}
       />
 
       <div class="video-info">

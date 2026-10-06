@@ -96,6 +96,7 @@ const allTags = await getAllTags();
               author={video.data.author}
               thumbnail={video.data.thumbnail}
               videoUrl={video.data.videoUrl}
+              posterUrl={(video.data as any).posterUrl}
               category={video.data.category}
               slug={video.id}
             />
