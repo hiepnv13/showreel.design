@@ -21,6 +21,7 @@ const {
 } = Astro.props;
 
 const resolvedUrl = canonicalUrl ?? Astro.url.href;
+const isAdmin = Astro.url.pathname.startsWith('/admin');
 ---
 
 <!DOCTYPE html>
@@ -68,19 +69,22 @@ const resolvedUrl = canonicalUrl ?? Astro.url.href;
         </script>
       </>
     )}
-    <!-- Netlify Identity: redirect from /admin after login -->
-    <script is:inline src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
-    <script is:inline>
-      if (window.netlifyIdentity) {
-        window.netlifyIdentity.on('init', function(user) {
-          if (!user) {
-            window.netlifyIdentity.on('login', function() {
-              document.location.href = '/admin/';
+    {isAdmin && (
+      <>
+        <script is:inline src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+        <script is:inline>
+          if (window.netlifyIdentity) {
+            window.netlifyIdentity.on('init', function(user) {
+              if (!user) {
+                window.netlifyIdentity.on('login', function() {
+                  document.location.href = '/admin/';
+                });
+              }
             });
           }
-        });
-      }
-    </script>
+        </script>
+      </>
+    )}
   </head>
   <body>
     <div class="app-layout">
