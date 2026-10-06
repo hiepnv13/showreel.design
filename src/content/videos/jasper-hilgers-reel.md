@@ -5,6 +5,7 @@ authorAvatarMode: auto
 category: Motion Graphics
 publishDate: 2026-08-12
 featured: false
+published: true
 videoFileName: Jasper Hilgers - Reel.mp4
 thumbnail: /placeholder.svg
 description: Jasper Hilgers is a Toronto-based freelance 2D animator and
@@ -13,7 +14,7 @@ description: Jasper Hilgers is a Toronto-based freelance 2D animator and
   projects at studios like Oddfellows, Buck Design, and Polyester Studio, Jasper
   combines technical problem-solving with artistic detail to bring high-impact
   designs to life.
-year: 2030
+year: 2026
 quality: 1080p
 sourceUrl: http://jasperhilgers.com/
 tags: []
