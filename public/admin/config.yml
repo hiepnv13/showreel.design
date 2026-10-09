@@ -13,6 +13,88 @@ slug:
   sanitize_replacement: "-"
 
 collections:
+  - name: "resources"
+    label: "Resources"
+    label_singular: "Resource"
+    folder: "src/content/resources"
+    create: true
+    delete: true
+    slug: "{{slug}}"
+    identifier_field: name
+    summary: "{{name}} — {{type}}"
+    sortable_fields: ["name", "type", "order"]
+    view_filters:
+      - label: "Featured"
+        field: featured
+        pattern: true
+      - label: "Tools"
+        field: type
+        pattern: "Tools"
+      - label: "Courses"
+        field: type
+        pattern: "Courses"
+      - label: "Assets"
+        field: type
+        pattern: "Assets"
+    fields:
+      - label: "Name"
+        name: name
+        widget: string
+        hint: "Tên tool / khoá học / asset"
+
+      - label: "Type"
+        name: type
+        widget: select
+        options:
+          - "Tools"
+          - "Courses"
+          - "Assets"
+
+      - label: "Description"
+        name: description
+        widget: text
+        hint: "Mô tả ngắn về resource"
+
+      - label: "Pricing"
+        name: pricing
+        widget: string
+        hint: "Ví dụ: Free, $9.99/month, $999 one-time"
+
+      - label: "Link"
+        name: href
+        widget: string
+        hint: "URL đến trang resource (có thể kèm affiliate ref)"
+
+      - label: "Logo URL"
+        name: logo
+        widget: string
+        required: false
+        hint: "URL ảnh logo (paste từ R2)"
+
+      - label: "Banner URL"
+        name: banner
+        widget: string
+        required: false
+        hint: "URL ảnh banner (paste từ R2)"
+
+      - label: "Tags"
+        name: tags
+        widget: list
+        default: []
+        hint: "Nhập từng tag rồi Enter (VD: Free, 3D, AI Video)"
+
+      - label: "Featured"
+        name: featured
+        widget: boolean
+        default: false
+
+      - label: "Order"
+        name: order
+        widget: number
+        value_type: int
+        default: 99
+        hint: "Số nhỏ = hiện trước"
+
   - name: "launch"
     label: "Launch Videos"
     label_singular: "Launch Video"
