@@ -1,7 +1,7 @@
 ---
 title: Billy Mpetha 2D Animation Reel
 author: Billy Mpetha
-authorAvatarMode: initials
+authorAvatarMode: auto
 category: Motion Graphics
 publishDate: 2026-10-21
 featured: false
@@ -16,7 +16,7 @@ description: >
   voice defined by precise linework and dynamic compositional choices.
 year: 2026
 quality: 1080p
-sourceUrl: ""
+sourceUrl: https://billympetha.co.uk/
 tags: []
 industries:
   - entertainment-media
