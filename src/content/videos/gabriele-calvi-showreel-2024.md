@@ -17,20 +17,7 @@ description: >
 year: 2025
 quality: 1080p
 sourceUrl: https://www.instagram.com/gbrl.c/
-tags:
-  - direction
-  - after effects
-  - animation
-  - 2d animation
-  - motion design
-  - motion graphics
-  - vector illustration
-  - art direction
-  - animation direction
-  - showreel
-  - abstract
-  - character design
-  - character animation
+tags: []
 industries:
   - advertising-commercial
   - entertainment-media
